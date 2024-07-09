@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre81
+// @version      3.4.1-pre82
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -255,7 +255,7 @@ let attemptedInjection = false;
     const tp = {}; // <-- tp = tweakpane
     // blank variables
     let ss = {};
-    let msgElement, botBlacklist, initialisedCustomSFX, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -265,6 +265,8 @@ let attemptedInjection = false;
     let isLeftButtonDown = false;
     let isRightButtonDown = false;
     let configNotSet = true;
+    let nameTextures = {};
+    let amountVisible = 0;
     const weaponArray = { //this could be done differently but i cba
         eggk47: 0,
         scrambler: 1,
@@ -895,6 +897,7 @@ sniping and someone sneaks up on you
             initModule({ location: tp.listsTab.pages[0], title: "Whitelist", storeAs: "whitelist", defaultValue: "User-1, User-2", });
             initFolder({ location: tp.listsTab.pages[0], title: "Whitelist (Target Only) Options", storeAs: "whitelistFolder", });
                 initModule({ location: tp.whitelistFolder, title: "WAimbot", storeAs: "enableWhitelistAimbot", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.whitelistFolder, title: "When None Visible", storeAs: "enableWhenNoneVisible", bindLocation: tp.listsTab.pages[1], });
                 initModule({ location: tp.whitelistFolder, title: "WESP", storeAs: "enableWhitelistTracers", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
                 initModule({ location: tp.whitelistFolder, title: "WESPType", storeAs: "whitelistESPType", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Only Include", value: "onlyinclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "onlyinclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true]], });
                 initModule({ location: tp.whitelistFolder, title: "WHighlight", storeAs: "whitelistColor", defaultValue: "#e80aac", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true], ["whitelistESPType", "highlight"]], });
@@ -1578,6 +1581,8 @@ debug mode).`},
         tp.botTabs.pages[1].addSeparator();
         initModule({ location: tp.botTabs.pages[1], title: "Don'tKillMe", storeAs: "botNoKillMe", botParam: true, });
         initModule({ location: tp.botTabs.pages[1], title: "Don'tKillBot", storeAs: "botNoKillBots", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "FollowMe", storeAs: "botFollowMe", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "FollowBots", storeAs: "botFollowBots", botParam: true, });
         tp.botTabs.pages[1].addSeparator();
         initModule({ location: tp.botTabs.pages[1], title: "Leave Games", storeAs: "leaveBots", button: "LEAVE", clickFunction: function () { broadcastToBots("leave") }, });
         initModule({ location: tp.botTabs.pages[1], title: "Leave Empty", storeAs: "leaveEmptyBots", botParam: true, });
@@ -2972,8 +2977,13 @@ z-index: 999999;
         } else {
             let oldBlacklist = botBlacklist;
             botBlacklist = "";
+            let oldWhitelist = botWhitelist;
+            botWhitelist = "";
             if (extract("botNoKillMe")) {
                 botBlacklist += botBlacklist + ((ss && ss.MYPLAYER && ss.MYPLAYER.uniqueId) || "value_undefined") + ",";
+            };
+            if (extract("botFollowMe")) {
+                botWhitelist += botWhitelist + ((ss && ss.MYPLAYER && ss.MYPLAYER.uniqueId) || "value_undefined") + ",";
             };
             monitorObjects.botOnline = "";
             amountOnline = 0;
@@ -2990,6 +3000,9 @@ z-index: 999999;
                     if (extract("botNoKillBots") && data.uniqueId !== "value_undefined") {
                         botBlacklist += data.uniqueId + ",";
                     };
+                    if (extract("botFollowBots") && data.uniqueId !== "value_undefined") {
+                        botWhitelist += data.uniqueId + ",";
+                    };
                     if ((data.timecode + 10000) < Date.now()) { //give up on this bot lmao
                         delete botsDict[botID];
                     } else if ((data.timecode + 4000) < Date.now()) { //maybe it will come back
@@ -3001,6 +3014,10 @@ z-index: 999999;
             };
             if (oldBlacklist !== botBlacklist) {
                 log("old:", oldBlacklist, "new:", botBlacklist);
+                updateBotParams();
+            };
+            if (oldWhitelist !== botWhitelist) {
+                log("old:", oldWhitelist, "new:", botWhitelist);
                 updateBotParams();
             };
             monitorObjects.botOnline = ((amountOnline) + " bots online.") + monitorObjects.botOnline;
@@ -4261,9 +4278,9 @@ z-index: 999999;
                 if (extract("autoEZ")) sendChatMessage(`imagine dying ${DEAD.name}, couldn't be me`);
             };
         });
-        createAnonFunction('interceptDrawTextOnNameTexture', (nameTexture, args) => {
-            // log(nameTexture);
-            ss.nameTexture = [nameTexture, [args]]; log(ss.nameTexture);
+        createAnonFunction('interceptDrawTextOnNameTexture', (nameTexture, args, player) => {
+            // log("balls", args[0], player, nameTexture, [args]);
+            nameTextures[args[0]] = [nameTexture, [args]];
         });
         createAnonFunction('interceptAudio', function (name, panner, somethingelse) {
             // log(0, name, panner, somethingelse);
@@ -4664,13 +4681,14 @@ z-index: 999999;
             //intercept player names before they are censored
             modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
             //intercept player names before they are censored
-            modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments)},`);
+            modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments, this.${H.player_})},`);
             //intercept signedIn function
             modifyJS(`if(this.isAnonymous`, `window.${functionNames.interceptSignedIn}(arguments);if(this.isAnonymous`);
 
             modifyJS(`="SPACE",`,`="SPACE",window.${functionNames.shouldInputSpace}()&&`)
 
             modifyJS(/tp-/g, '');
+            modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
 
             log(H);
             log(js);
@@ -4776,6 +4794,10 @@ z-index: 999999;
         //blacklist stuff
         addParam("blacklist", botBlacklist);
         addParam("enableBlacklistAimbot", true);
+        //whitelist stuff
+        addParam("whitelist", botWhitelist);
+        addParam("enableWhitelistAimbot", true);
+        addParam("enableWhenNoneVisible", true);
         //do aimbot
         addParam("aimbotTargetMode", 1);
         addParam("aimbotVisibilityMode", 1);
@@ -6075,13 +6097,13 @@ z-index: 999999;
 
                 let didAimbot
                 const candidates = [];
-                let amountVisible = 0;
+                amountVisible = 0;
 
                 ss.PLAYERS.forEach(player => { //iterate over all players to filter out players that we definitely wont target, and also calc some stats for later use
                     if (player && (player !== ss.MYPLAYER) && player[H.playing] && (player[H.hp] > 0)) {
-                        const whitelisted = (!extract("enableWhitelistAimbot") || extract("enableWhitelistAimbot") && playerMatchesList(whitelistPlayers, player));
+                        const whitelisted = (extract("enableWhenNoneVisible") || !extract("enableWhitelistAimbot") || extract("enableWhitelistAimbot") && playerMatchesList(whitelistPlayers, player));
                         const blacklisted = (extract("enableBlacklistAimbot") && playerMatchesList(blacklistPlayers, player));
-                        const passedLists = whitelisted && (!blacklisted);
+                        const passedLists = (whitelisted) && (!blacklisted);
                         player.distance = distancePlayers(player);
                         player.adjustedDistance = distancePlayers(player, 2);
                         const directionVector = getDirectionVectorFacingTarget(player);
@@ -6093,7 +6115,7 @@ z-index: 999999;
                             playerLookingAt = player;
                         };
 
-                        if (passedLists && ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team))) { //is an an enemy
+                        if (passedLists) { //is possibly an an enemy
                             if (isDoingAimbot) { //is doing aimbot and we care about getting a new target
                                 if (player.adjustedDistance < enemyMinimumValue) { //for antisneak, not targeting
                                     enemyMinimumDistance = player.adjustedDistance;
@@ -6101,7 +6123,7 @@ z-index: 999999;
                                 };
                                 if (selectNewTarget) {
                                     candidates.push(player);
-                                    if (player.isVisible) { amountVisible += 1 };
+                                    if ( player.isVisible ) { amountVisible += 1 };
                                 };
                             };
                         };
@@ -6110,13 +6132,15 @@ z-index: 999999;
 
                 candidates.forEach(player => {
                     const valueToUse = ((targetType == "nearest" && player.adjustedDistance) || (targetType == "pointingat" && player.angleDiff));
-                    let visibleValue;
+                    let visibleValue =  ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team));
                     if (visibilityMode == "disabled") { //we dont care about that shit
-                        visibleValue = true; //go ahead
+                        //go ahead
                     } else if (amountVisible < 1) { //none of candidates are visible
-                        visibleValue = (visibilityMode == "onlyvisible" ? false : true); //there are no visible candidates, so either select none if "onlyvisible" or ignore this altogether
+                        const whitelisted = (!extract("enableWhitelistAimbot") || extract("enableWhitelistAimbot") && playerMatchesList(whitelistPlayers, player));
+                        log(player.name, whitelisted, visibleValue)
+                        visibleValue = (whitelisted && extract("enableWhenNoneVisible")) || (visibilityMode == "onlyvisible" ? false : visibleValue); //there are no visible candidates, so either select none if "onlyvisible" or ignore this altogether
                     } else { //some are visible
-                        visibleValue = player.isVisible; //assuming now that either "prioritise" or "onlyvisible" are enabled, as "onlyvisible"'s use case fulfilled in previous statement
+                        visibleValue = visibleValue && player.isVisible; //assuming now that either "prioritise" or "onlyvisible" are enabled, as "onlyvisible"'s use case fulfilled in previous statement
                     };
                     if (visibleValue) {
                         if (valueToUse < enemyMinimumValue) {
@@ -6129,11 +6153,13 @@ z-index: 999999;
                 if (isDoingAimbot) {
                     if (currentlyTargeting && currentlyTargeting[H.playing] && currentlyTargeting[H.actor]) { //found a target
                         didAimbot = true;
-                        if (extract("tracers")) {
-                            currentlyTargeting.tracerLines.color = new L.BABYLON.Color3(...hexToRgb(extract("aimbotColor")));
-                        };
-                        if (extract("playerESP")) {
-                            currentlyTargeting.box.color = new L.BABYLON.Color3(...hexToRgb(extract("aimbotColor")));
+                        if (currentlyTargeting.generatedESP) {
+                            if (extract("tracers")) {
+                                currentlyTargeting.tracerLines.color = new L.BABYLON.Color3(...hexToRgb(extract("aimbotColor")));
+                            };
+                            if (extract("playerESP")) {
+                                currentlyTargeting.box.color = new L.BABYLON.Color3(...hexToRgb(extract("aimbotColor")));
+                            };
                         };
                         if ((!extract("silentAimbot")) && (!extract("noWallTrack") || getLineOfSight(player, true)) && (targetingComplete || (deg2rad(extract("aimbotMinAngle")) > currentlyTargeting?.angleDiff))) {
                             const distanceBetweenPlayers = distancePlayers(currentlyTargeting);
