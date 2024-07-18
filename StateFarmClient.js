@@ -802,6 +802,7 @@ sniping and someone sneaks up on you
                 initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2});
             initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Wireframe", storeAs: "wireframe", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Particle speed", storeAs: "particleSpeedMultiplier", slider: { min: 0.05, max: 5, step: 0.05 }, defaultValue: 1, });
             initModule({ location: tp.renderTab.pages[0], title: "Egg Size", storeAs: "eggSize", slider: { min: 0, max: 10, step: 0.25 }, defaultValue: 1, });
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "Set Detail", storeAs: "setDetail", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Auto Detail", value: "autodetail" }, { text: "No Details", value: "nodetails" }, { text: "Shadows", value: "shadows" }, { text: "High Res", value: "highres" }, { text: "Shadows+High Res", value: "shadowshighres" }], defaultValue: "disabled" });
@@ -1638,7 +1639,7 @@ debug mode).`},
                         });
                     };
                 } catch (error) {
-                    
+
                 }
             };
         };
@@ -2656,7 +2657,7 @@ z-index: 999999;
         };
         return found;
     };
-    
+
     const playAudio = function (name, panner, contextName) {
         contextName = findStringInLists(divertContexts, name) || "OTHER"+randomInt(1,9)
         let audioContext;
@@ -4488,6 +4489,11 @@ z-index: 999999;
 
             return extract('gameBlacklist') == false || extract('gameBlacklist') == undefined ? false : result;
         });
+      createAnonFunction("getParticleSpeedMultiplier", function(){
+        return extract("particleSpeedMultiplier");
+      });
+
+
         const originalXHROpen = XMLHttpRequest.prototype.open; //wtf??? libertymutual collab??????
         const originalXHRGetResponse = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'response');
         let shellshockjs
@@ -4689,6 +4695,16 @@ z-index: 999999;
 
             modifyJS(/tp-/g, '');
             modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
+
+            //intercept updateParticles for particle speed control
+            //deobf is: updateParticles(manager, delta)
+            match = js.match(/function [a-zA-Z]{2}\([a-z],[a-z]\)\{for\(var [a-z]=0;[a-z]<[a-z]\.sprites/); //this should only give one match.
+            const splitted = match[0].split("{"); //split right bevor function opens to inject delta manipulator. Might not be the best way but it works fine.
+            const delta = splitted[0].charAt(splitted[0].length - 2); //name of the delta argument.
+            modifyJS(match[0], splitted[0] + "{" //add curly bracket because the split removed it. ehhhhhh
+              +`${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
+              +splitted[1]
+            )
 
             log(H);
             log(js);
@@ -5956,7 +5972,7 @@ z-index: 999999;
                     ss.MYPLAYER[H.actor].hands.material.alpha = ((extract("perspective") !== "firstPerson") && extract("perspectiveAlpha")) ? .5 : 1;
                     ss.MYPLAYER[H.actor][H.bodyMesh].material.alpha = ((extract("perspective") !== "firstPerson") && extract("perspectiveAlpha")) ? .5 : 1;
                 };
-                
+
                 let filter = typeof(extract("filter")) == 'number' ? extract("filter") : 2;
                 if (ss.SCENE && ss.SCENE.appliedFilter !== filter) {
                     ss.SCENE.materials.forEach(material => {
@@ -6048,7 +6064,7 @@ z-index: 999999;
                     let username = usernameElement ? usernameElement.textContent.trim() : "";
                     const badgeURLs = Array.from(findBadgesForUsername(username)).reverse();
                     const existingBadges = slot.querySelectorAll('.badge-image');
-                    
+
                     if (username && badgeURLs && badgeURLs.length > 0 && existingBadges && existingBadges.length < 1) {
                         existingBadges.forEach(badge => badge.remove());
                         const eggIcon = !!slot.querySelector('.playerSlot--icons .fas.fa-egg:not(.hidden)');
@@ -6137,7 +6153,7 @@ z-index: 999999;
                         //go ahead
                     } else if (amountVisible < 1) { //none of candidates are visible
                         const whitelisted = (!extract("enableWhitelistAimbot") || extract("enableWhitelistAimbot") && playerMatchesList(whitelistPlayers, player));
-                        log(player.name, whitelisted, visibleValue)
+                        //log(player.name, whitelisted, visibleValue) //grrrr no console spam
                         visibleValue = (whitelisted && extract("enableWhenNoneVisible")) || (visibilityMode == "onlyvisible" ? false : visibleValue); //there are no visible candidates, so either select none if "onlyvisible" or ignore this altogether
                     } else { //some are visible
                         visibleValue = visibleValue && player.isVisible; //assuming now that either "prioritise" or "onlyvisible" are enabled, as "onlyvisible"'s use case fulfilled in previous statement
@@ -6247,7 +6263,7 @@ z-index: 999999;
                         ss.MYPLAYER.weapon.constructor.automatic = false;
                     };
                 };
-                
+
                 if (updateMenu) {
                     updateMenu = false; initMenu(false);
                     tp.mainPanel.hidden = extract("hideAtStartup");
