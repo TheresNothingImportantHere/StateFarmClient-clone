@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre82
+// @version      3.4.1-pre83
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -4380,19 +4380,22 @@ z-index: 999999;
                     document.getElementById("genericPopup").children[2].children[1].textContent = "heeheeheehaw";
                     document.getElementById("genericPopup").children[0].children[1].textContent = 'MAKE NEW AUTOJOIN CODE';
                 };
-                if ((!attemptedAutoUnban) && extract("autoUnban") && (errorString == "sessionNotFound")) {
-                    // log("StateFarm: Gonna refresh, could be banned but you can't play with this error anyways.");
-                    // createPopup("AutoUnban: Reloading page in 5 seconds...");
-                    // attemptedAutoUnban = true;
-                    // setTimeout(() => {
-                    //     if (extract("autoUnban")) { //you get a bit of time to stop it
-                    //         createPopup("AutoUnban: Reloading page now.");
-                    //         reloadPage(); attemptedAutoUnban = false;
-                    //     } else {
-                    //         createPopup("AutoUnban: Reload page cancelled.");
-                    //     };
-                    // }, 5000);
-                    isBanned = true;
+                if (extract("autoUnban") && (errorString == "sessionNotFound")) {
+                    if (!attemptedAutoUnban) {
+                        isBanned = true;
+                    } else if (isBanned) {
+                        log("StateFarm: Gonna refresh, could be banned but you can't play with this error anyways.");
+                        createPopup("AutoUnban: Reloading page in 5 seconds...");
+                        attemptedAutoUnban = true;
+                        setTimeout(() => {
+                            if (extract("autoUnban")) { //you get a bit of time to stop it
+                                createPopup("AutoUnban: Reloading page now.");
+                                reloadPage(); attemptedAutoUnban = false;
+                            } else {
+                                createPopup("AutoUnban: Reload page cancelled.");
+                            };
+                        }, 5000);
+                    };
                 };
                 createPopup("Leaving due to connection error.");
                 change("leaveGame");
