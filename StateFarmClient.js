@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre87
+// @version      3.4.1-pre88
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -4398,7 +4398,7 @@ z-index: 999999;
                         }, 5000);
                     };
                 };
-                createPopup("Leaving due to connection error.");
+                createPopup("Leaving due to connection error " + ERRORCODE + " (" + errorString + ")" + ".");
                 change("leaveGame");
             };
         });
