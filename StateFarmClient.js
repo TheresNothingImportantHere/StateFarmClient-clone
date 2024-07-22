@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre86
+// @version      3.4.1-pre88
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -478,8 +478,8 @@ let attemptedInjection = false;
         } else {
             Object.keys(bindsArray).forEach(function (module) {
                 if ((bindsArray[module] == event) && module != "zoom") {
-                    let state = change(module)
-                    let popupText = state
+                    let state = change(module);
+                    let popupText = state;
                     if (state != "NOMSG") {
                         if (state === true || state === false || state === undefined) { state = (state ? "ON" : "OFF") };
                         popupText = "Set " + module + " to: " + state;
@@ -491,12 +491,13 @@ let attemptedInjection = false;
                             case ("hide"):
                                 popupText = "Toggled StateFarm Panel"; break;
                             case ("showBotPanel"):
-                                popupText = "Toggled Bot Panel";
-                                break;
+                                popupText = "Toggled Bot Panel"; break;
                             case ("sfChatShowHide"):
                                 popupText = "Toggled SFC Chat"; break;
                             case ("panic"):
                                 popupText = "Exiting to set URL..."; break;
+                            default:
+                                popupText = module; break;
                         };
                     };
                     createPopup(popupText);
@@ -4151,9 +4152,11 @@ z-index: 999999;
         Math.capVector3(cappedVector);
         const terminalVelocity = -cappedVector.y;
         const timeAccelerating = Math.min(timeDiff, (terminalVelocity - velocityVector.y) / -0.012);
-        const predictedY = velocityVector.y * timeAccelerating + timeAccelerating * (timeAccelerating) * -0.012 / 2 + newPos.y + terminalVelocity * Math.max(timeDiff - timeAccelerating, 0);
-        const rayToGround = ss.RAYS[H.rayCollidesWithMap](newPos, new L.BABYLON.Vector3(0, predictedY - 1 - newPos.y, 0), ss.RAYS.grenadeCollidesWithCell);
-        newPos.y = Math.max(rayToGround ? rayToGround.pick.pickedPoint.y : 0, predictedY) - 0.072;
+        if(player.onGround==0){ //if player on ground we don't need to predict y because it's gonna stay same. the new pos y value has already been set to current y so no need to do anything when on ground.
+            const predictedY = velocityVector.y * timeAccelerating + timeAccelerating * (timeAccelerating) * -0.012 / 2 + newPos.y + terminalVelocity * Math.max(timeDiff - timeAccelerating, 0);
+            const rayToGround = ss.RAYS[H.rayCollidesWithMap](newPos, new L.BABYLON.Vector3(0, predictedY - 1 - newPos.y, 0), ss.RAYS.grenadeCollidesWithCell);
+            newPos.y = Math.max(rayToGround ? rayToGround.pick.pickedPoint.y : 0, predictedY) - 0.072;
+        }
         // log(velocityVector, bulletSpeed, timeDiff, cappedVector, terminalVelocity, timeAccelerating, predictedY, rayToGround, newPos);
         return newPos;
     };
@@ -4397,7 +4400,7 @@ z-index: 999999;
                         }, 5000);
                     };
                 };
-                createPopup("Leaving due to connection error.");
+                createPopup("Leaving due to connection error " + ERRORCODE + " (" + errorString + ")" + ".");
                 change("leaveGame");
             };
         });
