@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre86
+// @version      3.4.1-pre87
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -478,8 +478,8 @@ let attemptedInjection = false;
         } else {
             Object.keys(bindsArray).forEach(function (module) {
                 if ((bindsArray[module] == event) && module != "zoom") {
-                    let state = change(module)
-                    let popupText = state
+                    let state = change(module);
+                    let popupText = state;
                     if (state != "NOMSG") {
                         if (state === true || state === false || state === undefined) { state = (state ? "ON" : "OFF") };
                         popupText = "Set " + module + " to: " + state;
@@ -491,12 +491,13 @@ let attemptedInjection = false;
                             case ("hide"):
                                 popupText = "Toggled StateFarm Panel"; break;
                             case ("showBotPanel"):
-                                popupText = "Toggled Bot Panel";
-                                break;
+                                popupText = "Toggled Bot Panel"; break;
                             case ("sfChatShowHide"):
                                 popupText = "Toggled SFC Chat"; break;
                             case ("panic"):
                                 popupText = "Exiting to set URL..."; break;
+                            default:
+                                popupText = module; break;
                         };
                     };
                     createPopup(popupText);
