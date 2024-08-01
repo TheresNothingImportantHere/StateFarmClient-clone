@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Shell Shockers Aimbot & ESP: StateFarm Client V3 - Cheats For Bloom, Chat, Botting, Unbanning & More
-// @description  Fixed for 0.48.1! Advanced, Open Source, No Ads. Best cheats menu for Shell Shockers in 2024. Many modules such as Aimbot, PlayerESP, AmmoESP, Chams, Nametags, Join/Leave messages, Chat Filter Disabling, AntiAFK, FOV Slider, Zooming, Co-ords, Player Stats, Auto Refill and many more whilst having unsurpassed customisation options such as binding to any key, easily editable color scheme and themes - all on the fly!
+// @description  Fixed for 0.48.3! Advanced, Open Source, No Ads. Best cheats menu for shellshock.io in 2024. Many modules such as Aimbot, PlayerESP, AmmoESP, Chams, Nametags, Join/Leave messages, Chat Filter Disabling, AntiAFK, FOV Slider, Zooming, Co-ords, Player Stats, Auto Refill and many more whilst having unsurpassed customisation options such as binding to any key, easily editable color scheme and themes - all on the fly!
 // @author       Hydroflame521, onlypuppy7, enbyte, notfood, 1ust, OakSwingZZZ, Seq and de_Neuublue
 // @namespace    http://github.com/Hydroflame522/StateFarmClient/
 // @supportURL   http://github.com/Hydroflame522/StateFarmClient/issues/
@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre88
+// @version      3.4.1-pre89
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
