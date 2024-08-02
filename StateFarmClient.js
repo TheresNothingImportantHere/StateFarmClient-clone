@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre90
+// @version      3.4.1-pre91
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -4247,7 +4247,9 @@ z-index: 999999;
             return !document.activeElement.classList.contains('tp-txtv_i');
         });
         createAnonFunction('getPointerEscape', function () {
-            return (sneakyDespawning ? false : (noPointerPause || (unsafeWindow.extern.inGame ? unsafeWindow.extern.gamePaused : false)));
+            let verdict = (sneakyDespawning ? false : (noPointerPause || (unsafeWindow.extern.inGame && !document.getElementById("healthContainer").style.display == 'block')));
+            // log("verdict", verdict, sneakyDespawning, (noPointerPause || (unsafeWindow.extern.inGame && !document.getElementById("healthContainer").style.display == 'block')), noPointerPause, unsafeWindow.extern.inGame, !document.getElementById("healthContainer").style.display == 'block');
+            return verdict;
         });
         createAnonFunction('setNewGame', function () {
             newGame = true; log("NEWGAME");
