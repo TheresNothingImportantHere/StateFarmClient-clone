@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre92
+// @version      3.4.1-pre93
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -227,7 +227,7 @@ let attemptedInjection = false;
                                 <div class="dynamic-text" style="font-size: 1em;">StateFarm Updates</div>
                             </div>
                             <a href="${discordURL}" target="_blank" style="text-decoration: none; margin-left: auto;">
-                                <button class="ss_button btn_blue bevel_blue box_relative pause-screen-ui btn-account-w-icon text-shadow-none text_blue1" style="font-size: 0.75em; display: flex; align-items: center; padding: 0.5em 1em; width: 190px; margin-left: -3em;">
+                                <button class="ss_button btn_blue bevel_blue box_relative pause-screen-ui btn-account-w-icon text-shadow-none text_blue1" style="font-size: 0.75em; display: flex; align-items: center; padding: 0.5em 1em; width: 12em; margin-left: -3em;">
                                     <i class="fab fa-discord" style="font-size: 1.2em; margin-right: 0.5em;"></i>
                                     <span>Join Discord</span>
                                 </button>
@@ -967,7 +967,7 @@ sniping and someone sneaks up on you
         ]);
             initModule({ location: tp.chatTab.pages[0], title: "InfiniHistory", storeAs: "chatExtend", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.chatTab.pages[0], title: "HighlightTxt", storeAs: "chatHighlight", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.chatTab.pages[0], title: "RestoreScroll", storeAs: "restoreScroll", bindLocation: tp.chatTab.pages[1], });
+            // initModule({ location: tp.chatTab.pages[0], title: "RestoreScroll", storeAs: "restoreScroll", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.chatTab.pages[0], title: "Max Ingame", storeAs: "maxChat", slider: { min: 0, max: 30, step: 1 }, defaultValue: 5, });
             initModule({ location: tp.chatTab.pages[0], title: "ShowFiltered", storeAs: "disableChatFilter", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.chatTab.pages[0], title: "UnfilterNames", storeAs: "unfilterNames", bindLocation: tp.chatTab.pages[1], });
