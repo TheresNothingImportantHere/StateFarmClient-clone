@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre89
+// @version      3.4.1-pre90
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -255,7 +255,7 @@ let attemptedInjection = false;
     const tp = {}; // <-- tp = tweakpane
     // blank variables
     let ss = {};
-    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -461,7 +461,9 @@ let attemptedInjection = false;
     document.addEventListener("keydown", function (event) {
         event = (event.code.originalReplace("Key", ""));
         isKeyToggled[event] = true;
-        if (event == "Escape") { noPointerPause = false; unsafeWindow.document.onpointerlockchange() };
+        if (event == "Escape") {
+            noPointerPause = false; unsafeWindow.document.onpointerlockchange();
+        };
     });
     document.addEventListener("keyup", function (event) {
         event = (event.code.originalReplace("Key", ""));
@@ -1314,6 +1316,24 @@ debug mode).`},
             initModule({ location: tp.miscTab.pages[0], title: "VIP Badge", storeAs: "spoofVIP", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", bindLocation: tp.miscTab.pages[1], });
+            tp.miscTab.pages[0].addSeparator();
+            initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
+                if (!(unsafeWindow.extern.gamePaused || sneakyDespawning)) {
+                    sneakyDespawning = true;
+                    ss.PAUSE(); createPopup("SneakyDespawn: 3 seconds.");
+                    setTimeout(() => { createPopup("SneakyDespawn: 2 seconds.");
+                    }, 1e3);
+                    setTimeout(() => { createPopup("SneakyDespawn: 1 second.");
+                    }, 2e3);
+                    setTimeout(() => { createPopup("SneakyDespawn: Now despawning!");
+                        document.exitPointerLock(); document.onpointerlockchange();
+                        setTimeout(() => {
+                            sneakyDespawning = false;
+                        }, 200);
+                    }, 3e3);
+                };
+            },});
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Replace Feeds", storeAs: "replaceFeeds", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             initModule({ location: tp.miscTab.pages[0], title: "Custom Badges", storeAs: "customBadges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
@@ -3361,6 +3381,7 @@ z-index: 999999;
             log("swapping out google analytics...");
             oldGa = unsafeWindow.ga;
             unsafeWindow.ga = F.interceptGa;
+
             ranEverySecond = true;
         };
 
@@ -4226,7 +4247,7 @@ z-index: 999999;
             return !document.activeElement.classList.contains('tp-txtv_i');
         });
         createAnonFunction('getPointerEscape', function () {
-            return noPointerPause;
+            return (sneakyDespawning ? false : (noPointerPause || (unsafeWindow.extern.inGame ? unsafeWindow.extern.gamePaused : false)));
         });
         createAnonFunction('setNewGame', function () {
             newGame = true; log("NEWGAME");
@@ -4470,13 +4491,27 @@ z-index: 999999;
             };
         });
         createAnonFunction('adBlocker', function (input) {
-            if (extract("adBlock")) {
+            if (input == 10 && sneakyDespawning) {
+                return 1;
+            } else if (extract("adBlock")) {
                 if (typeof (input) == 'boolean') {
                     return true;
-                } else if (input == "user-has-adblock") {
-                    return getScrambled();
+                } else if (input == 10) {
+                    return 5;
                 } else if (input == "adsBlocked") {
                     return false;
+                };
+            };
+            return input;
+        });
+        createAnonFunction("quickRespawn", function (input) {
+            if (input == 3e3) {
+                return sneakyDespawning ? 0 : 3e3;
+            } else if (input == 5 && sneakyDespawning) {
+                return 1;
+            } else if (extract("quickRespawn")) {
+                if (input == 5) {
+                    return 4;
                 };
             };
             return input;
@@ -4586,13 +4621,17 @@ z-index: 999999;
 
             //SERVERSYNC
             match = new RegExp(`!${H.CULL}&&(.+?\\}\\})`).exec(js);
-            H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) : "function(){log('no serversync womp womp')}";
             log("SERVERSYNC:", match);
+            H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) : "function(){log('no serversync womp womp')}";
+            //PAUSE
+            match = new RegExp(`,setTimeout\\(\\(\\(\\)=>\\{([=A-z0-9\\(\\),\\{ \\.;!\\|\\?:\\}]+send\\([a-zA-Z$_]+\\))`).exec(js);
+            log("PAUSE:", match);
+            H.PAUSE = match ? `function(){${match[1]}}` : "function(){log('no pause womp womp')}";
 
             const variableNameRegex = /^[a-zA-Z0-9_$\[\]"\\]*$/;
             for (let name in H) {
                 let deobf = H[name];
-                if (name == "SERVERSYNC" || variableNameRegex.test(deobf)) { //serversync should only be defined just before...
+                if (name == "SERVERSYNC" || name == "PAUSE" || variableNameRegex.test(deobf)) { //serversync should only be defined just before...
                     injectionString = `${injectionString}${name}: (() => { try { return ${deobf}; } catch (error) { return "value_undefined"; } })(),`;
                 } else {
                     alert("Message from the StateFarm Devs: WARNING! The keys inputted contain non-variable characters! There is a possibility that this could run code unintended by the StateFarm team, although possibly there is also a mistake. Do NOT proceed with using this, and report to the StateFarm developers what is printed in the console.");
@@ -4666,7 +4705,7 @@ z-index: 999999;
             //annoying shit
             modifyJS('alert', 'console.log');
             //pointer escape
-            modifyJS('onpointerlockchange=function(){', 'onpointerlockchange=function(){if (window.' + functionNames.getPointerEscape + '()) {return};');
+            modifyJS('onpointerlockchange=function(){', 'onpointerlockchange=function(){if (window.' + functionNames.getPointerEscape + '(arguments)) {return};');
             //death hook
             const DEATHARGS = new RegExp('function ' + f(H._deathFunction) + '\\(([a-zA-Z$_]+,[a-zA-Z$_]+)\\)').exec(js)[1];
             log("DEATHARGS", DEATHARGS);
@@ -4677,6 +4716,11 @@ z-index: 999999;
             modifyJS('layed=!1', 'layed=window.' + functionNames.adBlocker + '(!1)');
             modifyJS('showAdBlockerVideo', 'hideAdBlockerVideo'); //hello eggs bullshit
             modifyJS(H.USERDATA + '.playerAccount.isUpgraded()', functionNames.adBlocker + '(' + f(H.USERDATA) + '.playerAccount.isUpgraded())');
+            //respawn time stuff
+            modifyJS('5:10', functionNames.quickRespawn + '(5):' + functionNames.adBlocker + '(10)');
+            modifyJS(',3e3),console.log', `,window.${functionNames.quickRespawn}(3e3)),console.log`);
+            // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
+
             //Modifies matchmaker JS to block gamecodes.
             match = js.match(/ion,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/);
             if (match) {
