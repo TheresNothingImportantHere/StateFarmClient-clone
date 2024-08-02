@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre91
+// @version      3.4.1-pre92
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -84,8 +84,8 @@
 // @match        *://*.zygote.cafe/*
 // @match        *://*.shellshockers.best/*
 // @match        *://*.eggboy.me/*
-// @downloadURL https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.user.js
-// @updateURL https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.meta.js
+// @downloadURL  https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.user.js
+// @updateURL    https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.meta.js
 // ==/UserScript==
 
 // {{CRACKEDSHELL}}
@@ -129,7 +129,9 @@ let attemptedInjection = false;
     //INIT WEBSITE LINKS: store them here so they are easy to maintain and update!
     const discordURL = "https://dsc.gg/sfnetwork";
     const githubURL = "https://github.com/Hydroflame522/StateFarmClient";
-    const updateURL = "https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Cheats%20For%20Bloom%2C%20Chat%2C%20Botting%2C%20Unbanning%20%20More.user.js";
+    const downloadURL = "https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Cheats%20For%20Bloom%2C%20Chat%2C%20Botting%2C%20Unbanning%20%20More.user.js";
+    const updateURL = "https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Cheats%20For%20Bloom%2C%20Chat%2C%20Botting%2C%20Unbanning%20%20More.meta.js";
+    const scriptInfoURL = "https://greasyfork.org/scripts/482982.json";
     const featuresGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-features";
     const bottingGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-botting";
     const violentmonkeyURL = "https://violentmonkey.github.io/get-it/";
@@ -138,6 +140,7 @@ let attemptedInjection = false;
 
     const replacementLogoURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement.png?raw=true";
     const replacementFeedURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamefeeds/";
+    const commitFeedURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/commits?path=StateFarmClient.js";
     const badgeListURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamebadges/";
     const iconURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png";
     const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
@@ -167,6 +170,14 @@ let attemptedInjection = false;
             } catch (error) {
                 log("couldnt fetch badge list :(");
             };
+            try {
+                log("fetching greasyfork info...", scriptInfoURL);
+                scriptInfo = fetchTextContent(scriptInfoURL);
+                scriptInfo = JSON.parse(scriptInfo);
+                log(scriptInfo);
+            } catch (error) {
+                log("couldnt fetch greasyfork info :(");
+            };
             fetch(sfxURL).then(response => {
                 if (response.ok) return response.json();
                 else throw new Error('Failed to fetch folder contents');
@@ -181,8 +192,126 @@ let attemptedInjection = false;
                 initMenu(false);
                 tp.mainPanel.hidden = extract("hideAtStartup");
             });
+
+            let oldVersion = load("version");
+            save("version", version);
+
+            if (extract("statefarmUpdates")) {
+                const maxAttempts = 30;
+                const interval = 500;
+                let attempts = 0;
+            
+                const checkForElement = function() {
+                    const existingContainer = document.querySelector('.secondary-aside-wrap');
+            
+                    if (existingContainer) {
+                        log('Element found:', existingContainer);
+                        createAndAppendCommitHistoryBox(existingContainer);
+                    } else if (attempts < maxAttempts) {
+                        attempts++;
+                        log(`Attempt ${attempts}/${maxAttempts} failed. Retrying...`);
+                        setTimeout(checkForElement, interval); // Retry after interval
+                    } else {
+                        log('Element not found after maximum attempts');
+                    }
+                };
+            
+                const createAndAppendCommitHistoryBox = function(existingContainer) {
+                    let commitHistoryBox = document.createElement('div');
+                    commitHistoryBox.className = 'media-tabs-wrapper box_relative border-blue5 roundme_sm bg_blue6 common-box-shadow ss_margintop_sm';
+                
+                    let commitHistoryContent = `
+                    <div class="media-tab-container display-grid align-items-center gap-sm bg_blue3">
+                        <h4 class="common-box-shadow text-shadow-black-40 text_white dynamic-text" style="display: flex; align-items: center;">
+                            <div class="dynamic-text" style="width: 10em; font-size: 1em;">
+                                <div class="dynamic-text" style="font-size: 1em;">StateFarm Updates</div>
+                            </div>
+                            <a href="${discordURL}" target="_blank" style="text-decoration: none; margin-left: auto;">
+                                <button class="ss_button btn_blue bevel_blue box_relative pause-screen-ui btn-account-w-icon text-shadow-none text_blue1" style="font-size: 0.75em; display: flex; align-items: center; padding: 0.5em 1em; width: 190px; margin-left: -3em;">
+                                    <i class="fab fa-discord" style="font-size: 1.2em; margin-right: 0.5em;"></i>
+                                    <span>Join Discord</span>
+                                </button>
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="media-tabs-content f_col">
+                        <div class="tab-content ss_paddingright ss_paddingleft">
+                            <div class="news-container f_col v_scroll" style="height: 20em; overflow-y: auto;">
+                    `;
+                
+                    fetch(commitFeedURL).then(response => {
+                        if (response.ok) return response.json();
+                        else throw new Error('Failed to fetch commit history contents');
+                    }).then(commitHistory => {
+                        log("retrieved: commit history", commitHistory);
+                
+                        if (oldVersion !== version) {
+                            commitHistoryContent += `
+                                <a href="${githubURL}" target="_blank" style="text-decoration: none;">
+                                    <div class="updated-notice" style="background-color: #28a745; color: #fff; padding: 0.75em; text-align: center; font-weight: bold; margin-bottom: 0.15em; margin-top: 0.25em; border-radius: 10px; border: 2px solid #155724;">
+                                        <p style="margin: 0; font-size: 0.95em;">🎉 StateFarm has been updated (v${version})! Check out the latest updates below.</p>
+                                    </div>
+                                </a>
+                            `;
+                        }
+                
+                        if (scriptInfo && scriptInfo.version && scriptInfo.version !== version) {
+                            commitHistoryContent += `
+                            <a href="${downloadURL}" target="_blank" style="text-decoration: none;">
+                                <div class="attention-notice" style="background-color: #ffcc00; color: #000; padding: 0.75em; text-align: center; font-weight: bold; margin-bottom: 0.15em; margin-top: 0.25em; border-radius: 5px; border: 2px solid #ffff00;">
+                                    <p style="margin: 0; font-size: 0.95em;">🚨 A new update for StateFarm is available (v${scriptInfo.version})! Click to install it.</p>
+                                </div>
+                            </a>
+                            `;
+                        }
+                
+                        commitHistory.forEach(commit => {
+                            const commitDate = new Date(commit.commit.author.date).toLocaleString();
+                            const authorProfileURL = `https://github.com/${commit.author.login}`; // Replace with actual URL if available
+                            const messageParts = commit.commit.message.split('\n\n', 2); // Split by the first occurrence of '\n\n'
+                            const title = messageParts[0]; // Title part of the message
+                            const description = messageParts[1] || ''; // Description part of the message, defaults to empty string if not present
+                
+                            commitHistoryContent += `
+                            <div class="commit-item" style="padding: 0.2em 0.3em; background-color: #95e2fe; border-bottom: 2px solid #0B93BD;">
+                                <div style="display: flex; align-items: flex-start;">
+                                    <a href="${authorProfileURL}" target="_blank" style="margin-right: 0.3em; display: flex; align-items: flex-start;">
+                                        <img src="${commit.author.avatar_url}" alt="${commit.author.login}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                    </a>
+                                    <div style="display: flex; flex-direction: column; justify-content: flex-start;">
+                                        <a href="${commit.html_url}" target="_blank" style="color: #0E7697; text-decoration: none; font-size: 0.75em; font-weight: bold; line-height: 1.2;">
+                                            ${title}
+                                        </a>
+                                        ${description ? `<p style="color: #0B93BD; font-size: 0.65em; margin: 0; line-height: 1.2;">${description}</p>` : ''}
+                                        <span style="color: white; font-size: 0.75em; font-weight: bold;">
+                                            by <a href="${authorProfileURL}" target="_blank" style="color: #0E7697; text-decoration: none; font-size: 0.75em;">${commit.author.login}</a> on ${commitDate}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        });
+                
+                        commitHistoryContent += `
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                
+                    commitHistoryBox.innerHTML = commitHistoryContent;
+                    existingContainer.appendChild(commitHistoryBox);
+                    }).catch(error => {
+                        log('Error:', error);
+                    });
+                };
+                
+            
+                checkForElement();
+            }
         });
+
     };
+    
     //INIT VARS
     const inbuiltPresets = { //Don't delete onlypuppy7's Config
         "onlypuppy7's Config": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>true<aimbotMinAngle>77<aimbotAntiSnap>0.75<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>true<tracers>true<chams>false<nametags>true<targets>false<predictionESP>false<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<antiAFK>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre71 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<skybox>9<legacyModels>true<muteGame>false<distanceMult>1<customSFX1>3<customSFX2>4<customSFX3>1<replaceLogo>true<titleAnimation>true<themeType>5<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>true<spoofVIP>false<noAnnoyances>true<noTrack>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoUnban>false<autoChickenWinner>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<hideAtStartup>false<consoleLogs>false<popups>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
@@ -256,7 +385,7 @@ let attemptedInjection = false;
     // blank variables
     let ss = {};
     let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
-    let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
+    let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
     let pathfindingTargetOverride = undefined;
@@ -1335,6 +1464,7 @@ debug mode).`},
                 };
             },});
             tp.miscTab.pages[0].addSeparator();
+            initModule({ location: tp.miscTab.pages[0], title: "StateFarm Updates", storeAs: "statefarmUpdates", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             initModule({ location: tp.miscTab.pages[0], title: "Replace Feeds", storeAs: "replaceFeeds", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             initModule({ location: tp.miscTab.pages[0], title: "Custom Badges", storeAs: "customBadges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             tp.miscTab.pages[0].addSeparator();
@@ -1552,7 +1682,7 @@ debug mode).`},
             },});
             initModule({ location: tp.clientTab.pages[0], title: "Debug", storeAs: "debug", bindLocation: tp.clientTab.pages[1], });
         tp.mainPanel.addSeparator();
-        initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", button: "Link", clickFunction: () => GM_openInTab(updateURL, { active: true }) });
+        initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", button: "Link", clickFunction: () => GM_openInTab(downloadURL, { active: true }) });
         initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", button: "Link", clickFunction: () => GM_openInTab(featuresGuideURL, { active: true }) });
 
 
@@ -4209,7 +4339,7 @@ z-index: 999999;
             pitchReal: calculatePitch(directionVector),
         };
 
-        if (extract("antiBloom")) {
+        if (extract("antiBloom") && ss.MYPLAYER.weapon.constructor.standardMeshName !== "dozenGauge") {
             direction = applyBloom(direction, 1);
         };
 
@@ -4578,7 +4708,6 @@ z-index: 999999;
             const getVardata = function (hash) {
                 return fetchTextContent(clientKeysURL + hash + ".json");
             };
-
 
             let hash, onlineClientKeys;
             hash = L.CryptoJS.SHA256(originalJS).toString(L.CryptoJS.enc.Hex); // eslint-disable-line
