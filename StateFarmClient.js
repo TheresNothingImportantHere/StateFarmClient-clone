@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre96
+// @version      3.4.1-pre97
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -2039,8 +2039,18 @@ debug mode).`},
 
                     if (extract("sfChatInvitations")) {
                         let uppercaseMsg = message.message.toUpperCase();
-                        foundCode = (uppercaseMsg).match(/(?=[A-Z0-9]*\d)[A-Z0-9]{7}/g);
-                        foundCode = foundCode ? foundCode[0] : false;
+                        const findCode = (input) => {
+                            const allMatches = input.match(/(?:[A-Z0-9]{7})/g);
+                            if (allMatches) {
+                                for (const match of allMatches) {
+                                    if (/[A-Z]/.test(match) && /\d/.test(match)) {
+                                        return match;
+                                    }
+                                }
+                            }
+                            return null;
+                        };
+                        let foundCode = findCode(uppercaseMsg);
                         if (foundCode) {
                             createPrompt(`INVITE! User "${message.user.name}" has invited you to join game "${foundCode}"! (via SFChat)`, [
                                 ['JOIN', () => {
