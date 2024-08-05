@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre97
+// @version      3.4.1-pre98
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -865,8 +865,8 @@ sniping and someone sneaks up on you
                 initModule({ location: tp.aimbotFolder, title: "SemiSilent", storeAs: "aimbSemiSilent", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", true]], });
                 initModule({ location: tp.aimbotFolder, title: "NoWallTrack", storeAs: "noWallTrack", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", false]], });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "Prediction", storeAs: "prediction", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "AntiBloom", storeAs: "antiBloom", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "Prediction", storeAs: "prediction", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
+                initModule({ location: tp.aimbotFolder, title: "AntiBloom", storeAs: "antiBloom", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "AntiSwitch", storeAs: "antiSwitch", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
                 initModule({ location: tp.aimbotFolder, title: "1 Kill", storeAs: "oneKill", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
@@ -1901,6 +1901,15 @@ debug mode).`},
         `);
         const buttonContainer = document.createElement('div');
         buttonContainer.setAttribute('style', 'margin-top: 10px; pointer-events: auto; text-align: center;');
+
+        const deleteButton = function(){
+            document.body.removeChild(promptElement);
+        };
+
+        buttons = [...buttons,
+            [`Dismiss (${Math.ceil(duration/1000)}s)`, () => deleteButton()]
+        ];
+
         buttons.forEach(([buttonText, buttonFunction]) => {
             const button = document.createElement('button');
             button.innerText = buttonText;
@@ -1922,12 +1931,12 @@ debug mode).`},
         setTimeout(() => {
             promptElement.style.opacity = '1';
         }, 100);
-        setTimeout(() => {
+        setTimeout(() => { 
             promptElement.style.opacity = '0';
             setTimeout(() => {
-                document.body.removeChild(promptElement);
+                deleteButton();
             }, 800);
-        }, duration);
+         }, duration);
     };
 
     //StateFarmChat functions
@@ -2064,8 +2073,7 @@ debug mode).`},
                                             foundCode,
                                         );
                                     }, 500);
-                                }],
-                                ['Dismiss (10s)', () => alert('Cancel clicked')]
+                                }]
                             ], 10000);
                         };
                     };
