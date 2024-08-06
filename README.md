@@ -20,7 +20,7 @@ StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), includ
 <h3 align='center'>Join our <a href='https://dsc.gg/sfnetwork'>Discord Server</a> for the latest news!</h3>
 <br>
 
-The information below is accurate as of StateFarm version **3.4.1-pre72**. 
+The information below is accurate as of StateFarm version **3.4.1-pre98**. 
 <br><br>
 
 <h1 align='center'>Table of Contents</h1>
@@ -57,18 +57,22 @@ The information below is accurate as of StateFarm version **3.4.1-pre72**.
 <br>
    
 # [](#download-sources)Download Sources:
-- [GitHub Repository](https://github.com/Hydroflame522/StateFarmClient).
-- [GreasyFork](https://greasyfork.org/scripts/482982).
+- [GitHub](https://github.com/Hydroflame522/StateFarmClient)
+![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)
+
+- [GreasyFork](https://greasyfork.org/scripts/482982)
+![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)
 
 <br>
 
 # [](#installation-tutorial)Installation Tutorial:
 Before you can install the client, there are a few things you must set up to be able to run userscripts.
-1. Install Violentmonkey from [https://violentmonkey.github.io/get-it/](https://violentmonkey.github.io/get-it/) or any other userscript manager. PS: DO NOT use Tampermonkey unless no other option available!
-2. Open the Violentmonkey dashboard.
-3. Visit the [GreasyFork](https://greasyfork.org/scripts/482982) page & click `Install this script`.
+1. Install Violentmonkey from [https://violentmonkey.github.io/get-it/](https://violentmonkey.github.io/get-it/) or any other userscript manager. (**DO NOT** use Tampermonkey unless no other option available!)
+
+3. Open the Violentmonkey dashboard.
+4. Visit the [GreasyFork](https://greasyfork.org/scripts/482982) page & click `Install this script`.
     - Alternatively, use the raw version from [Github](https://github.com/Hydroflame522/StateFarmClient/raw/main/StateFarmClient.js).
-4. Visit [https://shellshock.io](https://shellshock.io/) (or another Shell Shockers link), & use StateFarm!
+5. Visit [https://shellshock.io](https://shellshock.io/) (or another Shell Shockers link), & use StateFarm!
 
 <br>
 
@@ -76,22 +80,24 @@ Before you can install the client, there are a few things you must set up to be 
 > You just installed Statefarm Client...and you're probably confused by all the tabs, sliders, & buttons.
 > Below is a few basic ways to start using StateFarm.
 
-- Press 'H' to show/hide the panel. You can also drag it by clicking & dragging `StateFarm` at the top.
-- Click on various categories (combat, render, chat, etc) for different areas of cheating.
-- Press 'J' to show/hide the botting panel. This allows you to use bots.
+- Press **H** to show/hide the panel. You can also drag it by clicking & dragging `StateFarm` at the top.
+- Click on various categories/tabs (combat, render, chat, etc) to expand different areas of the client.
+- Press **K** to chat with other StateFarm users
+- Press **J** to show/hide the botting panel. This allows you to use bots. See more at [Botting](#botting).
 
-Here are some key features to learn:
+## Key features of StateFarm Client:
 
 ### Aimbot
 Aimbot is one of the key features of StateFarm, it is the most powerful combat module.<br>
-To configure the aimbot, open the `Combat` tab.
+- To configure the aimbot, open the `Combat` tab. 
+- For more aimbot settings, open the `Aimbot Options` tab.
 
-- If you have an external mouse, activate `ToggleRM` to use the right side of the mouse to toggle aimbot.
-- Use `Prediction` & `AntiBloom` to have better accuracy.
-- If using a mouse, click the `v` key to enable & disable aimbot.
+	- If you have an external mouse, activate `ToggleRM` to use the right side of the mouse to toggle aimbot.
+	- Use `Prediction` & `AntiBloom` to have better accuracy.
+	- If using a mouse, click the **V** key to enable & disable aimbot.
   
 ### ESP
-Being also named `wall hacks`, these cheats allow you to see players through walls.<br>
+**ESP** or also known as `wall hacks`, are cheats that allow you to see players positions through walls.<br>
 To configure ESP, open the `Render` tab.
 
 - To see eggs through walls with **boxes**, enable `PlayerESP`.
@@ -114,13 +120,13 @@ With the exception of the color pickers and some links, each option should all b
 
 ## [](#badges) Badges:
 StateFarm Client version 3.4.1-pre71 added custom badges. These badges are displayed to yourself and other StateFarm users next to the respective username, like the golden VIP egg.
-There are a number of badges available, and they do stack. Anyone can get the basic StateFarm badge, all you need to do is add "SFC" (not case-sensitive) to your username, and you will see the icon next to your name, as will anyone else using StateFarm.
+There are a number of badges available, and they do stack. Anyone can get the basic StateFarm badge, all you need to do is add "SFC"  to your username, and you will see the icon next to your name, as will anyone else using StateFarm.
 > These badges are based on usernames and not any other metric, so a user who has a badge is not automatically another StateFarm user, nor are they the real person. The badges are for fun and don't serve to be a verification method.
 
-### Other Available Badges:
+### Available Badges:
 
-- Gold StateFarm: For devs.
-- Silver StateFarm: For active server boosters (https://statefarm.onlypuppy7.online).
+- Gold StateFarm: For developers.
+- Silver StateFarm: For active server boosters ([our discord](https://statefarm.onlypuppy7.online)).
 - Bronze StateFarm: For previous server boosters and other things such as prize winners.
 - Basic StateFarm: Adding "sfc" to your username.
 - FBI: For Eggforcers.
@@ -132,10 +138,11 @@ The badges can be turned off by unchecking "CustomBadges" in the misc tab.
 StateFarm chat is a universal chatroom to chat with other client users or discord members. <br> 
 <!-- The chat is universal to all SFNetwork clients, so it also includes [**KrunkFarm**](https://github.com/onlypuppy7/KrunkFarmClient) users.--> <!-- uncomment once KrukFarm finished.-->
 - **Username** - your username in the chatroom.
-- **Show/Hide** - toggle chat panel visibility. 
+- **Show/Hide** - toggle chat panel visibility.
 - **Notifications** - shows an in-game notification for every new chat message.
 - **Notification Sound** - play a sound for every new message.
 - **Auto Start Chat** - will show the chat panel and connect to the chatroom on startup.
+- **Prompt Invitations** - show invite prompts when someone sends a game code in the chatroom
 
 ## [](#combat) Combat:
 - **Aimbot** - locks onto targeted player.
@@ -150,10 +157,10 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
   - **SilentAim** - shoots without moving the camera. ONLY visual, VERY blatant cheating. [more information](https://youtu.be/R1NkSsi2LrI?t=20)
   - **SemiSilent** - SilentAimbot behavior, but will move the camera after a shot has been fired.
   - **NoWallTrack** - aimbot ignores the player if they're behind obstacles.
-  - **Prediction** - predicts where the player will be when the bullet hits them.
+  - **Prediction** - predicts where the player will be when the bullet hits them and ajusts aimbot accordingly
   - **AntiBloom** - locks onto the predicted bloom point. good for shooting & moving.
   - **AntiSwitch** - prevents the aimbot from changing the target until they die.
-  - **1Kill** - disables aimbot when the player dies.
+  - **1Kill** - disables aimbot when the targeted player dies.
   - **MinAngle** - prevents you from snapping if the angle between you and the player is greater than this value.
   - **AntiSnap** - this makes snapping smooth at higher values. useful to avoid being spotted.
   - **AntiSneak** - recommended distance under 2. this automatically kills players in this range.
@@ -183,16 +190,20 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
   - **ESP** - outlines the ammo/grenades
   - **Tracers** - adds tracers like the ones with normal ESP to ammo/grenades
   - **Regime** - allows you to configure when to trace
-- **FOV** - controls the FOV of the client.
-- **ZoomFOV** - controls how zoomed in/out you are.
-- **Perspective** - Allows you to switch between third and first person. Think Minecraft F5! Default bind is the DIGIT 5.
+- **ShowLookDir** - renders the looking direction of each player as a line
+	- **Render Above** - renders above obstacles
+- **FOV** - controls the FOV of the game.
+- **ZoomFOV** - controls how zoomed in/out you are. default is **C** to zoom
+- **Perspective** - Allows you to switch between third and first person. Think Minecraft F5! Default bind is the DIGIT **5** (`5`).
 - **Perspective Options** - options for the Perspective.
   - **Alpha Effect** - Makes your own player a bit transparent (currently affects ALL players though!).
   - **Y Offset** - offset of the camera in y-direction (how far behind should it be?)
   - **Z Offset** - offset of the camera in z-direction (how far above should it be?)
 - **CamWIP** - Work-in-progress module. You should leave this off if you are not a dev. 
 - **Wireframe** - outlines map objects to allow you to see directly though walls.
-- **EggSize** - changes how big eggs are. This does not affect hitboxes and is client-side only.
+- **EggSize** - changes how big eggs are. This does not affect hitboxes and is client-side 
+only.
+- **Particle Speed** - adjusts speed of particles
 - **SetDetail** - changes quality of game graphics.
 - **Textures** - disables some textures. primarily, the sky.
 - **RenderDelay** - basically, this adds extra FPS buffer.
@@ -217,6 +228,12 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
 - **BypassFilter** - bypass naughty word game message filter!
 - **TallChat** - makes the chat text taller, appends a character to all sent messages.
 - **AntiAFK** - prevents you from automatically leaving the lobby.
+- **Fake Message** - allows sending messages as MOD or SERVER (client sided only)
+	- **Send as**  - who to send fake message as
+	- **Refresh List** - refreshes list
+	- **Content** - the content of the fake message
+	- **Bold Text** - bold text
+	- **Send** - sends the fake message
 - **Spammer** - automatically send messages
   - **Delay** - the interval to send messages.
   - **Spam Text** - the message to spam.
@@ -344,7 +361,7 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
 - **CustomSFX(1-3)** - uses custom SFX packages. Allows for three different packages to be active at once.
 - **ReplaceLogo** - replaces shell shockers' logo with the StateFarm logo.
 - **AnimateTitle** - makes the page title look cool.
-- **Theme** - controls the UI theme.
+- **Theme** - controls the client's UI theme.
 
 ## [](#accounts) Accounts:
 Various account management tools
@@ -359,6 +376,9 @@ Various account management tools
 - **VIP Badge** - makes the VIP badge visible locally (other players won't see).
 - **NoAnnoyances** - removes ads.
 - **NoTrack** - removes some user data tracking code.
+- **Quick Respawn** - respawns quicker than usual
+- **Sneaky Despawn** - Despawns, similar to the `Esc` key, but you can move while despawning, not that you cannot deal damage while sneaky despawning. Default key is **`** (backtick)
+- **StateFarm updates** shows a element at the home screen about statefarm's update history, notifies you when update is available.
 - **ReplaceFeeds** - replaces the game menu's news and videos feed with content by the StateFarm dev team.
 - **CustomBadges** - enables custom StateFarm badges. [more info](#-badges)
 - **UnlockSkins** - unlocks all skins in locally (other players will not see these).
@@ -373,7 +393,7 @@ Various account management tools
 - **Custom Macro** - allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.
 - **DoAtStartup** - executes the entered macro at client startup.
 - **RandomPath** - forces a new random path (pathfinding currently disabled).
-<!-- I have no idea about silentRoll, so just gonna ignore and pretend like I missed it... -->
+- **SilentRoll** - Rolls around without showing it client sided
 - **SeizureX** - rotates the player by the specified amount around the y-axis (yaw).
 - **SeizureY** - rotates the player by the specified amount around the x-axis (pitch).
 
@@ -395,11 +415,14 @@ Various account management tools
 
 # [](#adblocking)Adblocking
 > Ads are quite an annoying feature. Use the steps below to add a good ad-blocker.<br>
-> Use the 'Ad Block' feature in the Misc tab to disable Ad Blocker detection.<br>
+> Use the `Ad Block` feature in the **Misc** tab to disable Ad Blocker detection.
+> Use the `NoAnnoyances` feature to block other annoyances
+> Use the `NoTrack` feature to block tracking and analytics.
+> <br>
 > This is unspecific to StateFarm Client but is here as a helpful tip for general user experience improvement.
 
 **Procedure:**
-1. Install [uBlock Orgin](https://ublockorigin.com/) - the best adblocker.
+1. Install [uBlock Orgin](https://ublockorigin.com/) - the best blocker.
     - **uBlock Origin** is NOT **uBlock**. They are **different**.
 2. Enable uBlock Origin. That's it. No more ads.
 
@@ -407,30 +430,31 @@ Various account management tools
 
 # [](#issues-and-troubleshooting)Issues and Troubleshooting
 
-|       Known Issues         |  Solution                                                |
+|       Issue        |  Solution                                                |
 |----------------|---------------------------------------------|
 |Stuck on loading screen|Press CTRL+F5 (or FN+F5) until "Script Injected" is shown.|
 
-> If you have any issues, feel free to contact us in our [Discord server](https://dsc.gg/sfnetwork).
+> If you have any issues, contact us in our [Discord server](https://dsc.gg/sfnetwork).
 
 <br>
 
 # [](#credits-and-disclaimer)Credits & Disclaimer
 
-- **Hydroflame521** - the man who started StateFarm client, a contributor of code.
-- **onlypuppy7** and **porcupane**, & **not_food** (micro contributions, dead now) - the OG developers of StateFarm Client.
-- **de_Neuublue**, **OakSwingZZZ** and **1ust** - wave 2 developers in StateFarm Client.
-- **susdung** - made the visuals improved on StateFarm Client.
-- **gus/yk0_0** - made some skyboxes used in StateFarm Client.
+ - **Hydroflame521** - for founding the project.
+ - **onlypuppy7** - for leading developement.
+ - **porcupane**, **not_food** , **de_Neuublue**, **OakSwingZZZ**, **1ust** , **Seq** for code contributions & developement.
+ - **susdung** - for the current version of the readme
+ - **gus/yk0_0** - for some skyboxes used in StateFarm Client.
 <!-- **Zertalious** - old code in old versions. -->
 <!-- oops i commented this out! what a horrible mistake! someone should really fix this idk... -->
 <!-- you just need to watch an ad before you can get credited in the readme. -->
-
 <br>
 
-**StateFarm Client is a powerful tool, but like any powerful tool, it can have unintended consequences. We urge you to consider these points before using it:**
-- Social Impact: StateFarm Client's functionalities may negatively impact your relationships. Using it excessively could lead to lost friendships, damaged reputations, and social isolation.
-- Public Perception: Using StateFarm Client in public lobbies is highly discouraged. It can cause frustration and hostility among others, potentially leading to bans and loss of in-game progress. Be respectful of shared spaces and avoid actions that disrupt others' experiences.
-- Loss of Progress: Your usage of StateFarm Client may cause you to lose all of your in-game progress such as "skins", "eggs", or VIP status. You may also be banned in game, which is not our concern.
+Statefarm Client is licensed under the **GNU General Public License v3.0** (GPL-3.0). This means you are free to use, modify, and distribute the UserScript, provided that you comply with the terms of the GPL-3.0. For more details, please refer to the full license text available [here]( https://github.com/Hydroflame522/StateFarmClient/blob/main/LICENSE.md).
+
+
+**Disclaimer**: The StateFarm Client team will **not** take any responsibility  for negative consequences caused by the user misusing the client. It is the user's responsibility to ensure it is used properly.
+
+StateFarm Client is a powerful tool, but like any powerful tool, it can have unintended consequences. So use it with caution.
 
 Remember, be safe & wise on the internet.
