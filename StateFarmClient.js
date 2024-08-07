@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre99
+// @version      3.4.1-pre100
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1447,7 +1447,7 @@ debug mode).`},
 `Sorry! No guide yet!`},
         ]);
             initModule({ location: tp.miscTab.pages[0], title: "Ad Block", storeAs: "adBlock", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "VIP Badge", storeAs: "spoofVIP", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "VIP Spoof", storeAs: "spoofVIP", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
@@ -3329,9 +3329,6 @@ z-index: 999999;
             annoyancesRemoved = true;
         }
 
-        if (extract('spoofVIP') && document.getElementById("chickenBadge")) document.getElementById("chickenBadge").style.display = "block";
-        else if (!extract('spoofVIP') && document.getElementById("chickenBadge")) document.getElementById("chickenBadge").style.display = 'none';
-
         const fetchAndProcessAudioFromZip = async function (zipURL) {
             try {
                 const response = await fetch(zipURL);
@@ -3618,6 +3615,39 @@ z-index: 999999;
             log("swapping out google analytics...");
             oldGa = unsafeWindow.ga;
             unsafeWindow.ga = F.interceptGa;
+
+            const vueAppisUpgraded = Object.getOwnPropertyDescriptor(vueApp, 'isUpgraded')?.get;
+            Object.defineProperty(vueApp, 'isUpgraded', {
+                get: function() {
+                    if ((!extract("spoofVIP")) && vueAppisUpgraded) {
+                        return vueAppisUpgraded.call(vueApp);
+                    } else {
+                        return true;
+                    }
+                }
+            });
+
+            const vueAppisSubscriber = Object.getOwnPropertyDescriptor(vueApp, 'isSubscriber')?.get;
+            Object.defineProperty(vueApp, 'isSubscriber', {
+                get: function() {
+                    if ((!extract("spoofVIP")) && vueAppisSubscriber) {
+                        return vueAppisSubscriber.call(vueApp);
+                    } else {
+                        return true;
+                    }
+                }
+            });
+
+            const vueDataisSubscriber = Object.getOwnPropertyDescriptor(vueData, 'isSubscriber')?.get;
+            Object.defineProperty(vueData, 'isSubscriber', {
+                get: function() {
+                    if ((!extract("spoofVIP")) && vueDataisSubscriber) {
+                        return vueDataisSubscriber.call(vueData);
+                    } else {
+                        return true;
+                    }
+                }
+            });
 
             ranEverySecond = true;
         };
@@ -4919,7 +4949,7 @@ z-index: 999999;
             modifyJS(`!${f(H._filterFunction)}(${f(H._insideFilterFunction)})`, `((!${f(H._filterFunction)}(${f(H._insideFilterFunction)}))||window.${functionNames.getDisableChatFilter}())`);
             //chat mods: make filtered text red
             let [_, elm, str] = js.match(/\)\),([a-zA-Z$_]+)\.innerHTML=([a-zA-Z$_]+),/);
-            modifyJS(_, _ + `${f(H._filterFunction)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[2]&&(${elm}.style.color="red"),`);
+            modifyJS(_, _ + `${f(H._filterFunction)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[3]&&(${elm}.style.color="red"),`);
             //skins
             match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
             if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
