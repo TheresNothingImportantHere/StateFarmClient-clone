@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre100
+// @version      3.4.1-pre101
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -408,7 +408,7 @@ let attemptedInjection = false;
         trihard: 6,
         random: 3, // :trol_fancy:
     };
-    const antiAFKString = "AntiAFK Message. This message is not visible to others. || ";
+    // const antiAFKString = "AntiAFK Message. This message is not visible to others. || ";
     const filteredList = [ //a selection of filtered words for antiafk. brimslate reports afk messages, so have fun reporting this and trying to explain this to the "eggforcers"
         'date', 'dick', 'fuck', 'fuk', 'suck', 'piss', 'hate', 'nude', 'fux', 'hate', 'pussy',
     ]; //filteredList[randomInt(0,filteredList.length-1)]
@@ -980,34 +980,33 @@ sniping and someone sneaks up on you
             initModule({ location: tp.chatTab.pages[0], title: "BypassFilter", storeAs: "chatFilterBypass", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.chatTab.pages[0], title: "Tall Chat", storeAs: "tallChat", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
-            initModule({ location: tp.chatTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.chatTab.pages[0], title: "Spammer", storeAs: "spamChat", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "FakeMessage", storeAs: "fakeMessageFolder", });
-                let listOfIDs = [];
-                if (unsafeWindow.extern && unsafeWindow.extern.inGame && ss && ss.PLAYERS) {
-                    ss.PLAYERS.forEach((player) => {
-                        listOfIDs.push({ text: player.name, value: String(player.id) });
-                        log({ text: player.name, value: player.id })
-                    });
-                };
-                initModule({ location: tp.fakeMessageFolder, title: "Send As", storeAs: "fakeMessageID", bindLocation: tp.chatTab.pages[1], dropdown: [ ...listOfIDs, { text: "MOD", value: "254" }, { text: "SERVER", value: "255" } ], defaultValue: "255" });
-                initModule({ location: tp.fakeMessageFolder, title: '(Refresh List)', storeAs: 'fakeMessageRefresh', button: 'REFRESH', bindLocation: tp.chatTab.pages[1], clickFunction: function () {
-                    updateMenu = true;
-                } });
-                initModule({ location: tp.fakeMessageFolder, title: "Content", storeAs: "fakeMessageText", defaultValue: "ЅtateFarm Client On Top! ", });
-                initModule({ location: tp.fakeMessageFolder, title: "Bold Text", storeAs: "fakeMessageBold", bindLocation: tp.chatTab.pages[1], });
-                initModule({ location: tp.fakeMessageFolder, title: 'SEND', storeAs: 'fakeMessageSend', button: 'SEND MESSAGE', bindLocation: tp.chatTab.pages[1], clickFunction: function () {
-                    if (ss.addChat && unsafeWindow.extern.inGame) {
-                        try {
-                            if (ss.isBadWord(extract("fakeMessageText"))) createPopup("Message is filtered.", "error");
-                            ss.addChat(extract("fakeMessageText"), !!extract("fakeMessageBold"), Number(extract("fakeMessageID")));
-                        } catch (error) {
-                            log("shit, sending a fake message failed. damn lmao.", error)
-                        };
-                    }
-                } });
-            tp.chatTab.pages[0].addSeparator();
+            let listOfIDs = [];
+            if (unsafeWindow.extern && unsafeWindow.extern.inGame && ss && ss.PLAYERS) {
+                ss.PLAYERS.forEach((player) => {
+                    listOfIDs.push({ text: player.name, value: String(player.id) });
+                    log({ text: player.name, value: player.id })
+                });
+            };
+            initModule({ location: tp.fakeMessageFolder, title: "Send As", storeAs: "fakeMessageID", bindLocation: tp.chatTab.pages[1], dropdown: [ ...listOfIDs, { text: "MOD", value: "254" }, { text: "SERVER", value: "255" } ], defaultValue: "255" });
+            initModule({ location: tp.fakeMessageFolder, title: '(Refresh List)', storeAs: 'fakeMessageRefresh', button: 'REFRESH', bindLocation: tp.chatTab.pages[1], clickFunction: function () {
+                updateMenu = true;
+            } });
+            initModule({ location: tp.fakeMessageFolder, title: "Content", storeAs: "fakeMessageText", defaultValue: "ЅtateFarm Client On Top! ", });
+            initModule({ location: tp.fakeMessageFolder, title: "Bold Text", storeAs: "fakeMessageBold", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.fakeMessageFolder, title: 'SEND', storeAs: 'fakeMessageSend', button: 'SEND MESSAGE', bindLocation: tp.chatTab.pages[1], clickFunction: function () {
+                if (ss.addChat && unsafeWindow.extern.inGame) {
+                    try {
+                        if (ss.isBadWord(extract("fakeMessageText"))) createPopup("Message is filtered.", "error");
+                        ss.addChat(extract("fakeMessageText"), !!extract("fakeMessageBold"), Number(extract("fakeMessageID")));
+                    } catch (error) {
+                        log("shit, sending a fake message failed. damn lmao.", error)
+                    };
+                }
+            } });
+        tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "Spammer Options", storeAs: "spammerFolder", });
                 initModule({ location: tp.spammerFolder, title: "Delay (ms)", storeAs: "spamChatDelay", slider: { min: 250, max: 60000, step: 10 }, defaultValue: 500, enableConditions: [["spamChat", true]], });
                 initModule({ location: tp.spammerFolder, title: "Spam Text", storeAs: "spamChatText", defaultValue: "ЅtateFarm Client On Top! ", });
@@ -1451,6 +1450,7 @@ debug mode).`},
             initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
+            initModule({ location: tp.chatTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
                 if (!(unsafeWindow.extern.gamePaused || sneakyDespawning)) {
@@ -1834,8 +1834,9 @@ debug mode).`},
         initMenu("init");
         log("StateFarm: applyStylesAddElements()");
         applyStylesAddElements(); //set font and change menu cass, and other stuff to do with the page
-        const intervalId1 = setInterval(everySecond, 1000);
-        const intervalId2 = setInterval(everyDecisecond, 100);
+        const intervalId1 = setInterval(every15Seconds, 15000);
+        const intervalId2 = setInterval(everySecond, 1000);
+        const intervalId3 = setInterval(everyDecisecond, 100);
         applyStateFarmLogo();
         const observer = new MutationObserver(applyStateFarmLogo);
         observer.observe(document.body, { subtree: true, childList: true });
@@ -3163,6 +3164,15 @@ z-index: 999999;
         accountRecords[currentEmail] = accountDetails;
         GM_setValue("StateFarm_AccountRecords", accountRecords);
     };
+    const every15Seconds = function () {
+        if (extract("debug")) log("goodness", extract("antiAFK"), extern.inGame, (document.getElementById("spectate").style.display == "none"), ss, ss.MYPLAYER, ss.MYPLAYER.ws, (!ss.MYPLAYER[H.playing]));
+        if (extract("antiAFK") && extern.inGame && (document.getElementById("spectate").style.display == "none") && ss && ss.MYPLAYER && ss.MYPLAYER.ws && (!ss.MYPLAYER[H.playing])) {
+            if (extract("debug")) log("lets'r try'r to keep alive'r");
+            let out = ss.commOut.getBuffer();
+            out.packInt8(ss.SERVERCODES.keepAlive);
+            out.send(ss.MYPLAYER.ws);
+        };
+    };
     const everySecond = function () {
         if (extract("debug")) {
             unsafeWindow.globalSS = {};
@@ -3396,13 +3406,13 @@ z-index: 999999;
                     sendChatMessage(textAfterLastColon);
                 }; //mockMode, this will copy and send the chat into message when joining, but doesn't show to other players, so it's fine. solvable with an if statement bool
             };
-            if (extract("antiAFK")) {
-                if (Date.now() > (lastAntiAFKMessage + 270000)) {
-                    if (sendChatMessage(antiAFKString + filteredList[randomInt(0, filteredList.length - 1)])) {
-                        lastAntiAFKMessage = Date.now();
-                    };
-                };
-            };
+            // if (extract("antiAFK")) {
+            //     if (Date.now() > (lastAntiAFKMessage + 270000)) {
+            //         if (sendChatMessage(antiAFKString + filteredList[randomInt(0, filteredList.length - 1)])) {
+            //             lastAntiAFKMessage = Date.now();
+            //         };
+            //     };
+            // };
             if (extract("gameInfo")) {
                 let gameInfoText = GAMECODE + " | " + playersInGame + "/18 | " + (18 - playersInGame) + " slots remaining. | Server: " + unsafeWindow.vueData.currentRegionId + " | Gamemode: " + findKeyByValue(unsafeWindow.extern.GameType, unsafeWindow.vueApp.game.gameType) + " | Map: " + unsafeWindow.vueApp.game.mapName + " | Time in game: " + (Math.floor((Date.now() - timeJoinedGame) / 1000)) + "s" + (extract("autoLeave") ? " | AutoLeave: " + (Math.ceil(((timeJoinedGame + (1000 * extract("autoLeaveDelay"))) - Date.now()) / 1000)) + "s" : "");
                 gameInfoElement.innerText = gameInfoText;
@@ -4326,13 +4336,13 @@ z-index: 999999;
     };
     const chatPacketHandler = function (packet) {
         let string = extractChatPacket(packet);
-        if (string.includes(antiAFKString)) {
-            log(packet)
-            log("AntiAFK replacement...", string.originalReplace(antiAFKString, ""));
-            var constructed = constructChatPacket(string.originalReplace(antiAFKString, ""));
-            log(constructed)
-            return constructed;
-        };
+        // if (string.includes(antiAFKString)) {
+        //     log(packet)
+        //     log("AntiAFK replacement...", string.originalReplace(antiAFKString, ""));
+        //     var constructed = constructChatPacket(string.originalReplace(antiAFKString, ""));
+        //     log(constructed)
+        //     return constructed;
+        // };
         return packet;
     };
     const modifyPacket = function (data) {
