@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre98
+// @version      3.4.1-pre99
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1474,6 +1474,9 @@ debug mode).`},
             initModule({ location: tp.miscTab.pages[0], title: "Custom Badges", storeAs: "customBadges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins", storeAs: "unlockSkins", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function(){
+                extern.giveBasketBrosReward();
+            },});
             initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Unban", storeAs: "unban", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
