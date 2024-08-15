@@ -4716,31 +4716,58 @@ z-index: 999999;
             } else {
                 if (msg !== lastSentMessage) { //not spammed or afked
                     if (extract("chatFilterBypass") && ss.isBadWord(msg)) {
+						const exactLookAlikes = {
+							//(almost) exact lookalikes, will make it look better if it is enough
+							'a': 'а', 'e': 'е', 
+							'h': 'հ', 'i': 'і', 'j': 'ј',
+							'n': '𝗇', 'o': 'о', 'p': 'р',
+							'q': 'q', 'u': 'ս',  'w': 'ԝ',
+							'y': 'у',
+							//uppercase
+							'B': 'В', 'D': 'ꓓ', 'E': 'Е',
+							'H': 'Η', 'I': 'І', 'J': 'Ј', 
+							'U': '𐓎',
+							'V': 'ⴸ', 'W': 'Ԝ', 'X': 'Χ', 'Y': 'Υ',
+							'Z': 'Ζ', 
+							
+					  };
                       const lookAlikes = {
-                        //partially taken from https://gist.github.com/StevenACoffman/a5f6f682d94e38ed804182dc2693ed4b,
-                        //no dynamic loading bc we only need parts of it + it shouldnt change any time soon
-                        //I only took those who really look 100% alike (ignore k), should still be enough for it to do the job done
-                        a : "а",
-                        c : "c",
-                        d : "ԁ",
-                        e : "е",
-                        h : "h",
-                        i : "і",
-                        j : "ј",
-                        k : "κ",
-                        l : "ӏ",
-                        n : "ո",
-                        o : "о",
-                        p : "р",
-                        u : "ս",
-                        x : "х",
-                        y : "у"
+                        //nvm, found this complete list on reddit: https://www.reddit.com/r/Unicode/comments/gpgmb7/unique_unicode_chars_that_look_the_exact_same_as/
+						//should literally cover 100% of the thing now, still keeping fallback though
+                           ' ': ' ', '!': '！', '"': '＂', '$': '＄',
+						'%': '％', '&': '＆', "'": 'ˈ', '(': '（',
+						')': '）', '*': '⁎', '+': '＋', ',': '‚',
+						'-': '‐', '.': '․', '/': '⁄', '0': 'O',
+						'1': '𝟷', '2': '𝟸', '3': 'Ꝫ', '4': '４',
+						'5': '𝟻', '6': '𝟨', '7': '𝟽', '8': '𝟪',
+						'9': '𝟫', ':': '∶', ';': ';', '<': '𝈶',
+						'=': '᐀', '>': '𖼿', '?': 'ꛫ', '@': '＠',
+						'[': '［', '\\': '﹨', ']': '］', '_': 'ߺ',
+						'`': '`', 'b': 'ᖯ', 'c': 'ⅽ',
+						'd': '𝚍', 'f': '𝖿', 'g': '𝗀',
+						'k': '𝚔',
+						'l': 'ⅼ', 'm': 'ｍ', 'r': '𝗋', 's': '𐑈',
+						't': '𝚝', 'v': '∨',
+						'x': 'ⅹ',  'z': '𝗓', 'A': '𐊠',
+						'C': '𐊢', 
+						'F': '𐊇', 'G': 'Ԍ', 'K': 'Κ', 'L': 'Ⅼ', 'M': 'Μ',
+						'N': 'Ν', 'O': 'Ο', 'P': 'Ρ', 'Q': '𝖰',
+						'R': '𖼵', 'S': 'Ѕ', 'T': 'Τ', '{': '｛', '|': 'ا', '}': '｝',
+						'~': '∼',
                       };
                       let onlyReplace = msg;
-                      for (let char in lookAlikes) {
+					  //exact
+					  for (let char in exactLookAlikes) {
                         //replace all chars with lookalikes
-					  onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]); 
+					  onlyReplace = onlyReplace.replaceAll(char, exactLookAlikes[char]); 
                       };
+					  //did that work?
+					  if(ss.isBadWord(onlyReplace)){
+						  log("chatFilterBypass: exacts were not enough, trying full...");
+						for (let char in lookAlikes) {
+						onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]); 
+						};
+					  };
                       if(!ss.isBadWord(onlyReplace)){ 
                         //did the lookalike replace do the job? Set it as the new message
 						log("chatFilterBypass: lookalike replace worked!");
