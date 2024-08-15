@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre101
+// @version      3.4.1-pre102
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -4715,10 +4715,44 @@ z-index: 999999;
                 }
             } else {
                 if (msg !== lastSentMessage) { //not spammed or afked
-                    if (extract("chatFilterBypass")) {
+                    if (extract("chatFilterBypass") && ss.isBadWord(msg)) {
+                      const lookAlikes = {
+                        //partially taken from https://gist.github.com/StevenACoffman/a5f6f682d94e38ed804182dc2693ed4b,
+                        //no dynamic loading bc we only need parts of it + it shouldnt change any time soon
+                        //I only took those who really look 100% alike (ignore k), should still be enough for it to do the job done
+                        a : "а",
+                        c : "c",
+                        d : "ԁ",
+                        e : "е",
+                        h : "h",
+                        i : "і",
+                        j : "ј",
+                        k : "κ",
+                        l : "ӏ",
+                        n : "ո",
+                        o : "о",
+                        p : "р",
+                        u : "ս",
+                        x : "х",
+                        y : "у"
+                      };
+                      let onlyReplace = msg;
+                      for (let char in lookAlikes) {
+                        //replace all chars with lookalikes
+					  onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]); 
+                      };
+                      if(!ss.isBadWord(onlyReplace)){ 
+                        //did the lookalike replace do the job? Set it as the new message
+						log("chatFilterBypass: lookalike replace worked!");
+                        msg = onlyReplace;
+                      };
+                      if(ss.isBadWord(onlyReplace)){
+                        //if lookalike replace did NOT work, we use the old method.
+						log("chatFilterBypass: lookalike did NOT work, falling back to reverse...");
                         const UNICODE_RTL_OVERRIDE = '\u202e'
                         msg = ([UNICODE_RTL_OVERRIDE,].concat(reverseString(msg).split(""))).join("");
-                    };
+                      };
+					};
                 };
                 if (extract("tallChat") && !(msg.includes("᥊"))) {
                     msg = msg + "᥊";
