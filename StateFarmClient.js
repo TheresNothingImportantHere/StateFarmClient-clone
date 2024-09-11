@@ -5029,7 +5029,7 @@ z-index: 999999;
             //bypass chat filter
             modifyJS('.trim();', '.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
             //hook for control interception
-            match = new RegExp(`.prototype.${f(H._update)}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
+            match = new RegExp(`\\.prototype\\.${f(H._update)}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
             log("player update function:", match);
             modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
             //admin spoof lol
