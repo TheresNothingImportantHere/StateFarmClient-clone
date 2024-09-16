@@ -5061,7 +5061,7 @@ z-index: 999999;
             // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
 
             //Modifies matchmaker JS to block gamecodes.
-            match = js.match(/ion,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/);
+            match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
             if (match) {
                 modifyJS('region,', `region,window.${functionNames.gameBlacklisted}(${match[2]})?(${match[2]}.uuid="${getScrambled()}",${match[1]}(${match[2]}),vueApp.hideSpinner()):`);
             };
