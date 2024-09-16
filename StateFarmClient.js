@@ -2866,10 +2866,10 @@ z-index: 999999;
     };
     const setPrecision = function (value) { return Math.round(value * 8192) / 8192 }; //required precision
     const calculateYaw = function (pos) {
-        return setPrecision(Math.mod(Math.atan2(pos.x, pos.z), Math.PI2));
+        return setPrecision(Math.mod(Math.atan2(pos._x, pos._z), Math.PI2));
     };
     const calculatePitch = function (pos) {
-        return setPrecision(-Math.atan2(pos.y, Math.hypot(pos.x, pos.z)) % 1.5);
+        return setPrecision(-Math.atan2(pos.y, Math.hypot(pos._x, pos._z)) % 1.5);
     };
     const getAngularDifference = function (obj1, obj2) { //this is super scuffed
         return Math.abs(obj1[H.yaw] - obj2.yawReal) + Math.abs(obj1[H.pitch] - obj2.pitchReal);
@@ -2879,9 +2879,9 @@ z-index: 999999;
             target = vectorPassed ? target : target[H.actor][H.mesh].position;
             offsetY = offsetY || 0;
             return {
-                x: target.x - ss.MYPLAYER[H.actor][H.mesh].position.x,
-                y: target.y - ss.MYPLAYER[H.actor][H.mesh].position.y + offsetY,
-                z: target.z - ss.MYPLAYER[H.actor][H.mesh].position.z,
+                x: target._x - ss.MYPLAYER[H.actor][H.mesh].position._x,
+                y: target._y - ss.MYPLAYER[H.actor][H.mesh].position._y + offsetY,
+                z: target._z - ss.MYPLAYER[H.actor][H.mesh].position._z,
             };
         } else { //we really dont want this happening tho
             log("fuck");
@@ -3093,7 +3093,7 @@ z-index: 999999;
             object.generatedESP = true;
             ESPArray.push([object, tracerLines, box, target, object.lookDirLine]);
         };
-        if(object.lookDirLine && extract("lookTracers")){ //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
+        if (object.lookDirLine && extract("lookTracers")){ //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
             const TRACE_LENGTH_MULTIPLIER = 75; //how long is the trace max?
             const playerEye = object[H.actor].eye; // BABYLON.TransformNode (https://doc.babylonjs.com/typedoc/classes/BABYLON.TransformNode). TN of the "eye", as shell calls it. Basically camera pos.
 
@@ -3103,7 +3103,8 @@ z-index: 999999;
 
             //RAYCAST
             const rayToGround = ss.RAYS[H.rayCollidesWithMap](object[H.actor].eye.absolutePosition, conclusion, ss.RAYS.grenadeCollidesWithCell); //does player look at object, if yes, where?
-            const g = playerEye.absolutePosition; //easier acess
+            const g = playerEye.absolutePosition; //easier access
+            console.log("RAYCAST", g, g.x, g._x)
             if(rayToGround){
                 object.lookDirLine.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [g.x, g.y, g.z, rayToGround.pick.pickedPoint.x, rayToGround.pick.pickedPoint.y, rayToGround.pick.pickedPoint.z]);
                 //set line to correct points, with the map collision as endpoint
@@ -6345,9 +6346,9 @@ z-index: 999999;
                 //credit to helloworld for the idea (worked it out on my own tho :P)
                 if (ss.MYPLAYER[H.playing]) {
                     //camera adjustments
-                    ss.CAMERA.position.y = extract("perspective") !== "firstPerson" ? extract("perspectiveY") || 0 : 0;
-                    ss.CAMERA.position.z = extract("perspective") !== "firstPerson" ? extract("perspective") == "thirdPerson" ? -(extract("perspectiveZ") || 0) : extract("perspectiveZ") || 0 : 0;
-                    ss.CAMERA.rotation.x = extract("perspective") == "thirdPersonAlt" ? Math.PI : 0;
+                    ss.CAMERA.position._y = extract("perspective") !== "firstPerson" ? extract("perspectiveY") || 0 : 0;
+                    ss.CAMERA.position._z = extract("perspective") !== "firstPerson" ? extract("perspective") == "thirdPerson" ? (extract("perspectiveZ") || 0) : (-extract("perspectiveZ")) || 0 : 0;
+                    ss.CAMERA.rotation._x = extract("perspective") == "thirdPersonAlt" ? Math.PI : 0;
                     //rendering
                     ss.MYPLAYER[H.actor].gunContainer._children[0].renderingGroupId = extract("perspective") !== "firstPerson" ? 0 : 2;
                     ss.MYPLAYER[H.actor].gunContainer._children[2].renderingGroupId = extract("perspective") !== "firstPerson" ? 0 : 2;
