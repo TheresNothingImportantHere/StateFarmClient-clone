@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre105
+// @version      3.4.1-pre106
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -5087,7 +5087,7 @@ z-index: 999999;
 
             //intercept updateParticles for particle speed control
             //deobf is: updateParticles(manager, delta)
-            match = js.match(/function [a-zA-Z]{2}\([a-z],[a-z]\)\{for\(var [a-z]=0;[a-z]<[a-z]\.sprites/); //this should only give one match.
+            match = js.match(/function [a-zA-Z$_]+\([a-zA-Z$_]+,[a-zA-Z$_]+\)\{for\(var [a-zA-Z$_]+=0;[a-zA-Z$_]+<[a-zA-Z$_]+\.sprites/); //this should only give one match.
             const splitted = match[0].split("{"); //split right bevor function opens to inject delta manipulator. Might not be the best way but it works fine.
             const delta = splitted[0].charAt(splitted[0].length - 2); //name of the delta argument.
             modifyJS(match[0], splitted[0] + "{" //add curly bracket because the split removed it. ehhhhhh
