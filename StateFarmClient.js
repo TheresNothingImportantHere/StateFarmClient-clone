@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre106
+// @version      3.4.1-pre107
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -5027,7 +5027,7 @@ z-index: 999999;
             //reset join/leave msgs
             modifyJS(',console.log("joinGame()', ',window.' + functionNames.setNewGame + '(),console.log("value changed, also joinGame()');
             //bypass chat filter
-            modifyJS('.trim();', '.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
+            modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
             //hook for control interception
             match = new RegExp(`\\.prototype\\.${f(H._update)}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
             log("player update function:", match);
