@@ -136,7 +136,7 @@ let attemptedInjection = false;
     const bottingGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-botting";
     const violentmonkeyURL = "https://violentmonkey.github.io/get-it/";
 
-    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@3.3.0/babylon.min.js";
+    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.25.1/babylon.min.js";
 
     const replacementLogoURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement.png?raw=true";
     const replacementFeedURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamefeeds/";
