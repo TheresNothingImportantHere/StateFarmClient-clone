@@ -6071,7 +6071,9 @@ z-index: 999999;
 
                     if (player[H.actor]) {
                         let eggSize = extract("eggSize")
-                        player[H.actor][H.bodyMesh].scaling = { x: eggSize, y: eggSize, z: eggSize }
+                        player[H.actor][H.bodyMesh].scaling._x = eggSize;
+                        player[H.actor][H.bodyMesh].scaling._y = eggSize;
+                        player[H.actor][H.bodyMesh].scaling._z = eggSize;
                     };
 
                     player[H.actor][H.bodyMesh].renderingGroupId = extract("chams") ? 1 : 0;
@@ -6370,8 +6372,10 @@ z-index: 999999;
                 };
 
                 if (ss.MYPLAYER && ss.MYPLAYER[H.actor] && ss.MYPLAYER[H.actor][H.mesh]) {
-                    ss.MYPLAYER[H.actor][H.mesh].scaling.x = (extract("gunPosition") == "left" ? -1 : 1);
-                    ss.MYPLAYER[H.actor].gunContainer.scaling = extract("gunPosition") == "hidden" ? {x: 0, y: 0, z: 0} : {x: 1, y: 1, z: 1};
+                    ss.MYPLAYER[H.actor][H.mesh].scaling._x = (extract("gunPosition") == "left" ? -1 : 1);
+                    ss.MYPLAYER[H.actor].gunContainer.scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
+                    ss.MYPLAYER[H.actor].gunContainer.scaling._y = extract("gunPosition") == "hidden" ? 0 : 1;
+                    ss.MYPLAYER[H.actor].gunContainer.scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
                 };
 
                 if (extract("spamChat")) {
