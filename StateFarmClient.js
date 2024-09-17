@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre111
+// @version      3.4.1-pre112
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3168,7 +3168,8 @@ z-index: 999999;
         GM_setValue("StateFarm_AccountRecords", accountRecords);
     };
     const every15Seconds = function () {
-        if (extract("debug")) log("goodness", extract("antiAFK"), extern.inGame, (document.getElementById("spectate").style.display == "none"), ss, ss.MYPLAYER, ss.MYPLAYER.ws, (!ss.MYPLAYER[H.playing]));
+        //i forgot myself what this is for
+        // if (extract("debug")) log("goodness", extract("antiAFK"), extern.inGame, (document.getElementById("spectate").style.display == "none"), ss, ss.MYPLAYER, ss.MYPLAYER.ws, (!ss.MYPLAYER[H.playing]));
         if (extract("antiAFK") && extern.inGame && (document.getElementById("spectate").style.display == "none") && ss && ss.MYPLAYER && ss.MYPLAYER.ws && (!ss.MYPLAYER[H.playing])) {
             if (extract("debug")) log("lets'r try'r to keep alive'r");
             let out = ss.commOut.getBuffer();
@@ -4887,7 +4888,7 @@ z-index: 999999;
 
         const originalXHROpen = XMLHttpRequest.prototype.open; //wtf??? libertymutual collab??????
         const originalXHRGetResponse = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'response');
-        let shellshockjs
+        let shellshockjs;
         XMLHttpRequest.prototype.open = function (...args) { //outgoing
             const url = args[1];
             try {
@@ -4895,7 +4896,9 @@ z-index: 999999;
             } catch (error) { }; //phooey.
             if (url) {
                 let refresh = `?${Date.now()}`;
+
                 if (url.includes("js/shellshock.js")) shellshockjs = this;
+
                 let replaceFeeds = false;
                 try {
                     replaceFeeds = extract("replaceFeeds");
