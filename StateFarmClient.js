@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre108
+// @version      3.4.1-pre109
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -2879,9 +2879,9 @@ z-index: 999999;
             target = vectorPassed ? target : target[H.actor][H.mesh].position;
             offsetY = offsetY || 0;
             return {
-                x: - target.x + ss.MYPLAYER[H.actor][H.mesh].position.x,
-                y: - target.y + ss.MYPLAYER[H.actor][H.mesh].position.y - offsetY,
-                z: - target.z + ss.MYPLAYER[H.actor][H.mesh].position.z,
+                x: target.x - ss.MYPLAYER[H.actor][H.mesh].position.x,
+                y: target.y - ss.MYPLAYER[H.actor][H.mesh].position.y + offsetY,
+                z: target.z - ss.MYPLAYER[H.actor][H.mesh].position.z,
             };
         } else { //we really dont want this happening tho
             log("fuck");
@@ -4481,6 +4481,11 @@ z-index: 999999;
     const getAimbot = function (target) {
         let targetPosition = extract("prediction") ? predictPosition(target) : target[H.actor][H.mesh].position;
         let directionVector = getDirectionVectorFacingTarget(targetPosition, true, -0.05);
+
+        //NOTE: i dont really know HOW good this is of a fix! at least it will only affect aimbot and not anything else :pensive:
+        directionVector.x = -directionVector.x;
+        directionVector.y = -directionVector.y;
+        directionVector.z = -directionVector.z;
 
         let direction = {
             yawReal: calculateYaw(directionVector),
@@ -6521,6 +6526,12 @@ z-index: 999999;
                         player.distance = distancePlayers(player);
                         player.adjustedDistance = distancePlayers(player, 2);
                         const directionVector = getDirectionVectorFacingTarget(player);
+                        
+                        //NOTE: i dont really know HOW good this is of a fix! at least it will only affect this
+                        directionVector.x = -directionVector.x;
+                        directionVector.y = -directionVector.y;
+                        directionVector.z = -directionVector.z;
+
                         player.angleDiff = getAngularDifference(ss.MYPLAYER, { yawReal: calculateYaw(directionVector), pitchReal: calculatePitch(directionVector) });
                         player.isVisible = getLineOfSight(player, extract("prediction"));
 
