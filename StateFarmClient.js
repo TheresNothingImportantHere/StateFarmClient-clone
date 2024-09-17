@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre109
+// @version      3.4.1-pre110
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -386,7 +386,7 @@ let attemptedInjection = false;
     const tp = {}; // <-- tp = tweakpane
     // blank variables
     let ss = {};
-    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -882,8 +882,10 @@ sniping and someone sneaks up on you
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "Auto Fire", storeAs: "enableAutoFire", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "AutoFireType", storeAs: "autoFireType", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Force Automatic", value: "forceAutomatic" }, { text: "While Visible", value: "whileVisible" }, { text: "While Aimbotting", value: "whileAimbot" }, { text: "Visible and Aimbotting", value: "whileVisAimbot" }, { text: "Always", value: "always" }], defaultValue: "leftMouse", showConditions: [["enableAutoFire", true]] });
+            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, });
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "GrenadeMAX", storeAs: "grenadeMax", bindLocation: tp.combatTab.pages[1], });
+            initModule({ location: tp.combatTab.pages[0], title: "Nade Power", storeAs: "grenadePower", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 1, });
         //RENDER MODULES
         initFolder({ location: tp.mainPanel, title: "Render", storeAs: "renderFolder", });
         initTabs({ location: tp.renderFolder, storeAs: "renderTab" }, [
@@ -3810,7 +3812,7 @@ z-index: 999999;
                 const fonz = Number((ss.MYPLAYER[H.actor][H.mesh].position.z).toFixed(3));
                 const yaw = Number((ss.MYPLAYER[H.yaw]).toFixed(3)); //could i function this? yea
                 const pitch = Number((ss.MYPLAYER[H.pitch]).toFixed(3));
-                const personalCoordinate = `XYZ: ${fonx}, ${fony}, ${fonz} Rot: ${yaw}, ${pitch}`;
+                const personalCoordinate = `XYZ: ${fonx}, ${fony}, ${fonz} Rot: ${yaw}, ${pitch} Acc: ${Number(accuracyPercentage).toFixed(3)}`;
                 coordElement.innerText = personalCoordinate;
                 void coordElement.offsetWidth;
                 coordElement.style.display = '';
@@ -4364,7 +4366,7 @@ z-index: 999999;
 
         if (arr[0] == ss.SERVERCODES.throwGrenade) { // comm code 27 = client to server grenade throw
             if (extract("grenadeMax")) {
-                arr[1] = 255;
+                arr[1] = 255 * (0 || extract("grenadePower"));
                 log("StateFarm: modified a grenade packet to be at full power");
                 return arr.buffer;
             } else {
@@ -6492,6 +6494,13 @@ z-index: 999999;
                     };
                 });
 
+                try {
+                    let minAccuracy = ss.MYPLAYER.weapon.accuracyMin + ss.MYPLAYER.weapon.accuracyLoss;
+                    accuracyPercentage = (ss.MYPLAYER.weapon.accuracy - minAccuracy) / (ss.MYPLAYER.weapon.accuracyMax - minAccuracy);
+                    accuracyPercentage = Math.max(0, accuracyPercentage);
+                } catch (error) {
+                    accuracyPercentage = 1;
+                };
 
                 // playerNearest=undefined; //currently unused and not defined
                 // enemyLookingAt=undefined; //currently unused and not defined
@@ -6650,8 +6659,8 @@ z-index: 999999;
                         doAutoFire = true;
                     };
                     if (doAutoFire) {
-                        if ((ammo.rounds > 0) || (ammo.store > 0)) {
-                            ss.MYPLAYER.pullTrigger();
+                        if ((ammo.rounds > 0) || (ammo.store > 0)) { //i fucking hate tweakpane. "errrm actually when a slider is 0 it becomes undefined" go fuck yourself.
+                            ((accuracyPercentage >= (extract("autoFireAccuracy") || 0))) && ss.MYPLAYER.pullTrigger();
                         } else {
                             ss.MYPLAYER.melee();
                         };
