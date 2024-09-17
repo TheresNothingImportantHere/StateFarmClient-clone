@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre110
+// @version      3.4.1-pre111
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3205,6 +3205,7 @@ z-index: 999999;
             unsafeWindow.globalSS.retrievedSFX = retrievedSFX;
             unsafeWindow.globalSS.findBadgesForUsername = findBadgesForUsername;
             unsafeWindow.globalSS.badgeList = badgeList;
+            unsafeWindow.globalSS.crosshairsPosition = crosshairsPosition;
             unsafeWindow.globalSS.pathfindingInfo = {
                 activePath: activePath,
                 pathfindingTargetOverride: pathfindingTargetOverride,
@@ -6009,13 +6010,17 @@ z-index: 999999;
 
                 crosshairsPosition.copyFrom(ss.MYPLAYER[H.actor][H.mesh].position);
 
-                //borked rn, just find a new method this one was pretty bad kekek
-
-                // const horizontalOffset = Math.sin(ss.MYPLAYER[H.actor][H.mesh].rotation.y);
-                // const verticalOffset = Math.sin(ss.MYPLAYER[H.pitch]);
-                // crosshairsPosition.x += horizontalOffset;
-                // crosshairsPosition.z += Math.cos(ss.MYPLAYER[H.actor][H.mesh].rotation.y);
-                // crosshairsPosition.y += (verticalOffset + 0.4);
+                // //eye level
+                crosshairsPosition.y += 0.4;
+                const forwardOffset = -5; 
+                const yaw = ss.MYPLAYER[H.yaw];
+                const pitch = -ss.MYPLAYER[H.pitch];
+                const forwardX = Math.sin(yaw) * Math.cos(pitch);
+                const forwardY = Math.sin(pitch);
+                const forwardZ = Math.cos(yaw) * Math.cos(pitch);
+                crosshairsPosition.x += forwardX * forwardOffset;
+                crosshairsPosition.y += forwardY * forwardOffset;
+                crosshairsPosition.z += forwardZ * forwardOffset;
 
                 ammo = ss.MYPLAYER.weapon.ammo;
 
