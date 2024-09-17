@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre112
+// @version      3.4.1-pre113
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -386,7 +386,7 @@ let attemptedInjection = false;
     const tp = {}; // <-- tp = tweakpane
     // blank variables
     let ss = {};
-    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -1200,7 +1200,10 @@ But check out the GitHub guide.`},
             ], defaultValue: "defaultTheme", changeFunction: function(value) {
                 applyTheme(value.value);
             }});
-        //ACCOUNT MODULES
+            tp.themingTab.pages[0].addSeparator();
+            initModule({ location: tp.themingTab.pages[0], title: "Enable Party Lights", storeAs: "partyLightsEnabled", bindLocation: tp.themingTab.pages[1], });
+            initModule({ location: tp.themingTab.pages[0], title: "Party Lights Intensity", storeAs: "partyLightsIntensity", slider: { min: 0.01, max: 20, step: 0.01 }, defaultValue: 0.5, });
+            //ACCOUNT MODULES
         initFolder({ location: tp.mainPanel, title: "Accounts", storeAs: "accountsFolder", });
         initTabs({ location: tp.accountsFolder, storeAs: "accountsTab" }, [
             {
@@ -2753,6 +2756,27 @@ z-index: 999999;
         let yaw_degrees = yaw * 180.0 / Math.PI; // conversion to degrees
         if (yaw_degrees < 0) yaw_degrees += 360.0; // convert negative to positive angles
         return yaw_degrees;
+    };
+    const hslToRgb = function(h, s, l) {
+        var r, g, b;
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            function hue2rgb(p, q, t) {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1 / 6) return p + (q - p) * 6 * t;
+                if (t < 1 / 2) return q;
+                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                return p;
+            };
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1 / 3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1 / 3);
+        };
+        return new L.BABYLON.Color3(r, g, b);
     };
     const applyStateFarmLogo = function () {
         if (extract("replaceLogo")) {
@@ -6501,6 +6525,20 @@ z-index: 999999;
                         });
                     };
                 });
+
+                let partyLightsIntensity = extract("partyLightsIntensity") || 0;
+
+                if (extract("partyLightsEnabled") && partyLightsIntensity > 0 && !ss.SCENE.lights.find(light => light.name === "light")) {
+                    log("Lets party :joe_cool:");
+                    partyLight = new L.BABYLON.PointLight("light", new L.BABYLON.Vector3(0, 10, 0), ss.SCENE);
+                    partyLight.diffuse = new L.BABYLON.Color3(1, 0, 0);
+                    partyLight.specular = new L.BABYLON.Color3(1, 1, 1);
+                };
+                if (partyLight) {
+                    partyLight.intensity = partyLightsIntensity;
+                    var hue = (Date.now() / 1000) % 1;
+                    partyLight.diffuse = hslToRgb(hue, 1, 0.5);
+                };
 
                 try {
                     let minAccuracy = ss.MYPLAYER.weapon.accuracyMin + ss.MYPLAYER.weapon.accuracyLoss;
