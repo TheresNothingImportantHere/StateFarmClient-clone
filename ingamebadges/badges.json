@@ -1,9 +1,6 @@
 {
     "instructions: enter names LOWERCASE and with NO userscores (_) or spaces ( )": [
     ],
-    "rainbow.gif": [
-        "onlypuppy7"
-    ],
     "gold.png": [
         "onlypuppy7",
         "doescolder",
@@ -19,6 +16,9 @@
     ],
     "silver.png": [
         "thereaper"
+    ],
+    "rainbow.gif": [
+        "[duck]"
     ],
     "bronze.png": [
         "mush",
