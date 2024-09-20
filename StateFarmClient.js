@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre113
+// @version      3.4.1-pre114
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3793,7 +3793,7 @@ z-index: 999999;
                 currentFrameIndex = (currentFrameIndex + 1) % titleAnimationFrames.length;
             };
         } else {
-            unsafeWindow.document.title = "Shell Shockers 🍳 Multiplayer ,io game";
+            unsafeWindow.document.title = "Shell Shockers 🍳 Multiplayer .io game";
         };
 
         if (startUpComplete && (!unsafeWindow.extern.inGame) && extract("autoLogin") !== "disabled" && (extract("autoLogin") == "always" || extract("autoLogin") == "noaccount" && unsafeWindow.vueApp.accountCreated == null)) {
