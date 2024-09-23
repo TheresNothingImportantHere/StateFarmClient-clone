@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre114
+// @version      3.4.1-pre115
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1156,6 +1156,7 @@ But check out the GitHub guide.`},
                     { text: 'morning', value: 'morning' },
                     { text: 'purple space', value: 'purple-space' },
                     { text: 'rosey', value: 'rosey' },
+                    { text: 'satellite', value: 'satellite' },
                     { text: 'space explosion', value: 'space-explosion' },
                     { text: 'spring', value: 'spring' },
                     { text: 'sunrise', value: 'sunrise' },
