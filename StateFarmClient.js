@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre115
+// @version      3.4.1-pre116
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -145,6 +145,7 @@ let attemptedInjection = false;
     const iconURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png";
     const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
     const skyboxURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/master/skyboxes/";
+    const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/ItsOverSmaller.png?raw=true";
 
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
     const jsArchiveURL = 'https://raw.githubusercontent.com/onlypuppy7/ShellShockJSArchives/main/js_archive/';
@@ -209,7 +210,7 @@ let attemptedInjection = false;
                         createAndAppendCommitHistoryBox(existingContainer);
                     } else if (attempts < maxAttempts) {
                         attempts++;
-                        log(`Attempt ${attempts}/${maxAttempts} failed. Retrying...`);
+                        // log(`Attempt ${attempts}/${maxAttempts} failed. Retrying...`);
                         setTimeout(checkForElement, interval); // Retry after interval
                     } else {
                         log('Element not found after maximum attempts');
@@ -386,7 +387,7 @@ let attemptedInjection = false;
     const tp = {}; // <-- tp = tweakpane
     // blank variables
     let ss = {};
-    let msgElement, botBlacklist, botWhitelist, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -1571,6 +1572,9 @@ debug mode).`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
+            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }], defaultValue: "none", });
+            initModule({ location: tp.clientTab.pages[0], title: "Fallback Behaviour", storeAs: "vardataType", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "never", });
+            tp.clientTab.pages[0].addSeparator();
             initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
             initModule({ location: tp.clientTab.pages[0], title: "Hide at Startup", storeAs: "hideAtStartup", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
             initModule({ location: tp.clientTab.pages[0], title: "No Console Logs", storeAs: "consoleLogs", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
@@ -1947,6 +1951,175 @@ debug mode).`},
                 deleteButton();
             }, 800);
          }, duration);
+    };
+    const createVarDataPopup = function (vardataButtonsInfo) {
+        closeVardataPopup = (vardataPopup, vardataOverlay) => {
+            vardataPopup.style.opacity = '0';
+            vardataOverlay.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(vardataPopup);
+                document.body.removeChild(vardataOverlay);
+            }, 400);
+        };
+    
+        //create vardataOverlay
+        vardataOverlay = document.createElement('div');
+        vardataOverlay.style.position = 'fixed';
+        vardataOverlay.style.top = '0';
+        vardataOverlay.style.left = '0';
+        vardataOverlay.style.width = '100%';
+        vardataOverlay.style.height = '100%';
+        vardataOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+        vardataOverlay.style.zIndex = '9998';
+        vardataOverlay.style.opacity = '0';
+        vardataOverlay.style.transition = 'opacity 0.4s ease-in-out';
+    
+        //create vardataPopup
+        vardataPopup = document.createElement('div');
+        vardataPopup.style.position = 'fixed';
+        vardataPopup.style.left = '50%';
+        vardataPopup.style.top = '50%';
+        vardataPopup.style.width = '40em';
+        vardataPopup.style.transform = 'translate(-50%, -50%)';
+        vardataPopup.style.color = '#fff';
+        vardataPopup.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        vardataPopup.style.padding = '15px';
+        vardataPopup.style.borderRadius = '5px';
+        vardataPopup.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+        vardataPopup.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+        vardataPopup.style.pointerEvents = 'auto';
+        vardataPopup.style.opacity = '0'; // Start invisible for fade-in effect
+        vardataPopup.style.transition = 'opacity 0.4s ease-in-out'; // Fade-in transition
+        vardataPopup.style.fontFamily = 'Bahnschrift, sans-serif';
+        vardataPopup.style.fontSize = '16px';
+        vardataPopup.style.zIndex = '9999';
+        vardataPopup.style.whiteSpace = 'pre-wrap';
+    
+        //set vardataPopup content
+        const title = "Valid VarData for this hash could not be retrieved.";
+        const message = `This could be due to a conflicting script or StateFarm Client is out of date.<br>
+<strong>Why am I seeing this?</strong>
+StateFarm Client was unable to retrieve matching VarData from GitHub. Here are some common reasons for this happening:<br>
+1. Multiple scripts are running. This is usually the most common reason.
+2. There are multiple userscript managers. If you're using ViolentMonkey, check if Tampermonkey is installed and also affecting the site.<br>
+<strong>What is VarData?</strong>
+Shell Shockers uses obfuscation to protect its code. This makes the names of all the variables scrambled every update. VarData is an automatically generated JSON file that restores some information to make mods possible. It is maintained by the StateFarm dev team and hosted on GitHub.<br>
+<strong>How do I generate VarData?</strong>
+You can generate VarData by using the command "sf.vardata" in the StateFarm Network Discord bot channel.
+<a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the StateFarm Network Discord server</a> to generate VarData!`;
+        const message2 = `<br>Alternatively, if you know what you're doing you can enable one of these options:`;
+        const image = `<img src='${itsOverURL}' style='width: 20%; height: 20%; margin-right: 15px; vertical-align: middle;'>`;
+        vardataPopup.innerHTML = `${image}<strong>${title}</strong><br><small style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Hash: ${hash}</small><br><br>${message}<br>
+                           <label for="vardataInput">Enter VarData:</label>
+                           <div style="display: flex; align-items: center;">
+                               <input type="text" id="vardataInput" style="flex: 1; padding: 5px; width: 250px; border: 1px solid rgba(255, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; border-radius: 5px; margin-right: 10px;">
+                               <button id="submitVarData" style="padding: 5px 15px; background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; cursor: pointer; transition: background-color 0.2s;">GO</button>
+                           </div>${message2}`;
+    
+        //create buttons
+        const vardataButtonContainer = document.createElement('div');
+        vardataButtonContainer.style.display = 'flex';
+        vardataButtonContainer.style.justifyContent = 'space-between';
+        vardataButtonContainer.style.marginTop = '10px';
+    
+        vardataButtonsInfo.forEach(({ id, text, action }) => {
+            const button = document.createElement('button');
+            button.id = id;
+            button.innerHTML = text;
+            button.style.padding = '5px 10px';
+            button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            button.style.color = '#fff';
+            button.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+            button.style.borderRadius = '5px';
+            button.style.cursor = 'pointer';
+            button.style.transition = 'background-color 0.2s';
+            button.style.flex = '1';
+            button.style.marginRight = '10px';
+            button.style.fontSize = '12px';
+            button.style.whiteSpace = 'pre-wrap';
+        
+            button.addEventListener('click', action);
+            button.addEventListener('mouseenter', () => button.style.backgroundColor = 'rgba(255, 255, 255, 0.3)');
+            button.addEventListener('mouseleave', () => button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)');
+        
+            vardataButtonContainer.appendChild(button);
+        });
+        
+        vardataPopup.appendChild(vardataButtonContainer);
+
+        const setButtonState = function (buttonId, isEnabled) {
+            const button = unsafeWindow.document.getElementById(buttonId);
+            if (button) {
+                button.disabled = !isEnabled;
+                button.style.opacity = isEnabled ? '1' : '0.5';
+                button.style.pointerEvents = isEnabled ? 'auto' : 'none';
+            }
+        };
+        
+        (setTimeout(() => {
+            vardataButtonsInfo.forEach(({ id, enabled }) => {
+                setButtonState(id, enabled);
+            });
+        }, 200));
+
+        //create checkbox
+        const vardataCheckboxContainer = document.createElement('div');
+        vardataCheckboxContainer.style.display = 'flex';
+        vardataCheckboxContainer.style.justifyContent = 'center';
+        vardataCheckboxContainer.style.alignItems = 'center';
+        vardataCheckboxContainer.style.marginTop = '15px';
+        vardataCheckboxContainer.style.fontSize = '16px';
+    
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'rememberCheckbox';
+        checkbox.style.display = 'none';
+    
+        const customCheckbox = document.createElement('span');
+        customCheckbox.style.width = '20px';
+        customCheckbox.style.height = '20px';
+        customCheckbox.style.display = 'inline-block';
+        customCheckbox.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        customCheckbox.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+        customCheckbox.style.borderRadius = '5px';
+        customCheckbox.style.marginRight = '8px';
+        customCheckbox.style.cursor = 'pointer';
+    
+        customCheckbox.addEventListener('click', () => {
+            checkbox.checked = !checkbox.checked;
+            change("vardataType", checkbox.checked ? 2 : 1);
+            customCheckbox.style.backgroundColor = checkbox.checked ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.1)';
+        });
+    
+        vardataCheckboxContainer.appendChild(customCheckbox);
+        vardataCheckboxContainer.appendChild(checkbox);
+        vardataCheckboxContainer.appendChild(document.createTextNode('Remember my choice'));
+        vardataPopup.appendChild(vardataCheckboxContainer);
+    
+        document.body.appendChild(vardataOverlay);
+        document.body.appendChild(vardataPopup);
+
+        //add inputs stuff
+        const input = document.getElementById('vardataInput');
+        const submitButton = document.getElementById('submitVarData');
+
+        submitButton.addEventListener('click', () => {
+            const inputValue = input.value;
+            
+            alert(`Submitted: ${inputValue}`);
+        });
+
+        input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                submitButton.click();
+            }
+        });
+    
+        //fade anims
+        setTimeout(() => {
+            vardataOverlay.style.opacity = '1';
+            vardataPopup.style.opacity = '1';
+        }, 10);
     };
 
     //StateFarmChat functions
@@ -2805,14 +2978,18 @@ z-index: 999999;
         return queryParams.get(param);
     };
     const fetchTextContent = function (url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, false);
-        xhr.send();
-        if (xhr.status === 200) {
-            return xhr.responseText;
-        } else {
-            console.error("Error fetching " + url);
-            return null;
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, false);
+            xhr.send();
+            if (xhr.status === 200) {
+                return xhr.responseText;
+            } else {
+                console.error("Error fetching " + url);
+                return null;
+            };
+        } catch (err) {
+            return null
         };
     };
     const findKeyByValue = function (obj, value) {
@@ -4955,42 +5132,70 @@ z-index: 999999;
                 return fetchTextContent(clientKeysURL + hash + ".json");
             };
 
-            let hash, onlineClientKeys;
             hash = L.CryptoJS.SHA256(originalJS).toString(L.CryptoJS.enc.Hex); // eslint-disable-line
             onlineClientKeys = getVardata(hash);
 
+            const vardataCache = GM_getValue("StateFarm_VarDataCache") || {};
+
             if (onlineClientKeys == "value_undefined" || onlineClientKeys == null) {
-                let userInput = prompt(`Valid VarData could not be retrieved online. This could be due to a conflicting script or your script is out of date. Enter VarData if you have it, or alternatively the hash filename of a previous game js to attempt to load that. Join the StateFarm Network Discord server to generate VarData! Link: ${discordURL} Perform command "sf.vardata" in the bot channel. Hash: ${hash}`, '');
-                if (userInput !== null && userInput !== '') {
-                    alert('Aight, let\'s try this. If it is invalid, it will just crash.');
-                    try {
-                        clientKeys = JSON.parse(userInput);
-                    } catch {
-                        log("maybe they did a hash??");
-                        try {
-                            const archivedJS = fetchTextContent(`${jsArchiveURL}${userInput}.js`);
-                            log("did that just work??");
-                            js = archivedJS;
-                            hash = userInput.split("_")[5];
-                            onlineClientKeys = getVardata(hash);
-                            clientKeys = JSON.parse(onlineClientKeys);
-                        } catch {
-                            //at this point, fuck it. it's not happening
-                        };
-                    };
+                onlineClientKeys = getVardata("latest");
+
+                const vardataFallback = extract("vardataFallback");
+                const vardataType = extract("vardataType");
+
+                const cachedForHash = vardataCache && vardataCache[hash];
+                const cachedLatest = vardataCache && vardataCache.latest;
+
+                if (onlineClientKeys && vardataFallback == "loadLatest") {
+                    //l8er dealt with
+                } else if (cachedForHash && vardataFallback == "loadCached") {
+                    clientKeys = JSON.parse(cachedForHash);
+                } else if (cachedLatest && vardataFallback == "loadLatest") {
+                    clientKeys = JSON.parse(cachedLatest);
                 } else {
-                    alert('You did not enter anything, this is gonna crash lmao.');
-                };
-            } else {
-                clientKeys = JSON.parse(onlineClientKeys);
-                if (GM_getValue("StateFarm_KeyCache")) {
-                    GM_setValue("StateFarm_KeyCache", GM_getValue("StateFarm_KeyCache")[onlineClientKeys.hash] = onlineClientKeys);
-                } else {
-                    GM_setValue("StateFarm_KeyCache", { [onlineClientKeys.hash]: GM_getValue("StateFarm_KeyCache") });
+                    const vardataButtonsInfo = [
+                        { id: 'loadLatest', enabled: !!onlineClientKeys, text: 'Load Latest\n(online)', action: () => {
+                            change("vardataFallback", 1);
+                            if (vardataType == "never") change("vardataType", 1);
+                        }},
+                        { id: 'loadCached', enabled: !!vardataCache[hash], text: 'Load Cached\n(this hash)', action: () => {
+                            change("vardataFallback", 2);
+                            if (vardataType == "never") change("vardataType", 1);
+                        }},
+                        { id: 'loadRecent', enabled: !!vardataCache.latest, text: 'Load Cached\n(most recent)', action: () => {
+                            change("vardataFallback", 3);
+                            if (vardataType == "never") change("vardataType", 1);
+                        }}
+                    ];
+
+                    createVarDataPopup(vardataButtonsInfo);
+    
+                    return;
                 };
             };
 
-            log(hash, onlineClientKeys);
+            if (onlineClientKeys && !clientKeys) clientKeys = JSON.parse(onlineClientKeys);
+
+            if (vardataCache && onlineClientKeys) {
+                vardataCache[clientKeys.checksum] = onlineClientKeys;
+                vardataCache.latest = onlineClientKeys;
+                GM_setValue("StateFarm_VarDataCache", vardataCache);
+            };
+
+            // removed feature
+            //         log("maybe they did a hash??");
+            //         try {
+            //             const archivedJS = fetchTextContent(`${jsArchiveURL}${userInput}.js`);
+            //             log("did that just work??");
+            //             js = archivedJS;
+            //             hash = userInput.split("_")[5];
+            //             onlineClientKeys = getVardata(hash);
+            //             clientKeys = JSON.parse(onlineClientKeys);
+            //         } catch {
+            //             //at this point, fuck it. it's not happening
+            //         };
+
+            log(hash, onlineClientKeys, clientKeys);
 
             H = clientKeys.vars;
 
