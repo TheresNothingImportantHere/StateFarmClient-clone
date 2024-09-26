@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre116
+// @version      3.4.1-pre117
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -145,7 +145,7 @@ let attemptedInjection = false;
     const iconURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png";
     const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
     const skyboxURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/master/skyboxes/";
-    const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/ItsOverSmaller.png?raw=true";
+    const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/ItsOver4Smaller.png?raw=true";
 
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
     const jsArchiveURL = 'https://raw.githubusercontent.com/onlypuppy7/ShellShockJSArchives/main/js_archive/';
@@ -1572,8 +1572,9 @@ debug mode).`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }], defaultValue: "none", });
+            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "none", });
             initModule({ location: tp.clientTab.pages[0], title: "Fallback Behaviour", storeAs: "vardataType", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "never", });
+            initModule({ location: tp.clientTab.pages[0], title: "Custom VarData", storeAs: "vardataCustom", defaultValue: "{}", enableConditions: [["vardataFallback", "loadCustom"]] });
             tp.clientTab.pages[0].addSeparator();
             initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
             initModule({ location: tp.clientTab.pages[0], title: "Hide at Startup", storeAs: "hideAtStartup", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
@@ -1953,12 +1954,13 @@ debug mode).`},
          }, duration);
     };
     const createVarDataPopup = function (vardataButtonsInfo) {
-        closeVardataPopup = (vardataPopup, vardataOverlay) => {
+        closeVardataPopup = () => {
             vardataPopup.style.opacity = '0';
             vardataOverlay.style.opacity = '0';
             setTimeout(() => {
                 document.body.removeChild(vardataPopup);
                 document.body.removeChild(vardataOverlay);
+                reloadPage();
             }, 400);
         };
     
@@ -2093,7 +2095,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
     
         vardataCheckboxContainer.appendChild(customCheckbox);
         vardataCheckboxContainer.appendChild(checkbox);
-        vardataCheckboxContainer.appendChild(document.createTextNode('Remember my choice'));
+        vardataCheckboxContainer.appendChild(document.createTextNode('Remember until next hash'));
         vardataPopup.appendChild(vardataCheckboxContainer);
     
         document.body.appendChild(vardataOverlay);
@@ -2105,8 +2107,24 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
 
         submitButton.addEventListener('click', () => {
             const inputValue = input.value;
+
+            const error = function () {
+                createPopup("Inputted VarData isn't valid.", "error");
+            };
             
-            alert(`Submitted: ${inputValue}`);
+            try {
+                let converted = JSON.parse(inputValue);
+                if (converted.vars && converted.checksum) {
+                    change("vardataCustom", inputValue);
+                    change("vardataFallback", 4);
+                    change("vardataType", 1); //custom isnt consistent enough
+                    closeVardataPopup();
+                } else {
+                    error();
+                };
+            } catch (e) {
+                error();
+            }
         });
 
         input.addEventListener('keypress', (event) => {
@@ -5136,35 +5154,60 @@ z-index: 999999;
             onlineClientKeys = getVardata(hash);
 
             const vardataCache = GM_getValue("StateFarm_VarDataCache") || {};
+            const previousHash = GM_getValue("StateFarm_PreviousHash") || "";
 
             if (onlineClientKeys == "value_undefined" || onlineClientKeys == null) {
                 onlineClientKeys = getVardata("latest");
 
                 const vardataFallback = extract("vardataFallback");
-                const vardataType = extract("vardataType");
+                const customVarData = extract("vardataCustom");
+                let vardataType = extract("vardataType");
+
+                if (vardataType == "justOnce") change("vardataType", 0);
+                if (vardataType == "nextHash" && hash !== previousHash) {
+                    change("vardataType", 0);
+                    vardataType = "never";
+                };
+
+                let convertedCustom;
+
+                try {
+                    convertedCustom = JSON.parse(customVarData);
+                    log("did convert");
+                } catch (e) {
+                    log("did not convert");
+                    convertedCustom = false;
+                };
 
                 const cachedForHash = vardataCache && vardataCache[hash];
-                const cachedLatest = vardataCache && vardataCache.latest;
+                const cachedRecent = vardataCache && vardataCache.latest;
 
-                if (onlineClientKeys && vardataFallback == "loadLatest") {
+                log(cachedForHash, cachedRecent)
+
+                if (vardataType != "never" && convertedCustom && vardataFallback == "loadCustom" && convertedCustom.vars && convertedCustom.checksum) {
+                    clientKeys = convertedCustom;
+                } else if (vardataType != "never" && onlineClientKeys && vardataFallback == "loadLatest") {
                     //l8er dealt with
-                } else if (cachedForHash && vardataFallback == "loadCached") {
+                } else if (vardataType != "never" && cachedForHash && vardataFallback == "loadCached") {
                     clientKeys = JSON.parse(cachedForHash);
-                } else if (cachedLatest && vardataFallback == "loadLatest") {
-                    clientKeys = JSON.parse(cachedLatest);
+                } else if (vardataType != "never" && cachedRecent && vardataFallback == "loadRecent") {
+                    clientKeys = JSON.parse(cachedRecent);
                 } else {
                     const vardataButtonsInfo = [
                         { id: 'loadLatest', enabled: !!onlineClientKeys, text: 'Load Latest\n(online)', action: () => {
                             change("vardataFallback", 1);
-                            if (vardataType == "never") change("vardataType", 1);
+                            if (extract("vardataType") == "never") change("vardataType", 1);
+                            closeVardataPopup();
                         }},
                         { id: 'loadCached', enabled: !!vardataCache[hash], text: 'Load Cached\n(this hash)', action: () => {
                             change("vardataFallback", 2);
-                            if (vardataType == "never") change("vardataType", 1);
+                            if (extract("vardataType") == "never") change("vardataType", 1);
+                            closeVardataPopup();
                         }},
                         { id: 'loadRecent', enabled: !!vardataCache.latest, text: 'Load Cached\n(most recent)', action: () => {
                             change("vardataFallback", 3);
-                            if (vardataType == "never") change("vardataType", 1);
+                            if (extract("vardataType") == "never") change("vardataType", 1);
+                            closeVardataPopup();
                         }}
                     ];
 
@@ -5175,6 +5218,8 @@ z-index: 999999;
             };
 
             if (onlineClientKeys && !clientKeys) clientKeys = JSON.parse(onlineClientKeys);
+
+            GM_setValue("StateFarm_PreviousHash", hash);
 
             if (vardataCache && onlineClientKeys) {
                 vardataCache[clientKeys.checksum] = onlineClientKeys;
@@ -5201,148 +5246,158 @@ z-index: 999999;
 
             let injectionString = "";
 
-            //SERVERSYNC
-            match = new RegExp(`!${H.CULL}&&(.+?\\}\\})`).exec(js);
-            log("SERVERSYNC:", match);
-            H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) : "function(){log('no serversync womp womp')}";
-            //PAUSE
-            match = new RegExp(`,setTimeout\\(\\(\\(\\)=>\\{([=A-z0-9\\(\\),\\{ \\.;!\\|\\?:\\}]+send\\([a-zA-Z$_]+\\))`).exec(js);
-            log("PAUSE:", match);
-            H.PAUSE = match ? `function(){${match[1]}}` : "function(){log('no pause womp womp')}";
-
-            const variableNameRegex = /^[a-zA-Z0-9_$\[\]"\\]*$/;
-            for (let name in H) {
-                let deobf = H[name];
-                if (name == "SERVERSYNC" || name == "PAUSE" || variableNameRegex.test(deobf)) { //serversync should only be defined just before...
-                    injectionString = `${injectionString}${name}: (() => { try { return ${deobf}; } catch (error) { return "value_undefined"; } })(),`;
-                } else {
-                    alert("Message from the StateFarm Devs: WARNING! The keys inputted contain non-variable characters! There is a possibility that this could run code unintended by the StateFarm team, although possibly there is also a mistake. Do NOT proceed with using this, and report to the StateFarm developers what is printed in the console.");
-                    log("REPORT THIS IN THE DISCORD SERVER:", name, deobf, clientKeys);
-                    const crashplease = "balls";
-                    crashplease = "balls2";
+            try {
+                //SERVERSYNC
+                match = new RegExp(`!${H.CULL}&&(.+?\\}\\})`).exec(js);
+                log("SERVERSYNC:", match);
+                H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) : "function(){log('no serversync womp womp')}";
+                //PAUSE
+                match = new RegExp(`,setTimeout\\(\\(\\(\\)=>\\{([=A-z0-9\\(\\),\\{ \\.;!\\|\\?:\\}]+send\\([a-zA-Z$_]+\\))`).exec(js);
+                log("PAUSE:", match);
+                H.PAUSE = match ? `function(){${match[1]}}` : "function(){log('no pause womp womp')}";
+    
+                const variableNameRegex = /^[a-zA-Z0-9_$\[\]"\\]*$/;
+                for (let name in H) {
+                    let deobf = H[name];
+                    if (name == "SERVERSYNC" || name == "PAUSE" || variableNameRegex.test(deobf)) { //serversync should only be defined just before...
+                        injectionString = `${injectionString}${name}: (() => { try { return ${deobf}; } catch (error) { return "value_undefined"; } })(),`;
+                    } else {
+                        alert("Message from the StateFarm Devs: WARNING! The keys inputted contain non-variable characters! There is a possibility that this could run code unintended by the StateFarm team, although possibly there is also a mistake. Do NOT proceed with using this, and report to the StateFarm developers what is printed in the console.");
+                        log("REPORT THIS IN THE DISCORD SERVER:", name, deobf, clientKeys);
+                        const crashplease = "balls";
+                        crashplease = "balls2";
+                    };
                 };
-            };
-
-            log('%cSTATEFARM INJECTION STAGE 1: GATHER VARS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-
-            const modifyJS = function (find, replace) {
-                let oldJS = js;
-                try {
-                    js = js.originalReplaceAll(find, replace);
-                } catch (err) {
-                    log("%cReplacement failed! Likely a required var was not found. Attempted to replace " + find + " with: " + replace, 'color: red; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
+    
+                log('%cSTATEFARM INJECTION STAGE 1: GATHER VARS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+    
+                const modifyJS = function (find, replace) {
+                    let oldJS = js;
+                    try {
+                        js = js.originalReplaceAll(find, replace);
+                    } catch (err) {
+                        log("%cReplacement failed! Likely a required var was not found. Attempted to replace " + find + " with: " + replace, 'color: red; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
+                    };
+                    if (oldJS !== js) {
+                        log("%cReplacement successful! Injected code: replaced: " + find + " with: " + replace, 'color: green; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
+                    } else {
+                        log("%cReplacement failed! Attempted to replace " + find + " with: " + replace, 'color: red; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
+                    };
                 };
-                if (oldJS !== js) {
-                    log("%cReplacement successful! Injected code: replaced: " + find + " with: " + replace, 'color: green; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
-                } else {
-                    log("%cReplacement failed! Attempted to replace " + find + " with: " + replace, 'color: red; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
+    
+                const f = function (varName) { return varName.replace("$", "\\$") };
+    
+                log('%cSTATEFARM INJECTION STAGE 2: INJECT VAR RETRIEVAL FUNCTION AND MAIN LOOP', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                //hook for main loop function in render loop
+                modifyJS(f(H.SCENE) + '.' + f(H.render), `window["${functionNames.retrieveFunctions}"]({${injectionString}},true)||${f(H.SCENE)}.render`);
+                modifyJS('log("After Game Ready"),', `log("After Game Ready"),window["${functionNames.retrieveFunctions}"]({${injectionString}}),`);
+                log('%cSuccess! Variable retrieval and main loop hooked.', 'color: green; font-weight: bold;');
+                log('%cSTATEFARM INJECTION STAGE 3: INJECT CULL INHIBITION', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                //stop removal of objects
+                modifyJS(`${f(H.CULL)})r`, `${functionNames.shouldNotCull}())r`);
+                log('%cSuccess! Cull inhibition hooked ' + f(H.CULL), 'color: green; font-weight: bold;');
+                log('%cSTATEFARM INJECTION STAGE 4: INJECT OTHER FUNCTIONS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                //hook for modifications just before firing
+                modifyJS('fire(){var', 'fire(){window.' + functionNames.beforeFiring + '(this.player);var');
+                //hook for fov mods
+                modifyJS(/\.fov\s*=\s*1\.25/g, '.fov = window.' + functionNames.fixCamera + '()');
+                modifyJS(/\.fov\s*\+\s*\(1\.25/g, '.fov + (window.' + functionNames.fixCamera + '()');
+                //chat mods: disable chat culling
+                const chatCull = /return\}[a-zA-Z$_]+\.length>4/.exec(js)[0];
+                modifyJS(chatCull, chatCull.originalReplace('4', `window.${functionNames.getChatLimit}()`));
+                //chat mods: disable filter (credit to A3+++ for this finding)
+                modifyJS(`!${f(H._filterFunction)}(${f(H._insideFilterFunction)})`, `((!${f(H._filterFunction)}(${f(H._insideFilterFunction)}))||window.${functionNames.getDisableChatFilter}())`);
+                //chat mods: make filtered text red
+                let [_, elm, str] = js.match(/\)\),([a-zA-Z$_]+)\.innerHTML=([a-zA-Z$_]+),/);
+                modifyJS(_, _ + `${f(H._filterFunction)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[3]&&(${elm}.style.color="red"),`);
+                //skins
+                match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
+                if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
+                //reset join/leave msgs
+                modifyJS(',console.log("joinGame()', ',window.' + functionNames.setNewGame + '(),console.log("value changed, also joinGame()');
+                //bypass chat filter
+                modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
+                //hook for control interception
+                match = new RegExp(`\\.prototype\\.${f(H._update)}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
+                log("player update function:", match);
+                modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
+                //admin spoof lol
+                modifyJS('isGameOwner(){return ', 'isGameOwner(){return window.' + functionNames.getAdminSpoof + '()?true:')
+                modifyJS('adminRoles(){return ', 'adminRoles(){return window.' + functionNames.getAdminSpoof + '()?255:')
+                //grab reason for connect fail
+                const FUNCTIONPARAM = new RegExp('function ' + f(H._connectFail) + '\\(([a-zA-Z$_]+)\\)').exec(js)[1];
+                log("FUNCTIONPARAM:", FUNCTIONPARAM);
+                modifyJS('function ' + f(H._connectFail) + '(' + f(FUNCTIONPARAM) + '){', 'function ' + f(H._connectFail) + '(' + f(FUNCTIONPARAM) + '){window.' + functionNames.onConnectFail + '(' + f(FUNCTIONPARAM) + ',' + f(H.ERRORARRAY) + ');')
+                //get rid of tutorial popup because its a stupid piece of shit
+                modifyJS(',vueApp.onTutorialPopupClick()', '');
+                //annoying shit
+                modifyJS('alert', 'console.log');
+                //pointer escape
+                modifyJS('onpointerlockchange=function(){', 'onpointerlockchange=function(){if (window.' + functionNames.getPointerEscape + '(arguments)) {return};');
+                //death hook
+                const DEATHARGS = new RegExp('function ' + f(H._deathFunction) + '\\(([a-zA-Z$_]+,[a-zA-Z$_]+)\\)').exec(js)[1];
+                log("DEATHARGS", DEATHARGS);
+                modifyJS('function ' + f(H._deathFunction) + '(' + DEATHARGS + '){', 'function ' + f(H._deathFunction) + '(' + f(DEATHARGS) + '){window.' + functionNames.interceptDeath + '(' + f(DEATHARGS) + ');');
+                //vip spoof/no ads credit absolutely goes to OakSwingZZZ
+                modifyJS('adsBlocked=' + FUNCTIONPARAM, 'adsBlocked=' + functionNames.adBlocker + '("adsBlocked")');
+                modifyJS('"user-has-adblock"', functionNames.adBlocker + '("user-has-adblock")');
+                modifyJS('layed=!1', 'layed=window.' + functionNames.adBlocker + '(!1)');
+                modifyJS('showAdBlockerVideo', 'hideAdBlockerVideo'); //hello eggs bullshit
+                modifyJS(H.USERDATA + '.playerAccount.isUpgraded()', functionNames.adBlocker + '(' + f(H.USERDATA) + '.playerAccount.isUpgraded())');
+                //respawn time stuff
+                modifyJS('5:10', functionNames.quickRespawn + '(5):' + functionNames.adBlocker + '(10)');
+                modifyJS(',3e3),console.log', `,window.${functionNames.quickRespawn}(3e3)),console.log`);
+                // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
+    
+                //Modifies matchmaker JS to block gamecodes.
+                match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
+                if (match) {
+                    modifyJS('region,', `region,window.${functionNames.gameBlacklisted}(${match[2]})?(${match[2]}.uuid="${getScrambled()}",${match[1]}(${match[2]}),vueApp.hideSpinner()):`);
                 };
+                //intercept and replace audio
+                match = js.match(/static play\(([a-zA-Z$_,]+)\){/);
+                log("AUDIO INTERCEPTION", match);
+                modifyJS(match[0], `${match[0]}[${match[1]}] = window.${functionNames.interceptAudio}(${match[1]});`);
+                modifyJS('"IFRAME"==document.activeElement.tagName', `("IFRAME"==document.activeElement.tagName&&document.activeElement.id!=='sfChat-iframe')`);
+                // skybox (yay)
+                modifyJS(`infiniteDistance=!0;`, `infiniteDistance=!0;window["${skyboxName}"]=${H.skybox};`);
+                modifyJS(`.name)}vueApp`, `.name)}window["${mapData}"]=${H.mapData};vueApp`);
+                //intercept player names before they are censored
+                modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
+                //intercept player names before they are censored
+                modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments, this.${H.player_})},`);
+                //intercept signedIn function
+                modifyJS(`if(this.isAnonymous`, `window.${functionNames.interceptSignedIn}(arguments);if(this.isAnonymous`);
+    
+                modifyJS(`="SPACE",`,`="SPACE",window.${functionNames.shouldInputSpace}()&&`)
+    
+                modifyJS(/tp-/g, '');
+                modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
+    
+                //intercept updateParticles for particle speed control
+                //deobf is: updateParticles(manager, delta)
+                match = js.match(/function [a-zA-Z$_]+\([a-zA-Z$_]+,[a-zA-Z$_]+\)\{for\(var [a-zA-Z$_]+=0;[a-zA-Z$_]+<[a-zA-Z$_]+\.sprites/); //this should only give one match.
+                const splitted = match[0].split("{"); //split right bevor function opens to inject delta manipulator. Might not be the best way but it works fine.
+                const delta = splitted[0].charAt(splitted[0].length - 2); //name of the delta argument.
+                modifyJS(match[0], splitted[0] + "{" //add curly bracket because the split removed it. ehhhhhh
+                  +`${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
+                  +splitted[1]
+                )
+    
+                log(H);
+                log(js);
+    
+                attemptedInjection = true;
+                return js;
+            } catch (error) {
+                log(error);
+                change("vardataType", 0);
+                alert("Bollocks! If you're getting this message, injection probably failed. To solve this, perform CTRL+F5 - this performs a hard reload. Check your VarData too! If this does not work, contact the developers.");
+                createPopup("Reloading page in 5 seconds...");
+                setTimeout(() => {
+                    reloadPage();
+                }, 5000);
             };
-
-            const f = function (varName) { return varName.replace("$", "\\$") };
-
-            log('%cSTATEFARM INJECTION STAGE 2: INJECT VAR RETRIEVAL FUNCTION AND MAIN LOOP', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-            //hook for main loop function in render loop
-            modifyJS(f(H.SCENE) + '.' + f(H.render), `window["${functionNames.retrieveFunctions}"]({${injectionString}},true)||${f(H.SCENE)}.render`);
-            modifyJS('log("After Game Ready"),', `log("After Game Ready"),window["${functionNames.retrieveFunctions}"]({${injectionString}}),`);
-            log('%cSuccess! Variable retrieval and main loop hooked.', 'color: green; font-weight: bold;');
-            log('%cSTATEFARM INJECTION STAGE 3: INJECT CULL INHIBITION', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-            //stop removal of objects
-            modifyJS(`${f(H.CULL)})r`, `${functionNames.shouldNotCull}())r`);
-            log('%cSuccess! Cull inhibition hooked ' + f(H.CULL), 'color: green; font-weight: bold;');
-            log('%cSTATEFARM INJECTION STAGE 4: INJECT OTHER FUNCTIONS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-            //hook for modifications just before firing
-            modifyJS('fire(){var', 'fire(){window.' + functionNames.beforeFiring + '(this.player);var');
-            //hook for fov mods
-            modifyJS(/\.fov\s*=\s*1\.25/g, '.fov = window.' + functionNames.fixCamera + '()');
-            modifyJS(/\.fov\s*\+\s*\(1\.25/g, '.fov + (window.' + functionNames.fixCamera + '()');
-            //chat mods: disable chat culling
-            const chatCull = /return\}[a-zA-Z$_]+\.length>4/.exec(js)[0];
-            modifyJS(chatCull, chatCull.originalReplace('4', `window.${functionNames.getChatLimit}()`));
-            //chat mods: disable filter (credit to A3+++ for this finding)
-            modifyJS(`!${f(H._filterFunction)}(${f(H._insideFilterFunction)})`, `((!${f(H._filterFunction)}(${f(H._insideFilterFunction)}))||window.${functionNames.getDisableChatFilter}())`);
-            //chat mods: make filtered text red
-            let [_, elm, str] = js.match(/\)\),([a-zA-Z$_]+)\.innerHTML=([a-zA-Z$_]+),/);
-            modifyJS(_, _ + `${f(H._filterFunction)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[3]&&(${elm}.style.color="red"),`);
-            //skins
-            match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
-            if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
-            //reset join/leave msgs
-            modifyJS(',console.log("joinGame()', ',window.' + functionNames.setNewGame + '(),console.log("value changed, also joinGame()');
-            //bypass chat filter
-            modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
-            //hook for control interception
-            match = new RegExp(`\\.prototype\\.${f(H._update)}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
-            log("player update function:", match);
-            modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
-            //admin spoof lol
-            modifyJS('isGameOwner(){return ', 'isGameOwner(){return window.' + functionNames.getAdminSpoof + '()?true:')
-            modifyJS('adminRoles(){return ', 'adminRoles(){return window.' + functionNames.getAdminSpoof + '()?255:')
-            //grab reason for connect fail
-            const FUNCTIONPARAM = new RegExp('function ' + f(H._connectFail) + '\\(([a-zA-Z$_]+)\\)').exec(js)[1];
-            log("FUNCTIONPARAM:", FUNCTIONPARAM);
-            modifyJS('function ' + f(H._connectFail) + '(' + f(FUNCTIONPARAM) + '){', 'function ' + f(H._connectFail) + '(' + f(FUNCTIONPARAM) + '){window.' + functionNames.onConnectFail + '(' + f(FUNCTIONPARAM) + ',' + f(H.ERRORARRAY) + ');')
-            //get rid of tutorial popup because its a stupid piece of shit
-            modifyJS(',vueApp.onTutorialPopupClick()', '');
-            //annoying shit
-            modifyJS('alert', 'console.log');
-            //pointer escape
-            modifyJS('onpointerlockchange=function(){', 'onpointerlockchange=function(){if (window.' + functionNames.getPointerEscape + '(arguments)) {return};');
-            //death hook
-            const DEATHARGS = new RegExp('function ' + f(H._deathFunction) + '\\(([a-zA-Z$_]+,[a-zA-Z$_]+)\\)').exec(js)[1];
-            log("DEATHARGS", DEATHARGS);
-            modifyJS('function ' + f(H._deathFunction) + '(' + DEATHARGS + '){', 'function ' + f(H._deathFunction) + '(' + f(DEATHARGS) + '){window.' + functionNames.interceptDeath + '(' + f(DEATHARGS) + ');');
-            //vip spoof/no ads credit absolutely goes to OakSwingZZZ
-            modifyJS('adsBlocked=' + FUNCTIONPARAM, 'adsBlocked=' + functionNames.adBlocker + '("adsBlocked")');
-            modifyJS('"user-has-adblock"', functionNames.adBlocker + '("user-has-adblock")');
-            modifyJS('layed=!1', 'layed=window.' + functionNames.adBlocker + '(!1)');
-            modifyJS('showAdBlockerVideo', 'hideAdBlockerVideo'); //hello eggs bullshit
-            modifyJS(H.USERDATA + '.playerAccount.isUpgraded()', functionNames.adBlocker + '(' + f(H.USERDATA) + '.playerAccount.isUpgraded())');
-            //respawn time stuff
-            modifyJS('5:10', functionNames.quickRespawn + '(5):' + functionNames.adBlocker + '(10)');
-            modifyJS(',3e3),console.log', `,window.${functionNames.quickRespawn}(3e3)),console.log`);
-            // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
-
-            //Modifies matchmaker JS to block gamecodes.
-            match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
-            if (match) {
-                modifyJS('region,', `region,window.${functionNames.gameBlacklisted}(${match[2]})?(${match[2]}.uuid="${getScrambled()}",${match[1]}(${match[2]}),vueApp.hideSpinner()):`);
-            };
-            //intercept and replace audio
-            match = js.match(/static play\(([a-zA-Z$_,]+)\){/);
-            log("AUDIO INTERCEPTION", match);
-            modifyJS(match[0], `${match[0]}[${match[1]}] = window.${functionNames.interceptAudio}(${match[1]});`);
-            modifyJS('"IFRAME"==document.activeElement.tagName', `("IFRAME"==document.activeElement.tagName&&document.activeElement.id!=='sfChat-iframe')`);
-            // skybox (yay)
-            modifyJS(`infiniteDistance=!0;`, `infiniteDistance=!0;window["${skyboxName}"]=${H.skybox};`);
-            modifyJS(`.name)}vueApp`, `.name)}window["${mapData}"]=${H.mapData};vueApp`);
-            //intercept player names before they are censored
-            modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
-            //intercept player names before they are censored
-            modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments, this.${H.player_})},`);
-            //intercept signedIn function
-            modifyJS(`if(this.isAnonymous`, `window.${functionNames.interceptSignedIn}(arguments);if(this.isAnonymous`);
-
-            modifyJS(`="SPACE",`,`="SPACE",window.${functionNames.shouldInputSpace}()&&`)
-
-            modifyJS(/tp-/g, '');
-            modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
-
-            //intercept updateParticles for particle speed control
-            //deobf is: updateParticles(manager, delta)
-            match = js.match(/function [a-zA-Z$_]+\([a-zA-Z$_]+,[a-zA-Z$_]+\)\{for\(var [a-zA-Z$_]+=0;[a-zA-Z$_]+<[a-zA-Z$_]+\.sprites/); //this should only give one match.
-            const splitted = match[0].split("{"); //split right bevor function opens to inject delta manipulator. Might not be the best way but it works fine.
-            const delta = splitted[0].charAt(splitted[0].length - 2); //name of the delta argument.
-            modifyJS(match[0], splitted[0] + "{" //add curly bracket because the split removed it. ehhhhhh
-              +`${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
-              +splitted[1]
-            )
-
-            log(H);
-            log(js);
-
-            attemptedInjection = true;
-            return js;
         };
     };
 
