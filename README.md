@@ -1,4 +1,4 @@
-<div align='center'>﻿<img src='./icons/shell-logo-replacement.png' width='80%'></div>
+<div align='center'>﻿<img src='https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/sfc%20banner/shell%20logo%20(transparent%20for%20white%20backgrounds).png?raw=true' width='80%'></div>
 <h1 align='center'>StateFarm Client</h1>
 <h3 align='center'>for Shell Shockers</h3>
 <br><br>
