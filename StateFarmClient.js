@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre117
+// @version      3.4.1-pre118
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -145,7 +145,7 @@ let attemptedInjection = false;
     const iconURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png";
     const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
     const skyboxURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/master/skyboxes/";
-    const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/ItsOver4Smaller.png?raw=true";
+    const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/its over/ItsOver4Smaller.png?raw=true";
 
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
     const jsArchiveURL = 'https://raw.githubusercontent.com/onlypuppy7/ShellShockJSArchives/main/js_archive/';
