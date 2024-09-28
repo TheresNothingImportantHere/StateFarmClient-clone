@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre118
+// @version      3.4.1-pre119
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1790,6 +1790,7 @@ debug mode).`},
         initModule({ location: tp.botTabs.pages[2], title: "DoMove", storeAs: "botAutoMove", botParam: true, enableConditions: [["botRespawn", true]], });
         initModule({ location: tp.botTabs.pages[2], title: "DoShoot", storeAs: "botAutoShoot", botParam: true, enableConditions: [["botRespawn", true]], });
         initModule({ location: tp.botTabs.pages[2], title: "DoAimbot", storeAs: "botAimbot", botParam: true, enableConditions: [["botRespawn", true]], });;
+        initModule({ location: tp.botTabs.pages[2], title: "UseMinAccuracy", storeAs: "botAccuracy", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, botParam: true, enableConditions: [["botRespawn", true]], });
         //INFO STUFF
         initModule({ location: tp.botTabs.pages[3], storeAs: "botOnline", monitor: 17.5, botParam: true, });
 
@@ -4914,7 +4915,7 @@ z-index: 999999;
                     document.getElementById("genericPopup").children[2].children[1].textContent = "heeheeheehaw";
                     document.getElementById("genericPopup").children[0].children[1].textContent = 'MAKE NEW AUTOJOIN CODE';
                 };
-                if (extract("autoUnban") && (errorString == "sessionNotFound")) {
+                if (extract("autoUnban") && (errorString == "sessionNotFound" || errorString == "readyBeforeReady")) {
                     if (!attemptedAutoUnban) {
                         isBanned = true;
                     } else if (isBanned) {
@@ -5509,6 +5510,7 @@ z-index: 999999;
         addParam("antiBloom", extract("botAimbot"));
         addParam("grenadeMax", extract("botAimbot"));
         addParam("autoRefill", extract("botAimbot"));
+        addParam("autoFireAccuracy", extract("botAccuracy"));
         //do shoot
         addParam("antiSneak", extract("botAutoShoot") ? 1.4 : 0);
         addParam("enableAutoFire", extract("botAutoShoot"));
