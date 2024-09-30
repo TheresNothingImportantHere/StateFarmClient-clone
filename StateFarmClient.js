@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre120
+// @version      3.4.1-pre121
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -387,7 +387,7 @@ let attemptedInjection = false;
             { text: 'satellite', value: 'satellite' },
             { text: 'space explosion', value: 'space-explosion' },
             { text: 'spring', value: 'spring' },
-            { text: 'sunrise', value: 'sunrise' },
+            //{ text: 'sunrise', value: 'sunrise' }, //"Is that a sunset or sunrise? Looking back like where'd the time go? So much for trying to keep this moving slow, 'Cause I don't believe in her no more, But I remember How we talked shit like we knew what we wanted, and I still remember what she said"
             { text: 'sunset', value: 'sunset' }
         ];
     const divertContexts = {
@@ -1169,8 +1169,8 @@ But check out the GitHub guide.`},
                     if (!unsafeWindow[skyboxName]) return;
                     unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
                 }});
-                initModule({ location: tp.themingTab.pages[0], title: "Randomize skybox", storeAs: "randomSkyBox", bindLocation: tp.themingTab.pages[1], });
-                initModule({ location: tp.themingTab.pages[0], title: "Rand interv (min)", storeAs: "randomSkyBoxInterval", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
+                initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", bindLocation: tp.themingTab.pages[1], });
+                initModule({ location: tp.themingTab.pages[0], title: "Rand Interv (min)", storeAs: "randomSkyBoxInterval", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Legacy Models", storeAs: "legacyModels", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", bindLocation: tp.themingTab.pages[1], dropdown: [
