@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre119
+// @version      3.4.1-pre120
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -354,6 +354,7 @@ let attemptedInjection = false;
     let autoStrafeValue = [0, 0, "left"];
     let TEAMCOLORS = ["#fed838", "#40e0ff", "#ffc0a0"];
     let autoLeaveReminder = 9999;
+    let lastRandomSkyBoxChangeTime = Date.now(); //in milliseconds
     const allModules = [];
     const allFolders = [];
     const F = [];
@@ -372,6 +373,23 @@ let attemptedInjection = false;
         "OTHER9": createAudioContext(),
         "SOUNDS": createAudioContext(),
     };
+    const SKYBOXES_DROPDOWN = 
+        [
+            { text: 'Default', value: 'default' },
+            { text: 'aurora', value: 'aurora' },
+            { text: 'city', value: 'city' },
+            { text: 'green', value: 'green' },
+            { text: 'lava', value: 'lava' },
+            { text: 'moonlight', value: 'moonlight' },
+            { text: 'morning', value: 'morning' },
+            { text: 'purple space', value: 'purple-space' },
+            { text: 'rosey', value: 'rosey' },
+            { text: 'satellite', value: 'satellite' },
+            { text: 'space explosion', value: 'space-explosion' },
+            { text: 'spring', value: 'spring' },
+            { text: 'sunrise', value: 'sunrise' },
+            { text: 'sunset', value: 'sunset' }
+        ];
     const divertContexts = {
         "KOTC": ["kotc_capture", "kotc_capturing_opponents", "kotc_capturing_player", "kotc_contested", "kotc_pointscore", "kotc_roundend", "kotc_zonespawn"],
     };
@@ -1147,25 +1165,12 @@ But check out the GitHub guide.`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", bindLocation: tp.themingTab.pages[1], dropdown: [
-                    { text: 'Default', value: 'default' },
-                    { text: 'aurora', value: 'aurora' },
-                    { text: 'city', value: 'city' },
-                    { text: 'green', value: 'green' },
-                    { text: 'lava', value: 'lava' },
-                    { text: 'moonlight', value: 'moonlight' },
-                    { text: 'morning', value: 'morning' },
-                    { text: 'purple space', value: 'purple-space' },
-                    { text: 'rosey', value: 'rosey' },
-                    { text: 'satellite', value: 'satellite' },
-                    { text: 'space explosion', value: 'space-explosion' },
-                    { text: 'spring', value: 'spring' },
-                    { text: 'sunrise', value: 'sunrise' },
-                    { text: 'sunset', value: 'sunset' }
-                ], changeFunction: (newSkybox) => {
+            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", bindLocation: tp.themingTab.pages[1], dropdown: SKYBOXES_DROPDOWN, changeFunction: (newSkybox) => {
                     if (!unsafeWindow[skyboxName]) return;
                     unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
                 }});
+                initModule({ location: tp.themingTab.pages[0], title: "Randomize skybox", storeAs: "randomSkyBox", bindLocation: tp.themingTab.pages[1], });
+                initModule({ location: tp.themingTab.pages[0], title: "Rand interv (min)", storeAs: "randomSkyBoxInterval", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Legacy Models", storeAs: "legacyModels", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", bindLocation: tp.themingTab.pages[1], dropdown: [
@@ -6605,6 +6610,19 @@ z-index: 999999;
         });
 
         const applySkybox = () => {
+            //check if we should switch
+            const delta2 = Date.now()-lastRandomSkyBoxChangeTime;
+            const desire = extract("randomSkyBoxInterval")? extract("randomSkyBoxInterval")*60*1000 : -1; //stored in minutes, so *60 -> seconds *1000 -> milliseconds.
+            if(
+                extract("randomSkyBox") 
+                &&delta2!=-1
+                &&delta2>desire
+            ){
+                const newIdx = randomInt(0, SKYBOXES_DROPDOWN.length-1);
+                log("skybox change overdue for " +(delta2-desire)+ "ms. New skybox index chosen: " +newIdx);
+                change("skybox", newIdx); //maybe not the best to overwrite the actual module setting, but eh, don't want to rewrite the entire thing....
+                lastRandomSkyBoxChangeTime = Date.now();
+            }
             if (!unsafeWindow[skyboxName]) return;
             if (!(extract('skybox') === 'default' || extract('skybox') === true || ss.SCENE.skyboxTextureThing == extract('skybox'))) {
                 unsafeWindow[skyboxName].material.reflectionTexture = new L.BABYLON.CubeTexture(`${skyboxURL}${extract("skybox")}/skybox`, ss.SCENE);
