@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre122
+// @version      3.4.1-pre123
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -143,9 +143,10 @@ let attemptedInjection = false;
     const commitFeedURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/commits?path=StateFarmClient.js";
     const badgeListURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamebadges/";
     const iconURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png";
-    const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
-    const skyboxURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/master/skyboxes/";
     const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/its over/ItsOver4Smaller.png?raw=true";
+    
+    const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
+    const skyboxListURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/skyboxes/";
 
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
     const jsArchiveURL = 'https://raw.githubusercontent.com/onlypuppy7/ShellShockJSArchives/main/js_archive/';
@@ -179,20 +180,6 @@ let attemptedInjection = false;
             } catch (error) {
                 log("couldnt fetch greasyfork info :(");
             };
-            fetch(sfxURL).then(response => {
-                if (response.ok) return response.json();
-                else throw new Error('Failed to fetch folder contents');
-            }).then(data => {
-                data.forEach((file, index) => {
-                    retrievedSFX.push({ text: file.name.replace(".zip", ""), value: btoa(file.download_url) })
-                });
-                initMenu(false);
-                tp.mainPanel.hidden = extract("hideAtStartup");
-            }).catch(error => {
-                console.error('Error:', error);
-                initMenu(false);
-                tp.mainPanel.hidden = extract("hideAtStartup");
-            });
 
             let oldVersion = load("version");
             save("version", version);
@@ -308,7 +295,48 @@ let attemptedInjection = false;
                 
             
                 checkForElement();
-            }
+            };
+            
+            (async () => {
+                try {
+                    var response = await fetch(sfxURL);
+                    if (!response.ok) throw new Error('Failed to fetch folder contents (custom sfx)');
+            
+                    var data = await response.json();
+                    data.forEach((file) => {
+                        retrievedSFX.push({ text: file.name.replace(".zip", ""), value: btoa(file.download_url) });
+                    });
+
+                    //1ust i hated your implementation and this is me showing that i reached my breaking point.
+                    var response = await fetch(skyboxListURL); //when the nice guy loses his temper
+                    if (!response.ok) throw new Error('Failed to fetch folder contents (custom skyboxes)');
+            
+                    var data = await response.json();
+                    data.forEach((folder) => {
+                        if (folder.type === "dir") {
+                            let url = folder.url;
+                            //make it into a download url
+                            url = url.replace("//api.github.com/repos/", "//raw.githubusercontent.com/");
+                            url = url.replace("/contents/", "/master/");
+                            url = `${url.split("?")[0]}/`;
+
+                            log(folder.name, url, folder);
+
+                            loadedSkyboxes.push({
+                                text: folder.name,
+                                value: btoa(url)
+                            });
+                        };
+                    });
+            
+                    initMenu(false);
+                    tp.mainPanel.hidden = extract("hideAtStartup");
+                } catch (error) {
+                    console.error('Error:', error);
+                    initMenu(false);
+                    tp.mainPanel.hidden = extract("hideAtStartup");
+                };
+            })();            
         });
 
     };
@@ -373,23 +401,9 @@ let attemptedInjection = false;
         "OTHER9": createAudioContext(),
         "SOUNDS": createAudioContext(),
     };
-    const SKYBOXES_DROPDOWN = 
-        [
-            { text: 'Default', value: 'default' },
-            { text: 'aurora', value: 'aurora' },
-            { text: 'city', value: 'city' },
-            { text: 'green', value: 'green' },
-            { text: 'lava', value: 'lava' },
-            { text: 'moonlight', value: 'moonlight' },
-            { text: 'morning', value: 'morning' },
-            { text: 'purple space', value: 'purple-space' },
-            { text: 'rosey', value: 'rosey' },
-            { text: 'satellite', value: 'satellite' },
-            { text: 'space explosion', value: 'space-explosion' },
-            { text: 'spring', value: 'spring' },
-            //{ text: 'sunrise', value: 'sunrise' }, //"Is that a sunset or sunrise? Looking back like where'd the time go? So much for trying to keep this moving slow, 'Cause I don't believe in her no more, But I remember How we talked shit like we knew what we wanted, and I still remember what she said"
-            { text: 'sunset', value: 'sunset' }
-        ];
+    const loadedSkyboxes =  [
+        { text: 'Default', value: 'default' }
+    ];
     const divertContexts = {
         "KOTC": ["kotc_capture", "kotc_capturing_opponents", "kotc_capturing_player", "kotc_contested", "kotc_pointscore", "kotc_roundend", "kotc_zonespawn"],
     };
@@ -1167,7 +1181,7 @@ But check out the GitHub guide.`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], dropdown: SKYBOXES_DROPDOWN, changeFunction: (newSkybox) => {
+            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], dropdown: loadedSkyboxes, changeFunction: (newSkybox) => {
                     if (!unsafeWindow[skyboxName]) return;
                     unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
                 }});
@@ -6657,17 +6671,18 @@ z-index: 999999;
             const desire = extract("randomSkyBoxInterval")? extract("randomSkyBoxInterval")*60*1000 : -1; //stored in minutes, so *60 -> seconds *1000 -> milliseconds.
             if(
                 extract("randomSkyBox") 
-                &&delta2!=-1
-                &&delta2>desire
+                && delta2 != -1
+                && delta2 > desire
             ){
-                const newIdx = randomInt(0, SKYBOXES_DROPDOWN.length-1);
+                const newIdx = randomInt(0, loadedSkyboxes.length-1);
                 log("skybox change overdue for " +(delta2-desire)+ "ms. New skybox index chosen: " +newIdx);
                 change("skybox", newIdx); //maybe not the best to overwrite the actual module setting, but eh, don't want to rewrite the entire thing....
                 lastRandomSkyBoxChangeTime = Date.now();
             }
             if (!unsafeWindow[skyboxName]) return;
             if (!(extract('skybox') === 'default' || extract('skybox') === true || ss.SCENE.skyboxTextureThing == extract('skybox'))) {
-                unsafeWindow[skyboxName].material.reflectionTexture = new L.BABYLON.CubeTexture(`${skyboxURL}${extract("skybox")}/skybox`, ss.SCENE);
+                let url = `${atob(extract("skybox"))}/skybox`;
+                unsafeWindow[skyboxName].material.reflectionTexture = new L.BABYLON.CubeTexture(url, ss.SCENE);
                 unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
                 ss.SCENE.skyboxTextureThing = extract('skybox');
             };
