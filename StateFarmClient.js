@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre124
+// @version      3.4.1-pre125
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -795,7 +795,7 @@ let attemptedInjection = false;
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.sfChatTab.pages[0], title: "Username", storeAs: "sfChatUsername", tooltip: "your username in the chatroom", defaultValue: ("Guest" + (Math.floor(Math.random() * 8999) + 1000)), });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Username", storeAs: "sfChatUsername", tooltip: "Your username in the chatroom", defaultValue: ("Guest" + (Math.floor(Math.random() * 8999) + 1000)), });
             // initModule({ location: tp.sfChatTab.pages[0], title: "Join Chat", storeAs: "sfChatJoin", button: "Join", bindLocation: tp.sfChatTab.pages[1], clickFunction: function(){
             //     if (sfChatIframe != undefined){
             //         createPopup("Already Started. Try Showing it.");
@@ -821,7 +821,7 @@ let attemptedInjection = false;
             initModule({ location: tp.sfChatTab.pages[0], title: "Notifications", storeAs: "sfChatNotifications", tooltip: "Shows an in-game notification for every new chat message", bindLocation: tp.sfChatTab.pages[1], });
             initModule({ location: tp.sfChatTab.pages[0], title: "Notification Sound", storeAs: "sfChatNotificationSound", tooltip: "Play a sound for every new message", bindLocation: tp.sfChatTab.pages[1], });
             tp.sfChatTab.pages[0].addSeparator();
-            initModule({ location: tp.sfChatTab.pages[0], title: "Auto Start Chat", storeAs: "sfChatAutoStart", tooltip: "Will show the chat panel and connect to the chatroom on startup", bindLocation: tp.sfChatTab.pages[1], });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Auto Start Chat", storeAs: "sfChatAutoStart", tooltip: "Automatically connects to the chatroom on startup", bindLocation: tp.sfChatTab.pages[1], });
             tp.sfChatTab.pages[0].addSeparator();
             initModule({ location: tp.sfChatTab.pages[0], title: "Prompt Invitations", storeAs: "sfChatInvitations", tooltip: "Show invite prompts when someone sends a game code in the chatroom", bindLocation: tp.sfChatTab.pages[1], defaultValue: true, });
         //COMBAT MODULES
@@ -905,7 +905,7 @@ sniping and someone sneaks up on you
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "MinAngle", storeAs: "aimbotMinAngle", tooltip: "Prevents you from snapping if the angle between you and the player is greater than this value (in degrees)", slider: { min: 0.05, max: 360, step: 1 }, defaultValue: 360, enableConditions: [["aimbot", true]], });
                 initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "This makes snapping smooth at higher values. useful to avoid being spotted", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
-                initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: " Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "ESPColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
             tp.combatTab.pages[0].addSeparator();
@@ -914,7 +914,7 @@ sniping and someone sneaks up on you
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "Auto Fire", storeAs: "enableAutoFire", tooltip: "Automatically shoot the gun", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "AutoFireType", storeAs: "autoFireType", tooltip: "Picks how to shoot the gun", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Force Automatic", value: "forceAutomatic" }, { text: "While Visible", value: "whileVisible" }, { text: "While Aimbotting", value: "whileAimbot" }, { text: "Visible and Aimbotting", value: "whileVisAimbot" }, { text: "Always", value: "always" }], defaultValue: "leftMouse", showConditions: [["enableAutoFire", true]] });
-            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", tooltip: "skibidi wojak I think I am not sure if you are going to be able to get it to the house tomorrow or not but I can do it tomorrow if you want to come over and get it to you because I", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, });
+            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", tooltip: "Minimum spread/accuracy before shooting. Helpful for sniper guns, bad for automatics. Leave at 0 for default.", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, });
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "GrenadeMAX", storeAs: "grenadeMax", tooltip: "Sets grenades to be thrown to max power immediately without the need of charging", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "Nade Power", storeAs: "grenadePower", tooltip: "porcupane hijinks ensue — Today at 6:33 PM• goo/ber grenade power override for how long you hold ot", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 1, });
@@ -927,20 +927,20 @@ sniping and someone sneaks up on you
         ]);
             initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", tooltip: "Creates boxes around enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", tooltip: "Creates lines pointing from the center of the screen to the location of enemy players", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: " Renders players through walls", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: "Renders players through walls", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Nametags", storeAs: "nametags", tooltip: "Enlarges nametags and makes them appear through walls", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", tooltip: "Its borked", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", tooltip: "It's borked rn", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "Creates an ESP box at the predicted position of the player", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
-                initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "How should PlayerESP color behave", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "No tooltip available", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
-                initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", tooltip: "No tooltip available", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
-                initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "The mode for how ESP/Tracers are coloured. Different colour options present themselves based on option.\n\nStatic: Just stays as one colour.\nProximity: Fades between three colours based on how close someone is.\nVisibility: Switches between two colours if there is Line of Sight.", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "Static: (Unused)\nProximity: Moderately close colour\nVisibility: Visible.", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
+                initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", tooltip: "Static: (Unused)\nProximity: Furthest colour\nVisibility: (Unused)", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
+                initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", tooltip: "Proximity: Distance from which it fades from 1 to 2. Should be the smaller range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", tooltip: "Proximity: Distance from which it fades from 2 to 3. Should be the larger range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
                 tp.tracersFolder.addSeparator();
-                initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", tooltip: "What color to use for the PredictionESP box", defaultValue: "#ff0000", disableConditions: [ ["predictionESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", tooltip: "Colour to use for the PredictionESP box", defaultValue: "#ff0000", disableConditions: [ ["predictionESP", false]], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Ammo ESP/Tracers Options", storeAs: "tracersAmmoFolder", });
                 initFolder({ location: tp.tracersAmmoFolder, title: "Ammo", storeAs: "ammoFolder", });
@@ -6494,7 +6494,7 @@ z-index: 999999;
             //update ammoESP boxes, tracer lines, colors
             if (extract("ammoESP") || extract("ammoTracers") || extract("grenadeESP") || extract("grenadeTracers")) {
                 ss.OBJECTSVAR.getShadowMap()[H.renderList].forEach(item => {
-                    if (item._isEnabled && item.sourceMesh && item.sourceMesh.name && (item.sourceMesh.name == "grenadeItem" || item.sourceMesh.name == "ammo")) { //this is what we want
+                    if (item.isEnabled && item.isEnabled() && item.sourceMesh && item.sourceMesh.name && (item.sourceMesh.name == "grenadeItem" || item.sourceMesh.name == "ammo")) { //this is what we want
                         const itemType = item.sourceMesh.name;
                         let color = itemType == "ammo" && extract("ammoESPColor") || extract("grenadeESPColor");
                         color = hexToRgb(color);
