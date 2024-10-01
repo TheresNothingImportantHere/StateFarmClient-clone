@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre121
+// @version      3.4.1-pre122
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -405,7 +405,7 @@ let attemptedInjection = false;
     const tp = {}; // <-- tp = tweakpane
     // blank variables
     let ss = {};
-    let msgElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -416,6 +416,7 @@ let attemptedInjection = false;
     let isRightButtonDown = false;
     let configNotSet = true;
     let nameTextures = {};
+    let tooltips = {};
     let amountVisible = 0;
     const weaponArray = { //this could be done differently but i cba
         eggk47: 0,
@@ -698,6 +699,8 @@ let attemptedInjection = false;
         const value = {};
         value[module.storeAs] = (module.defaultValue !== undefined ? module.defaultValue : false);
 
+        if (module.tooltip) tooltips[module.title] = module.tooltip;
+
         tp[module.storeAs + "TiedModules"] = {
             showConditions: (module.showConditions || false),
             hideConditions: (module.hideConditions || false),
@@ -782,7 +785,7 @@ let attemptedInjection = false;
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.sfChatTab.pages[0], title: "Username", storeAs: "sfChatUsername", defaultValue: ("Guest" + (Math.floor(Math.random() * 8999) + 1000)), });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Username", storeAs: "sfChatUsername", tooltip: "No tooltip available", defaultValue: ("Guest" + (Math.floor(Math.random() * 8999) + 1000)), });
             // initModule({ location: tp.sfChatTab.pages[0], title: "Join Chat", storeAs: "sfChatJoin", button: "Join", bindLocation: tp.sfChatTab.pages[1], clickFunction: function(){
             //     if (sfChatIframe != undefined){
             //         createPopup("Already Started. Try Showing it.");
@@ -792,7 +795,7 @@ let attemptedInjection = false;
             // },});
             tp.sfChatTab.pages[0].addSeparator();
             initModule({
-                location: tp.sfChatTab.pages[0], title: "Show/Hide", storeAs: "sfChatShowHide", button: "Show/Hide", bindLocation: tp.sfChatTab.pages[1], defaultBind: "K", clickFunction: function () {
+                location: tp.sfChatTab.pages[0], title: "Show/Hide", storeAs: "sfChatShowHide", tooltip: "No tooltip available", button: "Show/Hide", bindLocation: tp.sfChatTab.pages[1], defaultBind: "K", clickFunction: function () {
                     if (sfChatContainer != undefined) {
                         if (sfChatContainer.style.display == "none") {
                             sfChatContainer.style.display = "block";
@@ -805,12 +808,12 @@ let attemptedInjection = false;
                 },
             });
             tp.sfChatTab.pages[0].addSeparator();
-            initModule({ location: tp.sfChatTab.pages[0], title: "Notifications", storeAs: "sfChatNotifications", bindLocation: tp.sfChatTab.pages[1], });
-            initModule({ location: tp.sfChatTab.pages[0], title: "Notification Sound", storeAs: "sfChatNotificationSound", bindLocation: tp.sfChatTab.pages[1], });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Notifications", storeAs: "sfChatNotifications", tooltip: "No tooltip available", bindLocation: tp.sfChatTab.pages[1], });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Notification Sound", storeAs: "sfChatNotificationSound", tooltip: "No tooltip available", bindLocation: tp.sfChatTab.pages[1], });
             tp.sfChatTab.pages[0].addSeparator();
-            initModule({ location: tp.sfChatTab.pages[0], title: "Auto Start Chat", storeAs: "sfChatAutoStart", bindLocation: tp.sfChatTab.pages[1], });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Auto Start Chat", storeAs: "sfChatAutoStart", tooltip: "No tooltip available", bindLocation: tp.sfChatTab.pages[1], });
             tp.sfChatTab.pages[0].addSeparator();
-            initModule({ location: tp.sfChatTab.pages[0], title: "Prompt Invitations", storeAs: "sfChatInvitations", bindLocation: tp.sfChatTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Prompt Invitations", storeAs: "sfChatInvitations", tooltip: "No tooltip available", bindLocation: tp.sfChatTab.pages[1], defaultValue: true, });
         //COMBAT MODULES
         initFolder({ location: tp.mainPanel, title: "Combat", storeAs: "combatFolder", });
         initTabs({ location: tp.combatFolder, storeAs: "combatTab" }, [
@@ -829,9 +832,9 @@ are Predictions and Antibloom. These
 improve the accuracy of the tracking.
 AntiSwitch will make you lock on to a
 target until they die, and if you don't want
-to target them after they die then choose
-1Kill too. Auto Refill helps you stay
-topped up and choosing the Smart
+to target anyone else after they die then
+choose 1Kill too. Auto Refill helps you
+stay topped up and choosing the Smart
 mode allows you to refill at the moment
 when you will not have a long
 reload time. GrenadeMAX makes all
@@ -874,37 +877,37 @@ the pistol. Ideal use case is when you are
 sniping and someone sneaks up on you
 (...hence it is called... AntiSneak).`},
         ]);
-            initModule({ location: tp.combatTab.pages[0], title: "Aimbot", storeAs: "aimbot", bindLocation: tp.combatTab.pages[1], defaultBind: "V", });
+            initModule({ location: tp.combatTab.pages[0], title: "Aimbot", storeAs: "aimbot", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], defaultBind: "V", });
             initFolder({ location: tp.combatTab.pages[0], title: "Aimbot Options", storeAs: "aimbotFolder", });
-                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "TargetVisible", storeAs: "aimbotVisibilityMode", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Prioritise Visible", value: "prioritise" }, { text: "Only Visible", value: "onlyvisible" }], defaultValue: "disabled", enableConditions: [["aimbot", true]] });
+                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "TargetVisible", storeAs: "aimbotVisibilityMode", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Prioritise Visible", value: "prioritise" }, { text: "Only Visible", value: "onlyvisible" }], defaultValue: "disabled", enableConditions: [["aimbot", true]] });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "ToggleRM", storeAs: "aimbotRightClick", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "SilentAim", storeAs: "silentAimbot", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "SemiSilent", storeAs: "aimbSemiSilent", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "NoWallTrack", storeAs: "noWallTrack", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                initModule({ location: tp.aimbotFolder, title: "ToggleRM", storeAs: "aimbotRightClick", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "SilentAim", storeAs: "silentAimbot", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "SemiSilent", storeAs: "aimbSemiSilent", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "NoWallTrack", storeAs: "noWallTrack", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", false]], });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "Prediction", storeAs: "prediction", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
-                initModule({ location: tp.aimbotFolder, title: "AntiBloom", storeAs: "antiBloom", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
+                initModule({ location: tp.aimbotFolder, title: "Prediction", storeAs: "prediction", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
+                initModule({ location: tp.aimbotFolder, title: "AntiBloom", storeAs: "antiBloom", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "AntiSwitch", storeAs: "antiSwitch", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "1 Kill", storeAs: "oneKill", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "AntiSwitch", storeAs: "antiSwitch", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "1 Kill", storeAs: "oneKill", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "MinAngle", storeAs: "aimbotMinAngle", slider: { min: 0.05, max: 360, step: 1 }, defaultValue: 360, enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
-                initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "MinAngle", storeAs: "aimbotMinAngle", tooltip: "No tooltip available", slider: { min: 0.05, max: 360, step: 1 }, defaultValue: 360, enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "No tooltip available", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "No tooltip available", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "ESPColor", storeAs: "aimbotColor", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
+                initModule({ location: tp.aimbotFolder, title: "ESPColor", storeAs: "aimbotColor", tooltip: "No tooltip available", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
             tp.combatTab.pages[0].addSeparator();
-            initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", bindLocation: tp.combatTab.pages[1], });
-            initModule({ location: tp.combatTab.pages[0], title: "Smart Refill", storeAs: "smartRefill", bindLocation: tp.combatTab.pages[1], showConditions: [["autoRefill", true]], });
+            initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], });
+            initModule({ location: tp.combatTab.pages[0], title: "Smart Refill", storeAs: "smartRefill", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], showConditions: [["autoRefill", true]], });
             tp.combatTab.pages[0].addSeparator();
-            initModule({ location: tp.combatTab.pages[0], title: "Auto Fire", storeAs: "enableAutoFire", bindLocation: tp.combatTab.pages[1], });
-            initModule({ location: tp.combatTab.pages[0], title: "AutoFireType", storeAs: "autoFireType", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Force Automatic", value: "forceAutomatic" }, { text: "While Visible", value: "whileVisible" }, { text: "While Aimbotting", value: "whileAimbot" }, { text: "Visible and Aimbotting", value: "whileVisAimbot" }, { text: "Always", value: "always" }], defaultValue: "leftMouse", showConditions: [["enableAutoFire", true]] });
-            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, });
+            initModule({ location: tp.combatTab.pages[0], title: "Auto Fire", storeAs: "enableAutoFire", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], });
+            initModule({ location: tp.combatTab.pages[0], title: "AutoFireType", storeAs: "autoFireType", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Force Automatic", value: "forceAutomatic" }, { text: "While Visible", value: "whileVisible" }, { text: "While Aimbotting", value: "whileAimbot" }, { text: "Visible and Aimbotting", value: "whileVisAimbot" }, { text: "Always", value: "always" }], defaultValue: "leftMouse", showConditions: [["enableAutoFire", true]] });
+            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", tooltip: "No tooltip available", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, });
             tp.combatTab.pages[0].addSeparator();
-            initModule({ location: tp.combatTab.pages[0], title: "GrenadeMAX", storeAs: "grenadeMax", bindLocation: tp.combatTab.pages[1], });
-            initModule({ location: tp.combatTab.pages[0], title: "Nade Power", storeAs: "grenadePower", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 1, });
+            initModule({ location: tp.combatTab.pages[0], title: "GrenadeMAX", storeAs: "grenadeMax", tooltip: "No tooltip available", bindLocation: tp.combatTab.pages[1], });
+            initModule({ location: tp.combatTab.pages[0], title: "Nade Power", storeAs: "grenadePower", tooltip: "No tooltip available", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 1, });
         //RENDER MODULES
         initFolder({ location: tp.mainPanel, title: "Render", storeAs: "renderFolder", });
         initTabs({ location: tp.renderFolder, storeAs: "renderTab" }, [
@@ -912,60 +915,60 @@ sniping and someone sneaks up on you
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Nametags", storeAs: "nametags", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Nametags", storeAs: "nametags", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
-                initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
-                initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
-                initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "No tooltip available", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "No tooltip available", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
+                initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", tooltip: "No tooltip available", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
+                initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
                 tp.tracersFolder.addSeparator();
-                initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", defaultValue: "#ff0000", disableConditions: [ ["predictionESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", tooltip: "No tooltip available", defaultValue: "#ff0000", disableConditions: [ ["predictionESP", false]], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Ammo ESP/Tracers Options", storeAs: "tracersAmmoFolder", });
                 initFolder({ location: tp.tracersAmmoFolder, title: "Ammo", storeAs: "ammoFolder", });
-                    initModule({ location: tp.ammoFolder, title: "AESP", storeAs: "ammoESP", bindLocation: tp.renderTab.pages[1], });
-                    initModule({ location: tp.ammoFolder, title: "ATracers", storeAs: "ammoTracers", bindLocation: tp.renderTab.pages[1], });
+                    initModule({ location: tp.ammoFolder, title: "AESP", storeAs: "ammoESP", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+                    initModule({ location: tp.ammoFolder, title: "ATracers", storeAs: "ammoTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
                     tp.ammoFolder.addSeparator();
-                    initModule({ location: tp.ammoFolder, title: "ARegime", storeAs: "ammoESPRegime", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
-                    initModule({ location: tp.ammoFolder, title: "AColor", storeAs: "ammoESPColor", defaultValue: "#ffff00", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
+                    initModule({ location: tp.ammoFolder, title: "ARegime", storeAs: "ammoESPRegime", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
+                    initModule({ location: tp.ammoFolder, title: "AColor", storeAs: "ammoESPColor", tooltip: "No tooltip available", defaultValue: "#ffff00", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
                 initFolder({ location: tp.tracersAmmoFolder, title: "Grenades", storeAs: "grenadesFolder", });
-                    initModule({ location: tp.grenadesFolder, title: "GESP", storeAs: "grenadeESP", bindLocation: tp.renderTab.pages[1], });
-                    initModule({ location: tp.grenadesFolder, title: "GTracers", storeAs: "grenadeTracers", bindLocation: tp.renderTab.pages[1], });
+                    initModule({ location: tp.grenadesFolder, title: "GESP", storeAs: "grenadeESP", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+                    initModule({ location: tp.grenadesFolder, title: "GTracers", storeAs: "grenadeTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
                     tp.grenadesFolder.addSeparator();
-                    initModule({ location: tp.grenadesFolder, title: "GRegime", storeAs: "grenadeESPRegime", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
-                    initModule({ location: tp.grenadesFolder, title: "GColor", storeAs: "grenadeESPColor", defaultValue: "#00ffff", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
+                    initModule({ location: tp.grenadesFolder, title: "GRegime", storeAs: "grenadeESPRegime", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
+                    initModule({ location: tp.grenadesFolder, title: "GColor", storeAs: "grenadeESPColor", tooltip: "No tooltip available", defaultValue: "#00ffff", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
             tp.renderTab.pages[0].addSeparator();
-            initModule({ location: tp.renderTab.pages[0], title: "Show Look Dir", storeAs: "lookTracers", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Show Look Dir", storeAs: "lookTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
             initFolder({ location: tp.renderTab.pages[0], title: "Look Direction Options", storeAs: "lookTracersFolder", });
-                initModule({ location: tp.lookTracersFolder, title: "Render Above", storeAs: "lookTracersRGI1", bindLocation: tp.renderTab.pages[1], });
+                initModule({ location: tp.lookTracersFolder, title: "Render Above", storeAs: "lookTracersRGI1", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
                 //initModule({ location: tp.lookTracersFolder, title: "length", storeAs: "lookTracersLength", slider: { min: 0, max: 100, step: 0.25 }, defaultValue: 75, });
-                initModule({ location: tp.lookTracersFolder, title: "Color", storeAs: "lookTracersColor", defaultValue: "#00ffff", });
+                initModule({ location: tp.lookTracersFolder, title: "LookTracerColor", storeAs: "lookTracersColor", tooltip: "No tooltip available", defaultValue: "#00ffff", });
             tp.renderTab.pages[0].addSeparator();
-            initModule({ location: tp.renderTab.pages[0], title: "FOV", storeAs: "fov", slider: { min: 0, max: 360, step: 3 }, defaultValue: 72, });
-            initModule({ location: tp.renderTab.pages[0], title: "Zoom FOV", storeAs: "zoom", slider: { min: 0, max: 72, step: 1 }, defaultValue: 15, bindLocation: tp.renderTab.pages[1], defaultBind: "C", });
+            initModule({ location: tp.renderTab.pages[0], title: "FOV", storeAs: "fov", tooltip: "No tooltip available", slider: { min: 0, max: 360, step: 3 }, defaultValue: 72, });
+            initModule({ location: tp.renderTab.pages[0], title: "Zoom FOV", storeAs: "zoom", tooltip: "No tooltip available", slider: { min: 0, max: 72, step: 1 }, defaultValue: 15, bindLocation: tp.renderTab.pages[1], defaultBind: "C", });
             tp.renderTab.pages[0].addSeparator();
-            initModule({ location: tp.renderTab.pages[0], title: "Perspective", storeAs: "perspective", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "1st Person (Default)", value: "firstPerson" }, { text: "3rd Person", value: "thirdPerson" }, { text: "3rd Person (Alt)", value: "thirdPersonAlt" } ], defaultValue: "disabled", defaultBind: "Digit5", });
+            initModule({ location: tp.renderTab.pages[0], title: "Perspective", storeAs: "perspective", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "1st Person (Default)", value: "firstPerson" }, { text: "3rd Person", value: "thirdPerson" }, { text: "3rd Person (Alt)", value: "thirdPersonAlt" } ], defaultValue: "disabled", defaultBind: "Digit5", });
             initFolder({ location: tp.renderTab.pages[0], title: "Perspective Options", storeAs: "perspectiveFolder", });
-                initModule({ location: tp.perspectiveFolder, title: "Alpha Effect", storeAs: "perspectiveAlpha", bindLocation: tp.renderTab.pages[1], });
+                initModule({ location: tp.perspectiveFolder, title: "Alpha Effect", storeAs: "perspectiveAlpha", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
                 tp.perspectiveFolder.addSeparator();
-                initModule({ location: tp.perspectiveFolder, title: "Y Offset", storeAs: "perspectiveY", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 0.5});
-                initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2});
-            initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Wireframe", storeAs: "wireframe", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Particle Speed", storeAs: "particleSpeedMultiplier", slider: { min: 0.05, max: 5, step: 0.05 }, defaultValue: 1, });
-            initModule({ location: tp.renderTab.pages[0], title: "Egg Size", storeAs: "eggSize", slider: { min: 0, max: 10, step: 0.25 }, defaultValue: 1, });
+                initModule({ location: tp.perspectiveFolder, title: "Y Offset", storeAs: "perspectiveY", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 0.5});
+                initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2});
+            initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", tooltip: "Still a WIP", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Wireframe", storeAs: "wireframe", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Particle Speed", storeAs: "particleSpeedMultiplier", tooltip: "No tooltip available", slider: { min: 0.05, max: 5, step: 0.05 }, defaultValue: 1, });
+            initModule({ location: tp.renderTab.pages[0], title: "Egg Size", storeAs: "eggSize", tooltip: "No tooltip available", slider: { min: 0, max: 10, step: 0.25 }, defaultValue: 1, });
             tp.renderTab.pages[0].addSeparator();
-            initModule({ location: tp.renderTab.pages[0], title: "Set Detail", storeAs: "setDetail", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Auto Detail", value: "autodetail" }, { text: "No Details", value: "nodetails" }, { text: "Shadows", value: "shadows" }, { text: "High Res", value: "highres" }, { text: "Shadows+High Res", value: "shadowshighres" }], defaultValue: "disabled" });
-            initModule({ location: tp.renderTab.pages[0], title: "Textures", storeAs: "enableTextures", bindLocation: tp.renderTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.renderTab.pages[0], title: "Render Delay", storeAs: "renderDelay", slider: { min: 0, max: 30000, step: 10 }, defaultValue: 0, });
+            initModule({ location: tp.renderTab.pages[0], title: "Set Detail", storeAs: "setDetail", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Auto Detail", value: "autodetail" }, { text: "No Details", value: "nodetails" }, { text: "Shadows", value: "shadows" }, { text: "High Res", value: "highres" }, { text: "Shadows+High Res", value: "shadowshighres" }], defaultValue: "disabled" });
+            initModule({ location: tp.renderTab.pages[0], title: "Textures", storeAs: "enableTextures", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.renderTab.pages[0], title: "Render Delay", storeAs: "renderDelay", tooltip: "No tooltip available", slider: { min: 0, max: 30000, step: 10 }, defaultValue: 0, });
         //HUD MODULES
         initFolder({ location: tp.mainPanel, title: "HUD", storeAs: "hudFolder", });
         initTabs({ location: tp.hudFolder, storeAs: "hudTab" }, [
@@ -973,17 +976,17 @@ sniping and someone sneaks up on you
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.hudTab.pages[0], title: "Show Bloom", storeAs: "revealBloom", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "Show LOS", storeAs: "showLOS", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "Show MinAngle", storeAs: "showMinAngle", bindLocation: tp.hudTab.pages[1], });
-            initModule({ showConditions: [["disabledlmao", true]], location: tp.hudTab.pages[0], title: "Leaderboard", storeAs: "highlightLeaderboard", bindLocation: tp.hudTab.pages[1], enableConditions: [["aimbot", true]], });
+            initModule({ location: tp.hudTab.pages[0], title: "Show Bloom", storeAs: "revealBloom", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "Show LOS", storeAs: "showLOS", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "Show MinAngle", storeAs: "showMinAngle", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ showConditions: [["disabledlmao", true]], location: tp.hudTab.pages[0], title: "Leaderboard", storeAs: "highlightLeaderboard", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], enableConditions: [["aimbot", true]], });
             tp.hudTab.pages[0].addSeparator();
-            initModule({ location: tp.hudTab.pages[0], title: "Co-ords", storeAs: "showCoordinates", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "RadarWIP", storeAs: "radar", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "HP Display", storeAs: "playerStats", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "PlayerInfo", storeAs: "playerInfo", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "GameInfo", storeAs: "gameInfo", bindLocation: tp.hudTab.pages[1], });
-            initModule({ location: tp.hudTab.pages[0], title: "ShowStream", storeAs: "showStreams", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "Co-ords", storeAs: "showCoordinates", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "RadarWIP", storeAs: "radar", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "HP Display", storeAs: "playerStats", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "PlayerInfo", storeAs: "playerInfo", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "GameInfo", storeAs: "gameInfo", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "ShowStream", storeAs: "showStreams", tooltip: "No tooltip available", bindLocation: tp.hudTab.pages[1], });
         //CHAT MODULES
         initFolder({ location: tp.mainPanel, title: "Chat", storeAs: "chatFolder", });
         initTabs({ location: tp.chatFolder, storeAs: "chatTab" }, [
@@ -991,60 +994,59 @@ sniping and someone sneaks up on you
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.chatTab.pages[0], title: "InfiniHistory", storeAs: "chatExtend", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.chatTab.pages[0], title: "HighlightTxt", storeAs: "chatHighlight", bindLocation: tp.chatTab.pages[1], });
-            // initModule({ location: tp.chatTab.pages[0], title: "RestoreScroll", storeAs: "restoreScroll", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.chatTab.pages[0], title: "Max Ingame", storeAs: "maxChat", slider: { min: 0, max: 30, step: 1 }, defaultValue: 5, });
-            initModule({ location: tp.chatTab.pages[0], title: "ShowFiltered", storeAs: "disableChatFilter", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.chatTab.pages[0], title: "UnfilterNames", storeAs: "unfilterNames", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.chatTab.pages[0], title: "InfiniHistory", storeAs: "chatExtend", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.chatTab.pages[0], title: "HighlightTxt", storeAs: "chatHighlight", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+            // initModule({ location: tp.chatTab.pages[0], title: "RestoreScroll", storeAs: "restoreScroll", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.chatTab.pages[0], title: "Max Ingame", storeAs: "maxChat", tooltip: "No tooltip available", slider: { min: 0, max: 30, step: 1 }, defaultValue: 5, });
+            initModule({ location: tp.chatTab.pages[0], title: "ShowFiltered", storeAs: "disableChatFilter", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.chatTab.pages[0], title: "UnfilterNames", storeAs: "unfilterNames", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
-            initModule({ location: tp.chatTab.pages[0], title: "BypassFilter", storeAs: "chatFilterBypass", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.chatTab.pages[0], title: "Tall Chat", storeAs: "tallChat", bindLocation: tp.chatTab.pages[1], });
-            tp.chatTab.pages[0].addSeparator();
-            initModule({ location: tp.chatTab.pages[0], title: "Spammer", storeAs: "spamChat", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.chatTab.pages[0], title: "BypassFilter", storeAs: "chatFilterBypass", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.chatTab.pages[0], title: "Tall Chat", storeAs: "tallChat", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "FakeMessage", storeAs: "fakeMessageFolder", });
-            let listOfIDs = [];
-            if (unsafeWindow.extern && unsafeWindow.extern.inGame && ss && ss.PLAYERS) {
-                ss.PLAYERS.forEach((player) => {
-                    listOfIDs.push({ text: player.name, value: String(player.id) });
-                    log({ text: player.name, value: player.id })
-                });
-            };
-            initModule({ location: tp.fakeMessageFolder, title: "Send As", storeAs: "fakeMessageID", bindLocation: tp.chatTab.pages[1], dropdown: [ ...listOfIDs, { text: "MOD", value: "254" }, { text: "SERVER", value: "255" } ], defaultValue: "255" });
-            initModule({ location: tp.fakeMessageFolder, title: '(Refresh List)', storeAs: 'fakeMessageRefresh', button: 'REFRESH', bindLocation: tp.chatTab.pages[1], clickFunction: function () {
-                updateMenu = true;
-            } });
-            initModule({ location: tp.fakeMessageFolder, title: "Content", storeAs: "fakeMessageText", defaultValue: "ЅtateFarm Client On Top! ", });
-            initModule({ location: tp.fakeMessageFolder, title: "Bold Text", storeAs: "fakeMessageBold", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.fakeMessageFolder, title: 'SEND', storeAs: 'fakeMessageSend', button: 'SEND MESSAGE', bindLocation: tp.chatTab.pages[1], clickFunction: function () {
-                if (ss.addChat && unsafeWindow.extern.inGame) {
-                    try {
-                        if (ss.isBadWord(extract("fakeMessageText"))) createPopup("Message is filtered.", "error");
-                        ss.addChat(extract("fakeMessageText"), !!extract("fakeMessageBold"), Number(extract("fakeMessageID")));
-                    } catch (error) {
-                        log("shit, sending a fake message failed. damn lmao.", error)
-                    };
-                }
-            } });
-        tp.chatTab.pages[0].addSeparator();
+                let listOfIDs = [];
+                if (unsafeWindow.extern && unsafeWindow.extern.inGame && ss && ss.PLAYERS) {
+                    ss.PLAYERS.forEach((player) => {
+                        listOfIDs.push({ text: player.name, value: String(player.id) });
+                        log({ text: player.name, value: player.id })
+                    });
+                };
+                initModule({ location: tp.fakeMessageFolder, title: "Send As", storeAs: "fakeMessageID", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], dropdown: [ ...listOfIDs, { text: "MOD", value: "254" }, { text: "SERVER", value: "255" } ], defaultValue: "255" });
+                initModule({ location: tp.fakeMessageFolder, title: '(Refresh List)', storeAs: 'fakeMessageRefresh', button: 'REFRESH', tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], clickFunction: function () {
+                    updateMenu = true;
+                } });
+                initModule({ location: tp.fakeMessageFolder, title: "Content", storeAs: "fakeMessageText", tooltip: "No tooltip available", defaultValue: "ЅtateFarm Client On Top! ", });
+                initModule({ location: tp.fakeMessageFolder, title: "Bold Text", storeAs: "fakeMessageBold", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.fakeMessageFolder, title: 'SEND', storeAs: 'fakeMessageSend', button: 'SEND MESSAGE', tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], clickFunction: function () {
+                    if (ss.addChat && unsafeWindow.extern.inGame) {
+                        try {
+                            if (ss.isBadWord(extract("fakeMessageText"))) createPopup("Message would be filtered.", "error");
+                            ss.addChat(extract("fakeMessageText"), !!extract("fakeMessageBold"), Number(extract("fakeMessageID")));
+                        } catch (error) {
+                            log("shit, sending a fake message failed. damn lmao.", error)
+                        };
+                    }
+                } });
+            tp.chatTab.pages[0].addSeparator();
+            initModule({ location: tp.chatTab.pages[0], title: "Spammer", storeAs: "spamChat", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
             initFolder({ location: tp.chatTab.pages[0], title: "Spammer Options", storeAs: "spammerFolder", });
-                initModule({ location: tp.spammerFolder, title: "Delay (ms)", storeAs: "spamChatDelay", slider: { min: 250, max: 60000, step: 10 }, defaultValue: 500, enableConditions: [["spamChat", true]], });
-                initModule({ location: tp.spammerFolder, title: "Spam Text", storeAs: "spamChatText", defaultValue: "ЅtateFarm Client On Top! ", });
+                initModule({ location: tp.spammerFolder, title: "Delay (ms)", storeAs: "spamChatDelay", tooltip: "No tooltip available", slider: { min: 250, max: 60000, step: 10 }, defaultValue: 500, enableConditions: [["spamChat", true]], });
+                initModule({ location: tp.spammerFolder, title: "Spam Text", storeAs: "spamChatText", tooltip: "No tooltip available", defaultValue: "ЅtateFarm Client On Top! ", });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "Trolling", storeAs: "trollingFolder", });
-                initModule({ location: tp.trollingFolder, title: "Mock", storeAs: "mockMode", bindLocation: tp.chatTab.pages[1], });
-                initModule({ location: tp.trollingFolder, title: "Announcer", storeAs: "announcer", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "Mock", storeAs: "mockMode", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "Announcer", storeAs: "announcer", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
                 tp.trollingFolder.addSeparator();
-                initModule({ location: tp.trollingFolder, title: "AutoEZ", storeAs: "autoEZ", bindLocation: tp.chatTab.pages[1], });
-                initModule({ location: tp.trollingFolder, title: "CheatAccuse", storeAs: "cheatAccuse", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "AutoEZ", storeAs: "autoEZ", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "CheatAccuse", storeAs: "cheatAccuse", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "Join/Leave Msgs Options", storeAs: "joinLeaveFolder", });
-                initModule({ location: tp.joinLeaveFolder, title: "Join Msgs", storeAs: "joinMessages", bindLocation: tp.chatTab.pages[1], });
-                initModule({ location: tp.joinLeaveFolder, title: "Leave Msgs", storeAs: "leaveMessages", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.joinLeaveFolder, title: "Join Msgs", storeAs: "joinMessages", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.joinLeaveFolder, title: "Leave Msgs", storeAs: "leaveMessages", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
                 tp.joinLeaveFolder.addSeparator();
-                initModule({ location: tp.joinLeaveFolder, title: "Send2Chat", storeAs: "publicBroadcast", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
-                initModule({ location: tp.joinLeaveFolder, title: "[SFC]Added", storeAs: "joinLeaveBranding", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
+                initModule({ location: tp.joinLeaveFolder, title: "Send2Chat", storeAs: "publicBroadcast", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
+                initModule({ location: tp.joinLeaveFolder, title: "[SFC]Added", storeAs: "joinLeaveBranding", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
         //LISTS MODULES
         initFolder({ location: tp.mainPanel, title: "Lists", storeAs: "listsFolder", });
         initTabs({ location: tp.listsFolder, storeAs: "listsTab" }, [
@@ -1052,20 +1054,20 @@ sniping and someone sneaks up on you
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.listsTab.pages[0], title: "Whitelist", storeAs: "whitelist", defaultValue: "User-1, User-2", });
+            initModule({ location: tp.listsTab.pages[0], title: "Whitelist", storeAs: "whitelist", tooltip: "No tooltip available", defaultValue: "User-1, User-2", });
             initFolder({ location: tp.listsTab.pages[0], title: "Whitelist (Target Only) Options", storeAs: "whitelistFolder", });
-                initModule({ location: tp.whitelistFolder, title: "WAimbot", storeAs: "enableWhitelistAimbot", bindLocation: tp.listsTab.pages[1], });
-                initModule({ location: tp.whitelistFolder, title: "When None Visible", storeAs: "enableWhenNoneVisible", bindLocation: tp.listsTab.pages[1], });
-                initModule({ location: tp.whitelistFolder, title: "WESP", storeAs: "enableWhitelistTracers", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.whitelistFolder, title: "WESPType", storeAs: "whitelistESPType", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Only Include", value: "onlyinclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "onlyinclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true]], });
-                initModule({ location: tp.whitelistFolder, title: "WHighlight", storeAs: "whitelistColor", defaultValue: "#e80aac", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true], ["whitelistESPType", "highlight"]], });
+                initModule({ location: tp.whitelistFolder, title: "WAimbot", storeAs: "enableWhitelistAimbot", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.whitelistFolder, title: "When None Visible", storeAs: "enableWhenNoneVisible", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.whitelistFolder, title: "WESP", storeAs: "enableWhitelistTracers", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.whitelistFolder, title: "WESPType", storeAs: "whitelistESPType", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Only Include", value: "onlyinclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "onlyinclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true]], });
+                initModule({ location: tp.whitelistFolder, title: "WHighlight", storeAs: "whitelistColor", tooltip: "No tooltip available", defaultValue: "#e80aac", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true], ["whitelistESPType", "highlight"]], });
             tp.listsTab.pages[0].addSeparator();
-            initModule({ location: tp.listsTab.pages[0], title: "Blacklist", storeAs: "blacklist", defaultValue: "User-1, User-2", });
+            initModule({ location: tp.listsTab.pages[0], title: "Blacklist", storeAs: "blacklist", tooltip: "No tooltip available", defaultValue: "User-1, User-2", });
             initFolder({ location: tp.listsTab.pages[0], title: "Blacklist (Exclude) Options", storeAs: "blacklistFolder", });
-                initModule({ location: tp.blacklistFolder, title: "BAimbot", storeAs: "enableBlacklistAimbot", bindLocation: tp.listsTab.pages[1], });
-                initModule({ location: tp.blacklistFolder, title: "BESP", storeAs: "enableBlacklistTracers", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.blacklistFolder, title: "BESPType", storeAs: "blacklistESPType", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Just Exclude", value: "justexclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "justexclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true]], });
-                initModule({ location: tp.blacklistFolder, title: "BHighlight", storeAs: "blacklistColor", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true], ["blacklistESPType", "highlight"]], });
+                initModule({ location: tp.blacklistFolder, title: "BAimbot", storeAs: "enableBlacklistAimbot", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.blacklistFolder, title: "BESP", storeAs: "enableBlacklistTracers", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.blacklistFolder, title: "BESPType", storeAs: "blacklistESPType", tooltip: "No tooltip available", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Just Exclude", value: "justexclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "justexclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true]], });
+                initModule({ location: tp.blacklistFolder, title: "BHighlight", storeAs: "blacklistColor", tooltip: "No tooltip available", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true], ["blacklistESPType", "highlight"]], });
         //AUTOMATION MODULES
         initFolder({ location: tp.mainPanel, title: "Automation", storeAs: "automationFolder", });
         initTabs({ location: tp.automationFolder, storeAs: "automationTab" }, [
@@ -1074,46 +1076,46 @@ sniping and someone sneaks up on you
 `Sorry! No guide yet!`},
         ]);
             initModule({
-                location: tp.automationTab.pages[0], title: "Flood Report", storeAs: "floodReport", bindLocation: tp.automationTab.pages[1], button: "Spam Now!", clickFunction: function () {
+                location: tp.automationTab.pages[0], title: "Flood Report", storeAs: "floodReport", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], button: "Spam Now!", clickFunction: function () {
                     createPopup("Thank you for your efforts comrade! o7");
                     spamReport();
                 },
             });
             tp.automationTab.pages[0].addSeparator();
-            initModule({ location: tp.automationTab.pages[0], title: "Bunnyhop", storeAs: "bunnyhop", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Walk", storeAs: "autoWalk", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Strafe", storeAs: "autoStrafe", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Jump", storeAs: "autoJump", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Jump Delay", storeAs: "autoJumpDelay", slider: { min: 1, max: 10000, step: 1 }, defaultValue: 1, showConditions: [["autoJump", true]], });
+            initModule({ location: tp.automationTab.pages[0], title: "Bunnyhop", storeAs: "bunnyhop", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Walk", storeAs: "autoWalk", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Strafe", storeAs: "autoStrafe", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Jump", storeAs: "autoJump", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Jump Delay", storeAs: "autoJumpDelay", tooltip: "No tooltip available", slider: { min: 1, max: 10000, step: 1 }, defaultValue: 1, showConditions: [["autoJump", true]], });
             tp.automationTab.pages[0].addSeparator();
-            initModule({ location: tp.automationTab.pages[0], title: "AutoWeapon", storeAs: "autoWeapon", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "EggK-47", value: "eggk47" }, { text: "Scrambler", value: "scrambler" }, { text: "Free Ranger", value: "freeranger" }, { text: "RPEGG", value: "rpegg" }, { text: "Whipper", value: "whipper" }, { text: "Crackshot", value: "crackshot" }, { text: "Tri-Hard", value: "trihard" }, { text: "Randomised", value: "random" }], defaultValue: "disabled" });
-            initModule({ location: tp.automationTab.pages[0], title: "AutoGrenade", storeAs: "autoGrenade", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "AutoWeapon", storeAs: "autoWeapon", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "EggK-47", value: "eggk47" }, { text: "Scrambler", value: "scrambler" }, { text: "Free Ranger", value: "freeranger" }, { text: "RPEGG", value: "rpegg" }, { text: "Whipper", value: "whipper" }, { text: "Crackshot", value: "crackshot" }, { text: "Tri-Hard", value: "trihard" }, { text: "Randomised", value: "random" }], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "AutoGrenade", storeAs: "autoGrenade", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
             tp.automationTab.pages[0].addSeparator();
             initFolder({ location: tp.automationTab.pages[0], title: "Auto Join Options", storeAs: "autoJoinFolder", });
-                initModule({ location: tp.autoJoinFolder, title: "Auto Join", storeAs: "autoJoin", bindLocation: tp.automationTab.pages[1], });
-                initModule({ location: tp.autoJoinFolder, title: "Join Code", storeAs: "joinCode", defaultValue: "CODE", enableConditions: [["autoJoin", true]], });
-                initModule({ location: tp.autoJoinFolder, title: "Get Code", storeAs: "getCode", button: "Retrieve", clickFunction: function () { change("joinCode", GAMECODE) }, enableConditions: [["autoJoin", true]], });
+                initModule({ location: tp.autoJoinFolder, title: "Auto Join", storeAs: "autoJoin", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+                initModule({ location: tp.autoJoinFolder, title: "Join Code", storeAs: "joinCode", tooltip: "No tooltip available", defaultValue: "CODE", enableConditions: [["autoJoin", true]], });
+                initModule({ location: tp.autoJoinFolder, title: "Get Code", storeAs: "getCode", tooltip: "No tooltip available", button: "Retrieve", clickFunction: function () { change("joinCode", GAMECODE) }, enableConditions: [["autoJoin", true]], });
             initFolder({ location: tp.automationTab.pages[0], title: "Auto Name Options", storeAs: "autoNamesFolder", });
-                initModule({ location: tp.autoNamesFolder, title: "Use Name", storeAs: "useCustomName", bindLocation: tp.automationTab.pages[1], });
-                initModule({ location: tp.autoNamesFolder, title: "New Name", storeAs: "usernameAutoJoin", defaultValue: "ЅtateFarmer", enableConditions: [["useCustomName", true]], });
+                initModule({ location: tp.autoNamesFolder, title: "Use Name", storeAs: "useCustomName", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+                initModule({ location: tp.autoNamesFolder, title: "New Name", storeAs: "usernameAutoJoin", tooltip: "No tooltip available", defaultValue: "ЅtateFarmer", enableConditions: [["useCustomName", true]], });
                 //the name usernameAutoJoin is only kept for compatability
-                initModule({ location: tp.autoNamesFolder, title: "Copy Name", storeAs: "copyName", button: "Steal Name", enableConditions: [["useCustomName", true]], bindLocation: tp.automationTab.pages[1], clickFunction: function(){
+                initModule({ location: tp.autoNamesFolder, title: "Copy Name", storeAs: "copyName", button: "Steal Name", enableConditions: [["useCustomName", true]], tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
                     const copiedName = retrieveCopiedName();
                     log("Retrieved copied name:",copiedName);
                     change("usernameAutoJoin",(copiedName||"ЅtateFarmer"));
                 },});
-                initModule({ location: tp.autoNamesFolder, title: "Random Name", storeAs: "randomName", button: "Randomise Name", enableConditions: [["useCustomName", true]], bindLocation: tp.automationTab.pages[1], clickFunction: function(){
+                initModule({ location: tp.autoNamesFolder, title: "Random Name", storeAs: "randomName", button: "Randomise Name", enableConditions: [["useCustomName", true]], tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
                     const randomisedName = unsafeWindow.extern.generateRandomName();
                     change("usernameAutoJoin",(randomisedName||"ЅtateFarmer"));
                 },});
             tp.automationTab.pages[0].addSeparator();
-            initModule({ location: tp.automationTab.pages[0], title: "AutoRespawn", storeAs: "autoRespawn", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Team", storeAs: "autoTeam", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Red Team", value: "red" }, { text: "Blue Team", value: "blue" }, { text: "Random Team", value: "random" }], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "AutoRespawn", storeAs: "autoRespawn", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Team", storeAs: "autoTeam", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Red Team", value: "red" }, { text: "Blue Team", value: "blue" }, { text: "Random Team", value: "random" }], defaultValue: "disabled" });
             tp.automationTab.pages[0].addSeparator();
             initFolder({ location: tp.automationTab.pages[0], title: "Game Blacklist Settings", storeAs: "gameBlacklistFolder", });//Game Blacklist Folder
-                initModule({ location: tp.gameBlacklistFolder, title: "Blacklist On", storeAs: "gameBlacklist", bindLocation: tp.automationTab.pages[1], });
-                initModule({ location: tp.gameBlacklistFolder, title: "Codes:", storeAs: "gameBlacklistCodes", defaultValue: "", });
-                initModule({ location: tp.gameBlacklistFolder, title: "Get BL Code", storeAs: "getCodeBlacklist", button: "Retrieve", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
+                initModule({ location: tp.gameBlacklistFolder, title: "Blacklist On", storeAs: "gameBlacklist", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+                initModule({ location: tp.gameBlacklistFolder, title: "Codes:", storeAs: "gameBlacklistCodes", tooltip: "No tooltip available", defaultValue: "", });
+                initModule({ location: tp.gameBlacklistFolder, title: "Get BL Code", storeAs: "getCodeBlacklist", button: "Retrieve", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
                     if (GAMECODE != undefined && GAMECODE != null){
                       if (extract("gameBlacklistCodes") != "" && extract("gameBlacklistCodes") != undefined) { //does the list exist yet?
                           let cds = extract("gameBlacklistCodes").split(","); //get the codes as an array
@@ -1127,24 +1129,24 @@ sniping and someone sneaks up on you
                         createPopup("Join a game first");
                     };
                 },});
-                initModule({ location: tp.gameBlacklistFolder, title: "clear BL Codes", storeAs: "clearCodeBlacklist", button: "clear", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
+                initModule({ location: tp.gameBlacklistFolder, title: "Clear BL Codes", storeAs: "clearCodeBlacklist", button: "Clear", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], clickFunction: function(){ //capitalise PLS
                   //not a big fan of this "logic in init" thing, but it's basically the norm now + the funcs are really designed to be used this way so yh :( (Seq rant)
                   if(extract("gameBlacklistCodes") != undefined) //do we have codes yet? Otherwise the log is either gonna be pointless or error...
                     log("Clearing BL codes, cleared list: " +extract("gameBlacklistCodes")); //wouldn't be needed but allows for retrival of codes on accidental/partial deletion, and one more line of log can't hurt too much, can it?
                   change("gameBlacklistCodes", ""); //just set the blacklist to an empty String
                 },});
             tp.automationTab.pages[0].addSeparator();
-            initModule({ location: tp.automationTab.pages[0], title: "LeaveGame", storeAs: "leaveGame", button: "Unjoin Game", bindLocation: tp.automationTab.pages[1], clickFunction: function () { unsafeWindow.vueApp.onLeaveGameConfirm() }, });
-            initModule({ location: tp.automationTab.pages[0], title: "LeaveEmpty", storeAs: "leaveEmpty", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Leave", storeAs: "autoLeave", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.automationTab.pages[0], title: "Delay (s)", storeAs: "autoLeaveDelay", slider: { min: 0, max: 3600, step: 1 }, defaultValue: 300, enableConditions: [["autoLeave", true]] });
+            initModule({ location: tp.automationTab.pages[0], title: "LeaveGame", storeAs: "leaveGame", button: "Unjoin Game", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], clickFunction: function () { unsafeWindow.vueApp.onLeaveGameConfirm() }, });
+            initModule({ location: tp.automationTab.pages[0], title: "LeaveEmpty", storeAs: "leaveEmpty", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Leave", storeAs: "autoLeave", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], });
+            initModule({ location: tp.automationTab.pages[0], title: "Delay (s)", storeAs: "autoLeaveDelay", tooltip: "No tooltip available", slider: { min: 0, max: 3600, step: 1 }, defaultValue: 300, enableConditions: [["autoLeave", true]] });
             tp.automationTab.pages[0].addSeparator();
-            initModule({ location: tp.automationTab.pages[0], title: "Gamemode", storeAs: "autoGamemode", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "FFA", value: "ffa" }, { text: "Teams", value: "teams" }, { text: "Captula", value: "captula" }, { text: "KotC", value: "kotc" }, { text: "Randomised", value: "random" }], defaultValue: "disabled" });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Region", storeAs: "autoRegion", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Chile", value: "santiago" }, { text: "Germany", value: "germany" }, { text: "Singapore", value: "singapore" }, { text: "Sydney", value: "sydney" }, { text: "US Central", value: "uscentral" }, { text: "US East", value: "useast" }, { text: "US West", value: "uswest" }, { text: "Randomised", value: "random" }], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "Gamemode", storeAs: "autoGamemode", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "FFA", value: "ffa" }, { text: "Teams", value: "teams" }, { text: "Captula", value: "captula" }, { text: "KotC", value: "kotc" }, { text: "Randomised", value: "random" }], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Region", storeAs: "autoRegion", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Chile", value: "santiago" }, { text: "Germany", value: "germany" }, { text: "Singapore", value: "singapore" }, { text: "Sydney", value: "sydney" }, { text: "US Central", value: "uscentral" }, { text: "US East", value: "useast" }, { text: "US West", value: "uswest" }, { text: "Randomised", value: "random" }], defaultValue: "disabled" });
             tp.automationTab.pages[0].addSeparator();
-            initModule({ location: tp.automationTab.pages[0], title: "Egg Color", storeAs: "eggColor", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "White", value: "white" }, { text: "Light Blue", value: "lightblue" }, { text: "Light Eggshell", value: "lighteggshell" }, { text: "Eggshell", value: "eggshell" }, { text: "Dark Eggshell", value: "darkeggshell" }, { text: "Darker Eggshell", value: "darkereggshell" }, { text: "Darkest Eggshell", value: "darkesteggshell" }, { text: "Red (VIP)", value: "red" }, { text: "Purple (VIP)", value: "purple" }, { text: "Pink (VIP)", value: "pink" }, { text: "Yellow (VIP)", value: "yellow" }, { text: "Blue (VIP)", value: "blue" }, { text: "Green (VIP)", value: "green" }, { text: "Lime (VIP)", value: "lime" }, /*{text: "Randomised", value: "random"}*/], defaultValue: "disabled" });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Stamp", storeAs: "autoStamp", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Target Stamp", value: "target" }, { text: "No Sign Stamp", value: "nosign" }, { text: "Question Mark Stamp?", value: "question" }, { text: "Peace Stamp", value: "peace" }, { text: "Thumbs Up Stamp", value: "thumbsup" }, { text: "Pablo Smile Stamp", value: "pablosmile" }], defaultValue: "disabled" });
-            initModule({ location: tp.automationTab.pages[0], title: "Auto Hat", storeAs: "autoHat", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Ball Cap", value: "ballcap" }, { text: "Boat Fedora", value: "boatfedora" }, { text: "Top Hat", value: "tophat" }, { text: "Derby Hat", value: "derbyhat" }, { text: "Mountie Hat", value: "mountiehat" }, { text: "Pablo Hat", value: "pablohat" }], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "Egg Color", storeAs: "eggColor", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "White", value: "white" }, { text: "Light Blue", value: "lightblue" }, { text: "Light Eggshell", value: "lighteggshell" }, { text: "Eggshell", value: "eggshell" }, { text: "Dark Eggshell", value: "darkeggshell" }, { text: "Darker Eggshell", value: "darkereggshell" }, { text: "Darkest Eggshell", value: "darkesteggshell" }, { text: "Red (VIP)", value: "red" }, { text: "Purple (VIP)", value: "purple" }, { text: "Pink (VIP)", value: "pink" }, { text: "Yellow (VIP)", value: "yellow" }, { text: "Blue (VIP)", value: "blue" }, { text: "Green (VIP)", value: "green" }, { text: "Lime (VIP)", value: "lime" }, /*{text: "Randomised", value: "random"}*/], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Stamp", storeAs: "autoStamp", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Target Stamp", value: "target" }, { text: "No Sign Stamp", value: "nosign" }, { text: "Question Mark Stamp?", value: "question" }, { text: "Peace Stamp", value: "peace" }, { text: "Thumbs Up Stamp", value: "thumbsup" }, { text: "Pablo Smile Stamp", value: "pablosmile" }], defaultValue: "disabled" });
+            initModule({ location: tp.automationTab.pages[0], title: "Auto Hat", storeAs: "autoHat", tooltip: "No tooltip available", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Ball Cap", value: "ballcap" }, { text: "Boat Fedora", value: "boatfedora" }, { text: "Top Hat", value: "tophat" }, { text: "Derby Hat", value: "derbyhat" }, { text: "Mountie Hat", value: "mountiehat" }, { text: "Pablo Hat", value: "pablohat" }], defaultValue: "disabled" });
         //BOTTING MODULES
         initFolder({ location: tp.mainPanel, title: "Botting", storeAs: "bottingFolder", });
         initTabs({ location: tp.bottingFolder, storeAs: "bottingTab" }, [
@@ -1153,11 +1155,11 @@ sniping and someone sneaks up on you
 `Sorry! No guide yet!
 But check out the GitHub guide.`},
         ]);
-            initModule({ location: tp.bottingTab.pages[0], title: "Show Panel", storeAs: "showBotPanel", bindLocation: tp.bottingTab.pages[1], button: "Show Panel", defaultBind: "J", clickFunction: () => {
+            initModule({ location: tp.bottingTab.pages[0], title: "Show Panel", storeAs: "showBotPanel", tooltip: "No tooltip available", bindLocation: tp.bottingTab.pages[1], button: "Show Panel", defaultBind: "J", clickFunction: () => {
                 tp.botPanel.hidden = !tp.botPanel.hidden;
             }});
             tp.bottingTab.pages[0].addSeparator();
-            initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", button: "Link", clickFunction: function () { GM_openInTab(bottingGuideURL, { active: true }) }, });
+            initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", tooltip: "No tooltip available", button: "Link", clickFunction: function () { GM_openInTab(bottingGuideURL, { active: true }) }, });
         //THEMING MODULES
         initFolder({ location: tp.mainPanel, title: "Theming", storeAs: "themingFolder", });
         initTabs({ location: tp.themingFolder, storeAs: "themingTab" }, [
@@ -1165,36 +1167,36 @@ But check out the GitHub guide.`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", bindLocation: tp.themingTab.pages[1], dropdown: SKYBOXES_DROPDOWN, changeFunction: (newSkybox) => {
+            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], dropdown: SKYBOXES_DROPDOWN, changeFunction: (newSkybox) => {
                     if (!unsafeWindow[skyboxName]) return;
                     unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
                 }});
-                initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", bindLocation: tp.themingTab.pages[1], });
-                initModule({ location: tp.themingTab.pages[0], title: "Rand Interv (min)", storeAs: "randomSkyBoxInterval", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
+                initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], });
+                initModule({ location: tp.themingTab.pages[0], title: "Rand Interv (min)", storeAs: "randomSkyBoxInterval", tooltip: "No tooltip available", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
             tp.themingTab.pages[0].addSeparator();
-            initModule({ location: tp.themingTab.pages[0], title: "Legacy Models", storeAs: "legacyModels", bindLocation: tp.themingTab.pages[1], });
-            initModule({ location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", bindLocation: tp.themingTab.pages[1], dropdown: [
+            initModule({ location: tp.themingTab.pages[0], title: "Legacy Models", storeAs: "legacyModels", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], });
+            initModule({ location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], dropdown: [
                 {text: "Default", value: 2},
                 {text: "Blue", value: 3},
                 {text: "Mexico", value: 4},
             ],});
-            initModule({ location: tp.themingTab.pages[0], title: "Gun Position", storeAs: "gunPosition", bindLocation: tp.themingTab.pages[1], dropdown: [
+            initModule({ location: tp.themingTab.pages[0], title: "Gun Position", storeAs: "gunPosition", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], dropdown: [
                 {text: "Right", value: "right"},
                 {text: "Left", value: "left"},
                 {text: "Hidden", value: "hidden"},
             ],});
             tp.themingTab.pages[0].addSeparator();
             initFolder({ location: tp.themingTab.pages[0], title: "Audio Settings", storeAs: "audioFolder", });
-                initModule({ location: tp.audioFolder, title: "Mute Game", storeAs: "muteGame", bindLocation: tp.themingTab.pages[1], });
-                initModule({ location: tp.audioFolder, title: "DistanMult", storeAs: "distanceMult", slider: { min: 0.01, max: 2, step: 0.01 }, defaultValue: 1, });
+                initModule({ location: tp.audioFolder, title: "Mute Game", storeAs: "muteGame", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], });
+                initModule({ location: tp.audioFolder, title: "DistanMult", storeAs: "distanceMult", tooltip: "No tooltip available", slider: { min: 0.01, max: 2, step: 0.01 }, defaultValue: 1, });
                 tp.audioFolder.addSeparator();
-                initModule({ location: tp.audioFolder, title: "CustomSFX (1st)", storeAs: "customSFX1", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
-                initModule({ location: tp.audioFolder, title: "CustomSFX (2nd)", storeAs: "customSFX2", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
-                initModule({ location: tp.audioFolder, title: "CustomSFX (3rd)", storeAs: "customSFX3", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
+                initModule({ location: tp.audioFolder, title: "CustomSFX (1st)", storeAs: "customSFX1", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
+                initModule({ location: tp.audioFolder, title: "CustomSFX (2nd)", storeAs: "customSFX2", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
+                initModule({ location: tp.audioFolder, title: "CustomSFX (3rd)", storeAs: "customSFX3", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
             tp.themingTab.pages[0].addSeparator();
-            initModule({ location: tp.themingTab.pages[0], title: "Replace Logo", storeAs: "replaceLogo", bindLocation: tp.themingTab.pages[1], });
-            initModule({ location: tp.themingTab.pages[0], title: "Animate Title", storeAs: "titleAnimation", bindLocation: tp.themingTab.pages[1], });
-            initModule({ location: tp.themingTab.pages[0], title: "Client Theme", storeAs: "themeType", bindLocation: tp.themingTab.pages[1], dropdown: [
+            initModule({ location: tp.themingTab.pages[0], title: "Replace Logo", storeAs: "replaceLogo", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], });
+            initModule({ location: tp.themingTab.pages[0], title: "Animate Title", storeAs: "titleAnimation", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], });
+            initModule({ location: tp.themingTab.pages[0], title: "Client Theme", storeAs: "themeType", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], dropdown: [
                 {text: "Default", value: "defaultTheme"},
                 {text: "Iceberg", value: "icebergTheme"},
                 {text: "Jet Black", value: "jetblackTheme"},
@@ -1208,8 +1210,8 @@ But check out the GitHub guide.`},
                 applyTheme(value.value);
             }});
             tp.themingTab.pages[0].addSeparator();
-            initModule({ location: tp.themingTab.pages[0], title: "Enable Party Lights", storeAs: "partyLightsEnabled", bindLocation: tp.themingTab.pages[1], });
-            initModule({ location: tp.themingTab.pages[0], title: "Party Lights Intensity", storeAs: "partyLightsIntensity", slider: { min: 0.01, max: 20, step: 0.01 }, defaultValue: 0.5, });
+            initModule({ location: tp.themingTab.pages[0], title: "Enable Party Lights", storeAs: "partyLightsEnabled", tooltip: "No tooltip available", bindLocation: tp.themingTab.pages[1], });
+            initModule({ location: tp.themingTab.pages[0], title: "Party Lights Intensity", storeAs: "partyLightsIntensity", tooltip: "No tooltip available", slider: { min: 0.01, max: 20, step: 0.01 }, defaultValue: 0.5, });
             //ACCOUNT MODULES
         initFolder({ location: tp.mainPanel, title: "Accounts", storeAs: "accountsFolder", });
         initTabs({ location: tp.accountsFolder, storeAs: "accountsTab" }, [
@@ -1276,8 +1278,8 @@ Shell Shockers game (unless you have enabled
 debug mode).`},
         ]);
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Login (Basic)", storeAs: "loginFolder", });
-                initModule({ location: tp.loginFolder, title: 'Email:Pass', storeAs: 'loginEmailPass', defaultValue: "ex@gmail.com:passwd" });
-                initModule({ location: tp.loginFolder, title: 'Login Account', storeAs: 'loginLogin', button: 'LOGIN', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginFolder, title: 'Email:Pass', storeAs: 'loginEmailPass', tooltip: "No tooltip available", defaultValue: "ex@gmail.com:passwd" });
+                initModule({ location: tp.loginFolder, title: 'Login Account', storeAs: 'loginLogin', tooltip: "No tooltip available", button: 'LOGIN', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let emailPass = extract("loginEmailPass");
                     if (emailPass.includes(":")) {
                         loginOrCreateWithEmailPass(emailPass);
@@ -1290,7 +1292,7 @@ debug mode).`},
                 } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Login (Login Database)", storeAs: "loginDatabaseFolder", });
-                initModule({ location: tp.loginDatabaseFolder, title: 'Login Next Account', storeAs: 'loginDatabaseLogin', button: 'LOGIN', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'Login Next Account', storeAs: 'loginDatabaseLogin', button: 'LOGIN', tooltip: "No tooltip available", bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                     let loginDBlength = loginDB.length;
                     if (loginDBlength > 0) {
@@ -1306,14 +1308,14 @@ debug mode).`},
                         createPopup("LoginDB is empty!", "error");
                     };
                 } });
-                initModule({ location: tp.loginDatabaseFolder, title: "Selection Type", storeAs: "loginDatabaseSelection", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "In Order", value: "inorder" }, { text: "Random", value: "random" }], defaultValue: "inorder" });
-                initModule({ location: tp.loginDatabaseFolder, title: "Auto Login", storeAs: "autoLogin", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled" });
+                initModule({ location: tp.loginDatabaseFolder, title: "Selection Type", storeAs: "loginDatabaseSelection", tooltip: "No tooltip available", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "In Order", value: "inorder" }, { text: "Random", value: "random" }], defaultValue: "inorder" });
+                initModule({ location: tp.loginDatabaseFolder, title: "Auto Login", storeAs: "autoLogin", tooltip: "No tooltip available", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled" });
                 tp.loginDatabaseFolder.addSeparator();
-                initModule({ location: tp.loginDatabaseFolder, title: 'Export DB(JSON)', storeAs: 'loginDatabaseExport', button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'Export DB(JSON)', storeAs: 'loginDatabaseExport', tooltip: "No tooltip available", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     GM_setClipboard(JSON.stringify(GM_getValue("StateFarm_LoginDB") || []), "text", () => log("Clipboard set!"));
                     createPopup("Login DB copied to clipboard...");
                 } });
-                initModule({ location: tp.loginDatabaseFolder, title: 'Import Into LoginDB', storeAs: 'loginDatabaseExport', button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'Import Into LoginDB', storeAs: 'loginDatabaseExport', tooltip: "No tooltip available", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`Input data you would like to add to your LoginDB. This will NOT replace your current data. All data added here will be put at the end of the queue. Also make sure that this data goes here and not into the AccountRecords DB.`, 'Reminder: JSON format!');
                     try {
                         let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
@@ -1327,7 +1329,7 @@ debug mode).`},
                         createPopup("Failed! Check the formatting.", "error");
                     };
                 } });
-                initModule({ location: tp.loginDatabaseFolder, title: 'ImportFromRecords', storeAs: 'loginDatabaseImportRecords', button: 'APPEND', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'ImportFromRecords', storeAs: 'loginDatabaseImportRecords', tooltip: "No tooltip available", button: 'APPEND', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("This action will import any Email:Pass combos you have in AccountRecords. Make sure you want to do this, as this will potentially add a lot of new records. Type 'ok' to proceed. This cannot be reversed, export first to be safe. Note: all the new records are added to the end of the queue.") === 'ok') {
                         let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
                         let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
@@ -1341,30 +1343,30 @@ debug mode).`},
                         createPopup("Appended from AccountDetails!", "success");
                     };
                 } });
-                initModule({ location: tp.loginDatabaseFolder, title: 'Delete LoginDB', storeAs: 'loginDatabaseDelete', button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'Delete LoginDB', storeAs: 'loginDatabaseDelete', tooltip: "No tooltip available", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("WARNING! This is a destructive action! Type 'ok' if you are really sure you want to delete your LoginDB! This cannot be reversed, export first to be safe.") === 'ok') {
                         GM_setValue("StateFarm_LoginDB", []); //o7 data
                     };
                 } });
-                initModule({ location: tp.loginDatabaseFolder, title: 'LoginDB Info', storeAs: 'loginDatabaseInfo', button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'LoginDB Info', storeAs: 'loginDatabaseInfo', tooltip: "No tooltip available", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                     alert(`You currently have ${loginDB.length} accounts in LoginDB. For info on what this is, check the guide tab.`);
                 } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (Basic)", storeAs: "generatorFolder", });
-                initModule({ location: tp.generatorFolder, title: 'Gmail (before @)', storeAs: 'accountGmail', defaultValue: "example (NO @gmail.com)" });
-                initModule({ location: tp.generatorFolder, title: 'Password to use', storeAs: 'accountPass', defaultValue: "password69" });
-                initModule({ location: tp.generatorFolder, title: 'Create (Basic)', storeAs: 'accountCreate', button: 'CREATE', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.generatorFolder, title: 'Gmail (before @)', storeAs: 'accountGmail', tooltip: "No tooltip available", defaultValue: "example (NO @gmail.com)" });
+                initModule({ location: tp.generatorFolder, title: 'Password to use', storeAs: 'accountPass', tooltip: "No tooltip available", defaultValue: "password69" });
+                initModule({ location: tp.generatorFolder, title: 'Create (Basic)', storeAs: 'accountCreate', tooltip: "No tooltip available", button: 'CREATE', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     loginOrCreateWithEmailPass(extract("accountGmail")+"+"+getScrambled()+"@gmail.com:"+extract("accountPass"));
                 } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Records Database", storeAs: "accountRecordsFolder", });
-                initModule({ location: tp.accountRecordsFolder, title: "Disable Logging", storeAs: "accountRecordsLogging", bindLocation: tp.accountsTab.pages[1], });
-                initModule({ location: tp.accountRecordsFolder, title: 'Export DB (JSON)', storeAs: 'accountRecordsExport', button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.accountRecordsFolder, title: "Disable Logging", storeAs: "accountRecordsLogging", tooltip: "No tooltip available", bindLocation: tp.accountsTab.pages[1], });
+                initModule({ location: tp.accountRecordsFolder, title: 'Export DB (JSON)', storeAs: 'accountRecordsExport', tooltip: "No tooltip available", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     GM_setClipboard(JSON.stringify(GM_getValue("StateFarm_AccountRecords") || {}), "text", () => log("Clipboard set!"));
                     createPopup("AccountRecords DB copied to clipboard...");
                 } });
-                initModule({ location: tp.accountRecordsFolder, title: 'Import Into DB', storeAs: 'accountRecordsImport', button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.accountRecordsFolder, title: 'Import Into DB', storeAs: 'accountRecordsImport', tooltip: "No tooltip available", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`Input data you would like to add to your AccountRecords DB. This will NOT replace your current data. All data added here either be added or replace existing records. Also make sure that this data goes here and not into the LoginDB.`, 'Reminder: JSON format!');
                     try {
                         let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
@@ -1378,12 +1380,12 @@ debug mode).`},
                         createPopup("Failed! Check the formatting.", "error");
                     };
                 } });
-                initModule({ location: tp.accountRecordsFolder, title: 'Delete DB', storeAs: 'accountRecordsDelete', button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.accountRecordsFolder, title: 'Delete DB', storeAs: 'accountRecordsDelete', tooltip: "No tooltip available", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("WARNING! This is a destructive action! Type 'ok' if you are really sure you want to delete your AccountRecords DB! This cannot be reversed, export first to be safe.") === 'ok') {
                         GM_setValue("StateFarm_AccountRecords", {}); //o7 data
                     };
                 } });
-                initModule({ location: tp.accountRecordsFolder, title: 'View Info', storeAs: 'accountRecordsInfo', button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.accountRecordsFolder, title: 'View Info', storeAs: 'accountRecordsInfo', tooltip: "No tooltip available", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`This will output some information relating to what information you have in your AccountRecords DB.\nParameters: Enter 1 to only print Email:Pass list of those with items, enter 2 for those with no items.`, '');
                     let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
                     let tierCache = GM_getValue("StateFarm_TierCache") || {};
@@ -1446,9 +1448,9 @@ debug mode).`},
                 } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (ShellPrint)", storeAs: "shellPrintFolder", });
-            initModule({ location: tp.shellPrintFolder, title: 'ShellPrint Key', storeAs: 'shellPrintKey', defaultValue: "" });
-            initModule({ location: tp.shellPrintFolder, title: ' ', storeAs: 'getSPKey', button: 'Get a Key', clickFunction: () => GM_openInTab(discordURL, { active: true }) });
-            initModule({ location: tp.shellPrintFolder, title: 'Create (ShellPrint)', storeAs: 'shellprintGen', button: 'Generate!', clickFunction: () => F.register(), bindLocation: tp.accountsTab.pages[1] });
+            initModule({ location: tp.shellPrintFolder, title: 'ShellPrint Key', storeAs: 'shellPrintKey', tooltip: "No tooltip available", defaultValue: "" });
+            initModule({ location: tp.shellPrintFolder, title: ' ', storeAs: 'getSPKey', tooltip: "No tooltip available", button: 'Get a Key', clickFunction: () => GM_openInTab(discordURL, { active: true }) });
+            initModule({ location: tp.shellPrintFolder, title: 'Create (ShellPrint)', storeAs: 'shellprintGen', tooltip: "No tooltip available", button: 'Generate!', clickFunction: () => F.register(), bindLocation: tp.accountsTab.pages[1] });
             tp.accountsTab.pages[0].addSeparator();
         //MISC MODULES
         initFolder({ location: tp.mainPanel, title: "Misc", storeAs: "miscFolder", });
@@ -1457,14 +1459,14 @@ debug mode).`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.miscTab.pages[0], title: "Ad Block", storeAs: "adBlock", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "VIP Spoof", storeAs: "spoofVIP", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Ad Block", storeAs: "adBlock", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "VIP Spoof", storeAs: "spoofVIP", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.chatTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
+            initModule({ location: tp.chatTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "No tooltip available", bindLocation: tp.chatTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
                 if (!(unsafeWindow.extern.gamePaused || sneakyDespawning)) {
                     sneakyDespawning = true;
                     ss.PAUSE(); createPopup("SneakyDespawn: 3 seconds.");
@@ -1481,17 +1483,17 @@ debug mode).`},
                 };
             },});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "StateFarm Updates", storeAs: "statefarmUpdates", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.miscTab.pages[0], title: "Replace Feeds", storeAs: "replaceFeeds", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.miscTab.pages[0], title: "Custom Badges", storeAs: "customBadges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.miscTab.pages[0], title: "StateFarm Updates", storeAs: "statefarmUpdates", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.miscTab.pages[0], title: "Replace Feeds", storeAs: "replaceFeeds", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.miscTab.pages[0], title: "Custom Badges", storeAs: "customBadges", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins", storeAs: "unlockSkins", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins", storeAs: "unlockSkins", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function(){
                 extern.giveBasketBrosReward();
             },});
-            initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "Unban", storeAs: "unban", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "Unban", storeAs: "unban", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
                 if (GM_getValue('StateFarm_Unbanned')) unban();
                 else if (prompt("By proceeding, you will be signed out. If you don't have an account, your stats will be lost.\nEnter 'ok' to confirm this.\nThis popup will not be shown again for future unbans.") === 'ok') {
                     GM_setValue('StateFarm_Unbanned', 'true');
@@ -1500,18 +1502,18 @@ debug mode).`},
                     alert('You did not entire "ok", so the unban was cancelled.');
                 };
             },});
-            initModule({ location: tp.miscTab.pages[0], title: "Auto Unban", storeAs: "autoUnban", bindLocation: tp.miscTab.pages[1],});
-            initModule({ location: tp.miscTab.pages[0], title: "New Proxy", storeAs: "newProxy", bindLocation: tp.miscTab.pages[1], button: "NEW PROXY", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "Auto Unban", storeAs: "autoUnban", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1],});
+            initModule({ location: tp.miscTab.pages[0], title: "New Proxy", storeAs: "newProxy", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "NEW PROXY", clickFunction: function(){
                 const userConfirmed=confirm("Switching to a proxy URL. By proceeding, you will enter another URL for Shell Shockers but your data doesn't get transferred.");
                 if (userConfirmed) {
                     newProxy();
                 };
             },});
-            initModule({ location: tp.miscTab.pages[0], title: "Reload Page", storeAs: "reload", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "Reload Page", storeAs: "reload", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function(){
                 reloadPage();
             },});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "Switch Focus", storeAs: "unfocus", bindLocation: tp.miscTab.pages[1], button: "FOCUS/UNFOCUS", defaultBind: "P", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "Switch Focus", storeAs: "unfocus", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "FOCUS/UNFOCUS", defaultBind: "P", clickFunction: function(){
                 if (document.pointerLockElement !== null) { //currently locked
                     noPointerPause=true; unsafeWindow.document.exitPointerLock();
                 } else if (noPointerPause) { //already unlocked?
@@ -1520,7 +1522,7 @@ debug mode).`},
                 };
             },});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "FastChickenWinner", storeAs: "chickenWinner", bindLocation: tp.miscTab.pages[1], button: "Force Play", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "FastChickenWinner", storeAs: "chickenWinner", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "Force Play", clickFunction: function(){
                 unsafeWindow.extern.chwTryPlay();
                 const eggElement = document.getElementById("eggOne");
                 eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();
@@ -1542,10 +1544,10 @@ debug mode).`},
                     };
                 }, 100);
             },});
-            initModule({ location: tp.miscTab.pages[0], title: "AutoChickenWinner", storeAs: "autoChickenWinner", bindLocation: tp.miscTab.pages[1],});
+            initModule({ location: tp.miscTab.pages[0], title: "AutoChickenWinner", storeAs: "autoChickenWinner", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1],});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "Custom Macro", storeAs: "customMacro", defaultValue: "log('cool');" });
-            initModule({ location: tp.miscTab.pages[0], title: "Execute Macro", storeAs: "executeMacro", bindLocation: tp.miscTab.pages[1], button: "EXECUTE", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "Custom Macro", storeAs: "customMacro", tooltip: "No tooltip available", defaultValue: "log('cool');" });
+            initModule({ location: tp.miscTab.pages[0], title: "Execute Macro", storeAs: "executeMacro", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "EXECUTE", clickFunction: function(){
                 //use at your own risk, i guess. but is this really any more dangerous than pasting something into console? not really.
                 (async () => {
                     try {
@@ -1557,19 +1559,19 @@ debug mode).`},
                     }
                 })();
             },}); //but yes, as you can see "macros" are just scripts you can execute for whatever purposes you need. reminds me of userscripts...
-            initModule({ location: tp.miscTab.pages[0], title: "Do At Startup", storeAs: "autoMacro", bindLocation: tp.miscTab.pages[1],});
+            initModule({ location: tp.miscTab.pages[0], title: "Do At Startup", storeAs: "autoMacro", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1],});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "[WIP]RandomPath", storeAs: "randomPath", bindLocation: tp.miscTab.pages[1], button: "Random Path", clickFunction: function(){
+            initModule({ location: tp.miscTab.pages[0], title: "[WIP]RandomPath", storeAs: "randomPath", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], button: "Random Path", clickFunction: function(){
                 findNewPath = true;
             },});
             findNewPath = false;
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "SilentRoll", storeAs: "silentRoll", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "SilentRoll", storeAs: "silentRoll", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
             initFolder({ location: tp.miscTab.pages[0], title: "Seizure Options", storeAs: "seizureFolder", });
-                initModule({ location: tp.seizureFolder, title: "SeizureX", storeAs: "enableSeizureX", bindLocation: tp.miscTab.pages[1], });
-                initModule({ location: tp.seizureFolder, title: "X Amount", storeAs: "amountSeizureX", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
-                initModule({ location: tp.seizureFolder, title: "SeizureY", storeAs: "enableSeizureY", bindLocation: tp.miscTab.pages[1], });
-                initModule({ location: tp.seizureFolder, title: "Y Amount", storeAs: "amountSeizureY", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
+                initModule({ location: tp.seizureFolder, title: "SeizureX", storeAs: "enableSeizureX", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.seizureFolder, title: "X Amount", storeAs: "amountSeizureX", tooltip: "No tooltip available", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
+                initModule({ location: tp.seizureFolder, title: "SeizureY", storeAs: "enableSeizureY", tooltip: "No tooltip available", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.seizureFolder, title: "Y Amount", storeAs: "amountSeizureY", tooltip: "No tooltip available", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
         //CLIENT MODULES
         initFolder({ location: tp.mainPanel, title: "Client & About", storeAs: "clientFolder", });
         initTabs({ location: tp.clientFolder, storeAs: "clientTab" }, [
@@ -1577,19 +1579,20 @@ debug mode).`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "none", });
-            initModule({ location: tp.clientTab.pages[0], title: "Fallback Behaviour", storeAs: "vardataType", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "never", });
-            initModule({ location: tp.clientTab.pages[0], title: "Custom VarData", storeAs: "vardataCustom", defaultValue: "{}", enableConditions: [["vardataFallback", "loadCustom"]] });
+            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "none", });
+            initModule({ location: tp.clientTab.pages[0], title: "Fallback Behaviour", storeAs: "vardataType", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "never", });
+            initModule({ location: tp.clientTab.pages[0], title: "Custom VarData", storeAs: "vardataCustom", tooltip: "No tooltip available", defaultValue: "{}", enableConditions: [["vardataFallback", "loadCustom"]] });
             tp.clientTab.pages[0].addSeparator();
-            initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
-            initModule({ location: tp.clientTab.pages[0], title: "Hide at Startup", storeAs: "hideAtStartup", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
-            initModule({ location: tp.clientTab.pages[0], title: "No Console Logs", storeAs: "consoleLogs", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
-            initModule({ location: tp.clientTab.pages[0], title: "Pop-ups", storeAs: "popups", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
+            initModule({ location: tp.clientTab.pages[0], title: "Hide at Startup", storeAs: "hideAtStartup", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
+            initModule({ location: tp.clientTab.pages[0], title: "No Console Logs", storeAs: "consoleLogs", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
+            initModule({ location: tp.clientTab.pages[0], title: "Pop-ups", storeAs: "popups", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.clientTab.pages[0], title: "Tooltips", storeAs: "tooltips", tooltip: "Controls whether you want to see tooltips (the box displaying this very message!)", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
             tp.clientTab.pages[0].addSeparator();
-            initModule({ location: tp.clientTab.pages[0], title: "Panic", storeAs: "panic", bindLocation: tp.clientTab.pages[1], button: "EXIT!", clickFunction: function () { if (extract("enablePanic")) { unsafeWindow.location.replace(extract("panicURL")) } }, defaultBind: "X", enableConditions: [["enablePanic", true]], });
+            initModule({ location: tp.clientTab.pages[0], title: "Panic", storeAs: "panic", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], button: "EXIT!", clickFunction: function () { if (extract("enablePanic")) { unsafeWindow.location.replace(extract("panicURL")) } }, defaultBind: "X", enableConditions: [["enablePanic", true]], });
             initFolder({ location: tp.clientTab.pages[0], title: "Panic Options", storeAs: "panicFolder", });
-                initModule({ location: tp.panicFolder, title: "Enable", storeAs: "enablePanic", bindLocation: tp.clientTab.pages[1], defaultValue: false, });
-                initModule({ location: tp.panicFolder, title: "Set URL", storeAs: "panicURL", defaultValue: "https://classroom.google.com/", enableConditions: [["enablePanic", true]], });
+                initModule({ location: tp.panicFolder, title: "Enable", storeAs: "enablePanic", tooltip: "No tooltip available", bindLocation: tp.clientTab.pages[1], defaultValue: false, });
+                initModule({ location: tp.panicFolder, title: "Set URL", storeAs: "panicURL", tooltip: "No tooltip available", defaultValue: "https://classroom.google.com/", enableConditions: [["enablePanic", true]], });
             tp.clientTab.pages[0].addSeparator();
             let presetList = [];
             Object.entries(inbuiltPresets).forEach(([key, value]) => {//Get all presets from inbuilt presets var
@@ -1600,14 +1603,14 @@ debug mode).`},
             });
             //PRESETS: OakSwingZZZ 😎
             initFolder({ location: tp.clientTab.pages[0], title: "Presets", storeAs: "presetFolder",});
-                initModule({ location: tp.presetFolder, title: "Preset List", storeAs: "selectedPreset", defaultValue: "onlypuppy7's Config", bindLocation: tp.clientTab.pages[1], dropdown: presetList, });
-                initModule({ location: tp.presetFolder, title: "Apply", storeAs: "applyPreset", button: "Apply Preset", clickFunction: function () {
+                initModule({ location: tp.presetFolder, title: "Preset List", storeAs: "selectedPreset", tooltip: "No tooltip available", defaultValue: "onlypuppy7's Config", bindLocation: tp.clientTab.pages[1], dropdown: presetList, });
+                initModule({ location: tp.presetFolder, title: "Apply", storeAs: "applyPreset", tooltip: "No tooltip available", button: "Apply Preset", clickFunction: function () {
                     const userConfirmed = confirm( "Are you sure you want to continue? This will replace most of your current config." );
                         if (userConfirmed) { applySettings(inbuiltPresets[extract("selectedPreset")], true); };
                     },
                 });
                 tp.presetFolder.addSeparator();
-                initModule({ location: tp.presetFolder, title: "Save", storeAs: "savePreset", button: "Save As Preset", clickFunction: function () {
+                initModule({ location: tp.presetFolder, title: "Save", storeAs: "savePreset", tooltip: "No tooltip available", button: "Save As Preset", clickFunction: function () {
                     // log("Config Main: ", configMain);
                     let saveString = '';
                     const addParam = function(module,setTo) {saveString=saveString+module+">"+JSON.stringify(setTo)+"<"};
@@ -1639,7 +1642,7 @@ debug mode).`},
                     log(inbuiltPresets);
                     initMenu(false); //Reloads menu to add to dropdown list
                 },});
-                initModule({ location: tp.presetFolder, title: "Delete", storeAs: "deletePreset", button: "Remove Preset", clickFunction: function () { // Function won't do anything if they select a preset that was loaded in the gamecode
+                initModule({ location: tp.presetFolder, title: "Delete", storeAs: "deletePreset", tooltip: "No tooltip available", button: "Remove Preset", clickFunction: function () { // Function won't do anything if they select a preset that was loaded in the gamecode
                     let currUserPresets = loadUserPresets(); //gets current presets from storage
                     delete currUserPresets[extract("selectedPreset")];//deletes
                     delete inbuiltPresets[extract("selectedPreset")];//deletes
@@ -1648,7 +1651,7 @@ debug mode).`},
                     initMenu(false); //reloads menu
                 },});
                 tp.presetFolder.addSeparator();
-                initModule({ location: tp.presetFolder, title: "Import", storeAs: "importPreset", button: "Import Preset", clickFunction: function () {
+                initModule({ location: tp.presetFolder, title: "Import", storeAs: "importPreset", tooltip: "No tooltip available", button: "Import Preset", clickFunction: function () {
                     let preset = prompt("Paste preset here:"); // asks user to paste preset
                     if (preset == "" || preset == null) {
                         log("User cancelled save");
@@ -1671,7 +1674,7 @@ debug mode).`},
                         initMenu(false);
                     };
                 },});
-                initModule({ location: tp.presetFolder, title: "Export", storeAs: "exportPreset", button: "Copy To Clipboard", clickFunction: function () {
+                initModule({ location: tp.presetFolder, title: "Export", storeAs: "exportPreset", tooltip: "No tooltip available", button: "Copy To Clipboard", clickFunction: function () {
                     let saveString = '';
                     const addParam = function(module,setTo) {saveString=saveString+module+">"+JSON.stringify(setTo)+"<"};
                     Object.entries(configMain).forEach(([key, value]) => {
@@ -1694,20 +1697,20 @@ debug mode).`},
                 },});
             tp.clientTab.pages[0].addSeparator();
             initFolder({ location: tp.clientTab.pages[0], title: "Creator's Links", storeAs: "linksFolder",});
-                initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", button: "Link", clickFunction: () => GM_openInTab(discordURL, { active: true }) });
-                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", button: "Link", clickFunction: () => GM_openInTab(githubURL, { active: true }) });
+                initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", tooltip: "No tooltip available", button: "Link", clickFunction: () => GM_openInTab(discordURL, { active: true }) });
+                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "No tooltip available", button: "Link", clickFunction: () => GM_openInTab(githubURL, { active: true }) });
             tp.clientTab.pages[0].addSeparator();
-            initModule({ location: tp.clientTab.pages[0], title: "Reset", storeAs: "clear", button: "DELETE", clickFunction: function(){
+            initModule({ location: tp.clientTab.pages[0], title: "Reset", storeAs: "clear", tooltip: "No tooltip available", button: "DELETE", clickFunction: function(){
                 const userConfirmed=confirm("Are you sure you want to continue? This will clear all stored module states and keybinds.");
                 if (userConfirmed) {
                     initMenu(true);
                     alert("Reset to defaults.");
                 };
             },});
-            initModule({ location: tp.clientTab.pages[0], title: "Debug", storeAs: "debug", bindLocation: tp.clientTab.pages[1], });
+            initModule({ location: tp.clientTab.pages[0], title: "Debug", storeAs: "debug", tooltip: "Converts SFC into a development tool.\nExposes globalSS to the window (allowing you to manipulate many game variables directly) and also enables some extra logs.", bindLocation: tp.clientTab.pages[1], });
         tp.mainPanel.addSeparator();
-        initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", button: "Link", clickFunction: () => GM_openInTab(downloadURL, { active: true }) });
-        initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", button: "Link", clickFunction: () => GM_openInTab(featuresGuideURL, { active: true }) });
+        initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", tooltip: "No tooltip available", button: "Link", clickFunction: () => GM_openInTab(downloadURL, { active: true }) });
+        initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", tooltip: "No tooltip available", button: "Link", clickFunction: () => GM_openInTab(featuresGuideURL, { active: true }) });
 
 
         tp.botPanel = new Tweakpane.Pane(); // eslint-disable-line
@@ -1726,78 +1729,78 @@ debug mode).`},
         });
 
         //DEPLOY STUFF
-        initModule({ location: tp.botTabs.pages[0], title: "Bots Amount", storeAs: "numberBots", slider: { min: 1, max: 18, step: 1 }, defaultValue: 1, });
-        initModule({ location: tp.botTabs.pages[0], title: "Deploy", storeAs: "deployBots", button: "START BOTS!", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { deployBots() }, });
-        initModule({ location: tp.botTabs.pages[0], title: "Restart Bots", storeAs: "restartBots", button: "RESTART BOTS", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { broadcastToBots("kill"); setTimeout(function(){deployBots()}, 1000) }, });
+        initModule({ location: tp.botTabs.pages[0], title: "Bots Amount", storeAs: "numberBots", tooltip: "No tooltip available", slider: { min: 1, max: 18, step: 1 }, defaultValue: 1, });
+        initModule({ location: tp.botTabs.pages[0], title: "Deploy", storeAs: "deployBots", tooltip: "No tooltip available", button: "START BOTS!", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { deployBots() }, });
+        initModule({ location: tp.botTabs.pages[0], title: "Restart Bots", storeAs: "restartBots", tooltip: "No tooltip available", button: "RESTART BOTS", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { broadcastToBots("kill"); setTimeout(function(){deployBots()}, 1000) }, });
         tp.botTabs.pages[0].addSeparator();
-        initModule({ location: tp.botTabs.pages[0], title: "Window Width", storeAs: "botWindowWidth", slider: { min: 0, max: 10000, step: 1 }, defaultValue: 450, botParam: true, });
-        initModule({ location: tp.botTabs.pages[0], title: "Window Height", storeAs: "botWindowHeight", slider: { min: 0, max: 10000, step: 1 }, defaultValue: 300, botParam: true, });
+        initModule({ location: tp.botTabs.pages[0], title: "Window Width", storeAs: "botWindowWidth", tooltip: "No tooltip available", slider: { min: 0, max: 10000, step: 1 }, defaultValue: 450, botParam: true, });
+        initModule({ location: tp.botTabs.pages[0], title: "Window Height", storeAs: "botWindowHeight", tooltip: "No tooltip available", slider: { min: 0, max: 10000, step: 1 }, defaultValue: 300, botParam: true, });
         tp.botTabs.pages[0].addSeparator();
-        initModule({ location: tp.botTabs.pages[0], title: "Use Names", storeAs: "useCustomNameBots", defaultValue: true, botParam: true, });
-        initModule({ location: tp.botTabs.pages[0], title: "Bot Name", storeAs: "botUsername", defaultValue: "ЅtateFarmer", enableConditions: [["useCustomNameBots", true]], });
-        initModule({ location: tp.botTabs.pages[0], title: "AntiDupe", storeAs: "botAntiDupe", enableConditions: [["useCustomNameBots", true]], });
-        initModule({ location: tp.botTabs.pages[0], title: "CopyNames", storeAs: "botCopyName", enableConditions: [["useCustomNameBots", true]], });
+        initModule({ location: tp.botTabs.pages[0], title: "Use Names", storeAs: "useCustomNameBots", tooltip: "No tooltip available", defaultValue: true, botParam: true, });
+        initModule({ location: tp.botTabs.pages[0], title: "Bot Name", storeAs: "botUsername", tooltip: "No tooltip available", defaultValue: "ЅtateFarmer", enableConditions: [["useCustomNameBots", true]], });
+        initModule({ location: tp.botTabs.pages[0], title: "AntiDupe", storeAs: "botAntiDupe", tooltip: "No tooltip available", enableConditions: [["useCustomNameBots", true]], });
+        initModule({ location: tp.botTabs.pages[0], title: "CopyNames", storeAs: "botCopyName", tooltip: "No tooltip available", enableConditions: [["useCustomNameBots", true]], });
         tp.botTabs.pages[0].addSeparator();
-        initModule({ location: tp.botTabs.pages[0], title: "Use Macro", storeAs: "useBotMacro", defaultValue: true, botParam: true, });
-        initModule({ location: tp.botTabs.pages[0], title: "Bot Macro", storeAs: "botMacro", defaultValue: "createPopup('success?');", botParam: true, });
+        initModule({ location: tp.botTabs.pages[0], title: "Use Macro", storeAs: "useBotMacro", tooltip: "No tooltip available", defaultValue: true, botParam: true, });
+        initModule({ location: tp.botTabs.pages[0], title: "Bot Macro", storeAs: "botMacro", tooltip: "No tooltip available", defaultValue: "createPopup('success?');", botParam: true, });
         tp.botTabs.pages[0].addSeparator();
-        initModule({ location: tp.botTabs.pages[0], title: "Proxy URL", storeAs: "proxyBots", dropdown: [{ text: "Randomised", value: "randomised" }, { text: "Static", value: "static" },], defaultValue: "darkesteggshell", });
+        initModule({ location: tp.botTabs.pages[0], title: "Proxy URL", storeAs: "proxyBots", tooltip: "No tooltip available", dropdown: [{ text: "Randomised", value: "randomised" }, { text: "Static", value: "static" },], defaultValue: "darkesteggshell", });
         tp.botTabs.pages[0].addSeparator();
-        initModule({ location: tp.botTabs.pages[0], title: "Bot Color", storeAs: "eggColorBots", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "White", value: "white" }, { text: "Light Blue", value: "lightblue" }, { text: "Light Eggshell", value: "lighteggshell" }, { text: "Eggshell", value: "eggshell" }, { text: "Dark Eggshell", value: "darkeggshell" }, { text: "Darker Eggshell", value: "darkereggshell" }, { text: "Darkest Eggshell", value: "darkesteggshell" }, { text: "Red (VIP)", value: "red" }, { text: "Purple (VIP)", value: "purple" }, { text: "Pink (VIP)", value: "pink" }, { text: "Yellow (VIP)", value: "yellow" }, { text: "Blue (VIP)", value: "blue" }, { text: "Green (VIP)", value: "green" }, { text: "Lime (VIP)", value: "lime" }, { text: "Randomised", value: "random" }], defaultValue: "darkesteggshell", });
-        initModule({ location: tp.botTabs.pages[0], title: "Bot Stamp", storeAs: "autoStampBots", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Target Stamp", value: "target" }, { text: "No Sign Stamp", value: "nosign" }, { text: "Question Mark Stamp?", value: "question" }, { text: "Peace Stamp", value: "peace" }, { text: "Thumbs Up Stamp", value: "thumbsup" }, { text: "Pablo Smile Stamp", value: "pablosmile" }, { text: "Randomised", value: "random" }], defaultValue: "pablosmile", });
-        initModule({ location: tp.botTabs.pages[0], title: "Bot Hat", storeAs: "autoHatBots", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Ball Cap", value: "ballcap" }, { text: "Boat Fedora", value: "boatfedora" }, { text: "Top Hat", value: "tophat" }, { text: "Derby Hat", value: "derbyhat" }, { text: "Mountie Hat", value: "mountiehat" }, { text: "Pablo Hat", value: "pablohat" }, { text: "Randomised", value: "random" }], defaultValue: "pablohat", });
+        initModule({ location: tp.botTabs.pages[0], title: "Bot Color", storeAs: "eggColorBots", tooltip: "No tooltip available", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "White", value: "white" }, { text: "Light Blue", value: "lightblue" }, { text: "Light Eggshell", value: "lighteggshell" }, { text: "Eggshell", value: "eggshell" }, { text: "Dark Eggshell", value: "darkeggshell" }, { text: "Darker Eggshell", value: "darkereggshell" }, { text: "Darkest Eggshell", value: "darkesteggshell" }, { text: "Red (VIP)", value: "red" }, { text: "Purple (VIP)", value: "purple" }, { text: "Pink (VIP)", value: "pink" }, { text: "Yellow (VIP)", value: "yellow" }, { text: "Blue (VIP)", value: "blue" }, { text: "Green (VIP)", value: "green" }, { text: "Lime (VIP)", value: "lime" }, { text: "Randomised", value: "random" }], defaultValue: "darkesteggshell", });
+        initModule({ location: tp.botTabs.pages[0], title: "Bot Stamp", storeAs: "autoStampBots", tooltip: "No tooltip available", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Target Stamp", value: "target" }, { text: "No Sign Stamp", value: "nosign" }, { text: "Question Mark Stamp?", value: "question" }, { text: "Peace Stamp", value: "peace" }, { text: "Thumbs Up Stamp", value: "thumbsup" }, { text: "Pablo Smile Stamp", value: "pablosmile" }, { text: "Randomised", value: "random" }], defaultValue: "pablosmile", });
+        initModule({ location: tp.botTabs.pages[0], title: "Bot Hat", storeAs: "autoHatBots", tooltip: "No tooltip available", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Ball Cap", value: "ballcap" }, { text: "Boat Fedora", value: "boatfedora" }, { text: "Top Hat", value: "tophat" }, { text: "Derby Hat", value: "derbyhat" }, { text: "Mountie Hat", value: "mountiehat" }, { text: "Pablo Hat", value: "pablohat" }, { text: "Randomised", value: "random" }], defaultValue: "pablohat", });
         //MANAGE STUFF
-        initModule({ location: tp.botTabs.pages[1], title: "Close Bots", storeAs: "killBots", button: "CLOSE TABS", clickFunction: function () { broadcastToBots("kill") }, });
-        initModule({ location: tp.botTabs.pages[1], title: "Refresh Pages", storeAs: "refreshBots", button: "REFRESH", clickFunction: function () { broadcastToBots("refresh") }, });
+        initModule({ location: tp.botTabs.pages[1], title: "Close Bots", storeAs: "killBots", tooltip: "No tooltip available", button: "CLOSE TABS", clickFunction: function () { broadcastToBots("kill") }, });
+        initModule({ location: tp.botTabs.pages[1], title: "Refresh Pages", storeAs: "refreshBots", tooltip: "No tooltip available", button: "REFRESH", clickFunction: function () { broadcastToBots("refresh") }, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "New Proxies", storeAs: "newProxyBots", button: "NEW PROXIES", clickFunction: function () { broadcastToBots("newproxy") }, });
-        initModule({ location: tp.botTabs.pages[1], title: "Unban All", storeAs: "unbanBots", button: "UNBAN BOTS", clickFunction: function () { broadcastToBots("unban") }, });
-        initModule({ location: tp.botTabs.pages[1], title: "AutoUnbanBot", storeAs: "botAutoUnban", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "AutoLoginBot", storeAs: "botAutoLogin", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "New Proxies", storeAs: "newProxyBots", tooltip: "No tooltip available", button: "NEW PROXIES", clickFunction: function () { broadcastToBots("newproxy") }, });
+        initModule({ location: tp.botTabs.pages[1], title: "Unban All", storeAs: "unbanBots", tooltip: "No tooltip available", button: "UNBAN BOTS", clickFunction: function () { broadcastToBots("unban") }, });
+        initModule({ location: tp.botTabs.pages[1], title: "AutoUnbanBot", storeAs: "botAutoUnban", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "AutoLoginBot", storeAs: "botAutoLogin", tooltip: "No tooltip available", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled", botParam: true, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "Don'tKillMe", storeAs: "botNoKillMe", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "Don'tKillBot", storeAs: "botNoKillBots", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "FollowMe", storeAs: "botFollowMe", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "FollowBots", storeAs: "botFollowBots", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Don'tKillMe", storeAs: "botNoKillMe", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Don'tKillBot", storeAs: "botNoKillBots", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "FollowMe", storeAs: "botFollowMe", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "FollowBots", storeAs: "botFollowBots", tooltip: "No tooltip available", botParam: true, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "Leave Games", storeAs: "leaveBots", button: "LEAVE", clickFunction: function () { broadcastToBots("leave") }, });
-        initModule({ location: tp.botTabs.pages[1], title: "Leave Empty", storeAs: "leaveEmptyBots", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "AutoLeave", storeAs: "autoLeaveBots", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "Delay (s)", storeAs: "autoLeaveDelayBots", slider: { min: 0, max: 3600, step: 1 }, defaultValue: 300, enableConditions: [["autoLeaveBots", true]], botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Leave Games", storeAs: "leaveBots", tooltip: "No tooltip available", button: "LEAVE", clickFunction: function () { broadcastToBots("leave") }, });
+        initModule({ location: tp.botTabs.pages[1], title: "Leave Empty", storeAs: "leaveEmptyBots", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "AutoLeave", storeAs: "autoLeaveBots", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Delay (s)", storeAs: "autoLeaveDelayBots", tooltip: "No tooltip available", slider: { min: 0, max: 3600, step: 1 }, defaultValue: 300, enableConditions: [["autoLeaveBots", true]], botParam: true, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "Spam Report", storeAs: "reportBots", button: "SPAM REPORT!", clickFunction: function () { broadcastToBots("report") }, });
+        initModule({ location: tp.botTabs.pages[1], title: "Spam Report", storeAs: "reportBots", tooltip: "No tooltip available", button: "SPAM REPORT!", clickFunction: function () { broadcastToBots("report") }, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "Join Game", storeAs: "botAutoJoin", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "Game Code", storeAs: "botJoinCode", defaultValue: "CODE", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "Get Code", storeAs: "getCodeBots", button: "Retrieve", clickFunction: function () { change("botJoinCode", GAMECODE) }, botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Join Game", storeAs: "botAutoJoin", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Game Code", storeAs: "botJoinCode", tooltip: "No tooltip available", defaultValue: "CODE", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Get Code", storeAs: "getCodeBots", tooltip: "No tooltip available", button: "Retrieve", clickFunction: function () { change("botJoinCode", GAMECODE) }, botParam: true, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "GameType", storeAs: "autoGamemodeBots", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "FFA", value: "ffa" }, { text: "Teams", value: "teams" }, { text: "Captula", value: "captula" }, { text: "KotC", value: "kotc" }, { text: "Randomised", value: "random" }], defaultValue: "disabled", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "AutoRegion", storeAs: "autoRegionBots", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Chile", value: "santiago" }, { text: "Germany", value: "germany" }, { text: "Singapore", value: "singapore" }, { text: "Sydney", value: "sydney" }, { text: "US Central", value: "uscentral" }, { text: "US East", value: "useast" }, { text: "US West", value: "uswest" }, { text: "Randomised", value: "random" }], defaultValue: "disabled", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "GameType", storeAs: "autoGamemodeBots", tooltip: "No tooltip available", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "FFA", value: "ffa" }, { text: "Teams", value: "teams" }, { text: "Captula", value: "captula" }, { text: "KotC", value: "kotc" }, { text: "Randomised", value: "random" }], defaultValue: "disabled", botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "AutoRegion", storeAs: "autoRegionBots", tooltip: "No tooltip available", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Chile", value: "santiago" }, { text: "Germany", value: "germany" }, { text: "Singapore", value: "singapore" }, { text: "Sydney", value: "sydney" }, { text: "US Central", value: "uscentral" }, { text: "US East", value: "useast" }, { text: "US West", value: "uswest" }, { text: "Randomised", value: "random" }], defaultValue: "disabled", botParam: true, });
         tp.botTabs.pages[1].addSeparator();
-        initModule({ location: tp.botTabs.pages[1], title: "Select Team", storeAs: "botTeam", botParam: true, dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Red Team", value: "red" }, { text: "Blue Team", value: "blue" }, { text: "Random Team", value: "random" }], defaultValue: "disabled", });
+        initModule({ location: tp.botTabs.pages[1], title: "Select Team", storeAs: "botTeam", tooltip: "No tooltip available", botParam: true, dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Red Team", value: "red" }, { text: "Blue Team", value: "blue" }, { text: "Random Team", value: "random" }], defaultValue: "disabled", });
         //PARAMS STUFF
-        initModule({ location: tp.botTabs.pages[2], title: "DoPlay", storeAs: "botRespawn", botParam: true, });
-        initModule({ location: tp.botTabs.pages[2], title: "LowRes", storeAs: "botLowRes", botParam: true, })
-        initModule({ location: tp.botTabs.pages[2], title: "RenderDelay", storeAs: "renderDelayBots", slider: { min: 0, max: 30000, step: 10 }, defaultValue: 0, botParam: true, });
-        initModule({ location: tp.botTabs.pages[2], title: "MuteGame", storeAs: "botMuteGame", botParam: true, })
+        initModule({ location: tp.botTabs.pages[2], title: "DoPlay", storeAs: "botRespawn", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "LowRes", storeAs: "botLowRes", tooltip: "No tooltip available", botParam: true, })
+        initModule({ location: tp.botTabs.pages[2], title: "RenderDelay", storeAs: "renderDelayBots", tooltip: "No tooltip available", slider: { min: 0, max: 30000, step: 10 }, defaultValue: 0, botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "MuteGame", storeAs: "botMuteGame", tooltip: "No tooltip available", botParam: true, })
         tp.botTabs.pages[2].addSeparator();
-        initModule({ location: tp.botTabs.pages[2], title: "DoSeizure", storeAs: "botSeizure", botParam: true, enableConditions: [["botRespawn", true]], });
+        initModule({ location: tp.botTabs.pages[2], title: "DoSeizure", storeAs: "botSeizure", tooltip: "No tooltip available", botParam: true, enableConditions: [["botRespawn", true]], });
         tp.botTabs.pages[2].addSeparator();
-        initModule({ location: tp.botTabs.pages[2], title: "DoTallChat", storeAs: "botTallChat", botParam: true, });
-        initModule({ location: tp.botTabs.pages[2], title: "DoMock", storeAs: "botMock", botParam: true, });
-        initModule({ location: tp.botTabs.pages[2], title: "DoAutoEZ", storeAs: "botAutoEZ", botParam: true, });
-        initModule({ location: tp.botTabs.pages[2], title: "DoChAccuse", storeAs: "botCheatAccuse", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "DoTallChat", storeAs: "botTallChat", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "DoMock", storeAs: "botMock", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "DoAutoEZ", storeAs: "botAutoEZ", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "DoChAccuse", storeAs: "botCheatAccuse", tooltip: "No tooltip available", botParam: true, });
         tp.botTabs.pages[2].addSeparator();
-        initModule({ location: tp.botTabs.pages[2], title: "DoSpam", storeAs: "botSpam", botParam: true, });
-        initModule({ location: tp.botTabs.pages[2], title: "SpamText", storeAs: "spamChatTextBot", defaultValue: "ЅtateFarm Client On Top! ", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "DoSpam", storeAs: "botSpam", tooltip: "No tooltip available", botParam: true, });
+        initModule({ location: tp.botTabs.pages[2], title: "SpamText", storeAs: "spamChatTextBot", tooltip: "No tooltip available", defaultValue: "ЅtateFarm Client On Top! ", botParam: true, });
         tp.botTabs.pages[2].addSeparator();
-        initModule({ location: tp.botTabs.pages[2], title: "SelectWeapon", storeAs: "botWeapon", dropdown: [{ text: "EggK-47", value: "eggk47" }, { text: "Scrambler", value: "scrambler" }, { text: "Free Ranger", value: "freeranger" }, { text: "RPEGG", value: "rpegg" }, { text: "Whipper", value: "whipper" }, { text: "Crackshot", value: "crackshot" }, { text: "Tri-Hard", value: "trihard" }, { text: "Randomised", value: "random" }], botParam: true, defaultValue: "eggk47", enableConditions: [["botRespawn", true]], });
-        initModule({ location: tp.botTabs.pages[2], title: "DoMove", storeAs: "botAutoMove", botParam: true, enableConditions: [["botRespawn", true]], });
-        initModule({ location: tp.botTabs.pages[2], title: "DoShoot", storeAs: "botAutoShoot", botParam: true, enableConditions: [["botRespawn", true]], });
-        initModule({ location: tp.botTabs.pages[2], title: "DoAimbot", storeAs: "botAimbot", botParam: true, enableConditions: [["botRespawn", true]], });;
-        initModule({ location: tp.botTabs.pages[2], title: "UseMinAccuracy", storeAs: "botAccuracy", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, botParam: true, enableConditions: [["botRespawn", true]], });
+        initModule({ location: tp.botTabs.pages[2], title: "SelectWeapon", storeAs: "botWeapon", tooltip: "No tooltip available", dropdown: [{ text: "EggK-47", value: "eggk47" }, { text: "Scrambler", value: "scrambler" }, { text: "Free Ranger", value: "freeranger" }, { text: "RPEGG", value: "rpegg" }, { text: "Whipper", value: "whipper" }, { text: "Crackshot", value: "crackshot" }, { text: "Tri-Hard", value: "trihard" }, { text: "Randomised", value: "random" }], botParam: true, defaultValue: "eggk47", enableConditions: [["botRespawn", true]], });
+        initModule({ location: tp.botTabs.pages[2], title: "DoMove", storeAs: "botAutoMove", tooltip: "No tooltip available", botParam: true, enableConditions: [["botRespawn", true]], });
+        initModule({ location: tp.botTabs.pages[2], title: "DoShoot", storeAs: "botAutoShoot", tooltip: "No tooltip available", tooltip: "Makes the bot autoshoot.", botParam: true, enableConditions: [["botRespawn", true]], });
+        initModule({ location: tp.botTabs.pages[2], title: "DoAimbot", storeAs: "botAimbot", tooltip: "No tooltip available", botParam: true, enableConditions: [["botRespawn", true]], });;
+        initModule({ location: tp.botTabs.pages[2], title: "UseMinAccuracy", storeAs: "botAccuracy", tooltip: "No tooltip available", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, botParam: true, enableConditions: [["botRespawn", true]], });
         //INFO STUFF
-        initModule({ location: tp.botTabs.pages[3], storeAs: "botOnline", monitor: 17.5, botParam: true, });
+        initModule({ location: tp.botTabs.pages[3], storeAs: "botOnline", tooltip: "No tooltip available", monitor: 17.5, botParam: true, });
 
         if (!AUTOMATED) {
             if (!load("StateFarmConfigMainPanel") || reset===true) {
@@ -1834,6 +1837,23 @@ debug mode).`},
                     log(item[0], item[1]);
                 });
             };
+            //tooltip events
+            unsafeWindow.document.querySelectorAll('.tp-lblv_l').forEach(label => {
+                if (extract("debug") && !tooltips[label.innerText]) log("Warning: no tooltip assigned for module:", label.innerText);
+
+                label.addEventListener('mouseenter', () => {
+                    if (extract("tooltips")) {
+                        tooltipElement.innerText = tooltips[label.innerText] || 'Tooltip parameter not found';
+                        tooltipElement.style.opacity = '1';
+                        const rect = label.getBoundingClientRect();
+                        tooltipElement.style.top = `${rect.top + window.scrollY - 12}px`;
+                        tooltipElement.style.left = `${rect.left + window.scrollX - tooltipElement.offsetWidth - 10}px`;
+                    }
+                });
+                label.addEventListener('mouseleave', () => {
+                    tooltipElement.style.opacity = '0';
+                });
+            });            
         }, 500);
 
         menuInitiated = reset == "init" ? "init" : true;
@@ -2416,6 +2436,28 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         const messageContainer = document.createElement('div'); //so it can be cloned. i think.
         messageContainer.id = 'message-container';
         document.body.appendChild(messageContainer);
+        //initiate tooltip div and css and shit
+        tooltipElement = document.createElement('div');
+        tooltipElement.style.cssText = `
+            position: absolute;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.7);
+            font-weight: normal;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            animation: fadeIn 0.5s forwards, fadeOut 0.5s reverse forwards 3s;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            font-family: 'Bahnschrift', sans-serif !important;
+            font-size: 16px;
+            z-index: 9999999 !important;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        document.body.appendChild(tooltipElement);
         //initiate coord div and css and shit
         coordElement = document.createElement('div'); // create the element directly
         coordElement.classList.add('coords');
