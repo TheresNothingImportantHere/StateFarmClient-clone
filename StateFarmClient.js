@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre125
+// @version      3.4.1-pre126
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -139,6 +139,8 @@ let attemptedInjection = false;
     const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.25.1/babylon.min.js";
 
     const replacementLogoURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement.png?raw=true";
+    const replacementLogoHalloweenURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement-halloween.png?raw=true";
+
     const replacementFeedURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamefeeds/";
     const commitFeedURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/commits?path=StateFarmClient.js";
     const badgeListURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamebadges/";
@@ -3031,17 +3033,21 @@ z-index: 999999;
     const applyStateFarmLogo = function () {
         if (extract("replaceLogo")) {
             const images = document.getElementsByTagName('img');
+            let imgURL = replacementLogoURL;
+            const month = new Date().getMonth();
+            if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9) imgURL = replacementLogoHalloweenURL;
+            
             for (let i = 0; i < images.length; i++) {
                 const src = images[i].getAttribute('src');
                 if (src && src.includes('img/logo.svg')) {
-                    images[i].setAttribute('src', replacementLogoURL);
+                    images[i].setAttribute('src', imgURL);
                 };
             };
             const logoDiv = document.getElementById('logo');
             if (logoDiv) {
                 const logoImg = logoDiv.querySelector('img');
                 if (logoImg) {
-                    logoImg.setAttribute('src', replacementLogoURL);
+                    logoImg.setAttribute('src', imgURL);
                     logoImg.setAttribute('width', 300);
                     logoImg.setAttribute('height', 104);
                 };
