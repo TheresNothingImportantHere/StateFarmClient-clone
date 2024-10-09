@@ -424,7 +424,7 @@ Various account management tools
 > This is unspecific to StateFarm Client but is here as a helpful tip for general user experience improvement.
 
 **Procedure:**
-1. Install [uBlock Orgin](https://ublockorigin.com/) - the best blocker.
+1. Install [uBlock Origin](https://ublockorigin.com/) - the best blocker.
     - **uBlock Origin** is NOT **uBlock**. They are **different**.
 2. Enable uBlock Origin. That's it. No more ads.
 
