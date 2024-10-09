@@ -32,9 +32,13 @@
 // @match        *://*.algebra.best/*
 // @match        *://*.algebra.vip/*
 // @match        *://*.biologyclass.club/*
+// @match        *://*.combateggs.com/*
 // @match        *://*.deadlyegg.com/*
+// @match        *://*.deathegg.life/*
 // @match        *://*.deathegg.world/*
+// @match        *://*.eggbattle.com/*
 // @match        *://*.eggboy.club/*
+// @match        *://*.eggboy.me/*
 // @match        *://*.eggboy.xyz/*
 // @match        *://*.eggcombat.com/*
 // @match        *://*.egg.dance/*
@@ -64,9 +68,11 @@
 // @match        *://*.scrambled.today/*
 // @match        *://*.scrambled.us/*
 // @match        *://*.scrambled.world/*
+// @match        *://*.shellshockers.best/*
 // @match        *://*.shellshockers.club/*
 // @match        *://*.shellshockers.life/*
 // @match        *://*.shellshockers.site/*
+// @match	 *://*.shellshockers.today/*
 // @match        *://*.shellshockers.us/*
 // @match        *://*.shellshockers.world/*
 // @match        *://*.shellshockers.xyz/*
@@ -82,8 +88,6 @@
 // @match        *://*.yolk.quest/*
 // @match        *://*.yolk.today/*
 // @match        *://*.zygote.cafe/*
-// @match        *://*.shellshockers.best/*
-// @match        *://*.eggboy.me/*
 // @downloadURL  https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.user.js
 // @updateURL    https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.meta.js
 // ==/UserScript==
@@ -445,12 +449,12 @@ let attemptedInjection = false;
         'date', 'dick', 'fuck', 'fuk', 'suck', 'piss', 'hate', 'nude', 'fux', 'hate', 'pussy',
     ]; //filteredList[randomInt(0,filteredList.length-1)]
     let proxyList = [
-        'shellshock.io', 'algebra.best', 'algebra.vip', 'biologyclass.club', 'deadlyegg.com', 'deathegg.world', 'eggboy.club', 'eggboy.xyz', 'eggcombat.com', 'egg.dance',
+        'shellshock.io', 'algebra.best', 'algebra.vip', 'biologyclass.club', 'combateggs.com', 'deadlyegg.com', 'deathegg.life', 'deathegg.world', 'eggbattle.com', 'eggboy.club', 'eggboy.me', 'eggboy.xyz', 'eggcombat.com', 'egg.dance',
         'eggfacts.fun', 'egghead.institute', 'eggisthenewblack.com', 'eggsarecool.com', 'geometry.best', 'geometry.monster', 'geometry.pw', 'geometry.report', 'hardboiled.life',
         'hardshell.life', 'humanorganising.org', 'mathactivity.xyz', 'mathactivity.club', 'mathdrills.info', 'mathdrills.life', 'mathfun.rocks', 'mathgames.world', 'math.international',
-        'mathlete.fun', 'mathlete.pro', 'overeasy.club', 'risenegg.com', 'scrambled.tech', 'scrambled.today', 'scrambled.us', 'scrambled.world', 'shellshockers.club', 'shellshockers.life', 'shellshockers.site',
-        'shellshockers.us', 'shellshockers.world', 'shellshockers.xyz', 'shellsocks.com', 'softboiled.club', 'urbanegger.com', 'violentegg.club', 'violentegg.fun', 'yolk.best', 'yolk.life',
-        'yolk.rocks', 'yolk.tech', 'yolk.quest', 'yolk.today', 'zygote.cafe', 'shellshockers.best', 'eggboy.me'
+        'mathlete.fun', 'mathlete.pro', 'overeasy.club', 'risenegg.com', 'scrambled.tech', 'scrambled.today', 'scrambled.us', 'scrambled.world', 'shellshockers.best', 'shellshockers.club', 'shellshockers.life', 'shellshockers.site',
+        'shellshockers.today', 'shellshockers.us', 'shellshockers.world', 'shellshockers.xyz', 'shellsocks.com', 'softboiled.club', 'urbanegger.com', 'violentegg.club', 'violentegg.fun', 'yolk.best', 'yolk.life',
+        'yolk.rocks', 'yolk.tech', 'yolk.quest', 'yolk.today', 'zygote.cafe'
     ];
     proxyList = proxyList.filter(item => item !== unsafeWindow.location.hostname);
     proxyList = [...proxyList].sort(() => Math.random() - 0.5);
