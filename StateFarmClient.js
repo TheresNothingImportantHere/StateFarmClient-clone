@@ -46,6 +46,10 @@
 // @match        *://*.egghead.institute/*
 // @match        *://*.eggisthenewblack.com/*
 // @match        *://*.eggsarecool.com/*
+// @match        *://*.eggshock.com/*
+// @match        *://*.eggshooter.best/*
+// @match        *://*.eggshooter.com/*
+// @match        *://*.eggwarfare.com/*
 // @match        *://*.geometry.best/*
 // @match        *://*.geometry.monster/*
 // @match        *://*.geometry.pw/*
@@ -53,8 +57,8 @@
 // @match        *://*.hardboiled.life/*
 // @match        *://*.hardshell.life/*
 // @match        *://*.humanorganising.org/*
-// @match        *://*.mathactivity.xyz/*
 // @match        *://*.mathactivity.club/*
+// @match        *://*.mathactivity.xyz/*
 // @match        *://*.mathdrills.info/*
 // @match        *://*.mathdrills.life/*
 // @match        *://*.mathfun.rocks/*
@@ -74,6 +78,7 @@
 // @match        *://*.shellshockers.site/*
 // @match	 *://*.shellshockers.today/*
 // @match        *://*.shellshockers.us/*
+// @match        *://*.shellshockers.wiki/*
 // @match        *://*.shellshockers.world/*
 // @match        *://*.shellshockers.xyz/*
 // @match        *://*.shellsocks.com/*
@@ -450,10 +455,10 @@ let attemptedInjection = false;
     ]; //filteredList[randomInt(0,filteredList.length-1)]
     let proxyList = [
         'shellshock.io', 'algebra.best', 'algebra.vip', 'biologyclass.club', 'combateggs.com', 'deadlyegg.com', 'deathegg.life', 'deathegg.world', 'eggbattle.com', 'eggboy.club', 'eggboy.me', 'eggboy.xyz', 'eggcombat.com', 'egg.dance',
-        'eggfacts.fun', 'egghead.institute', 'eggisthenewblack.com', 'eggsarecool.com', 'geometry.best', 'geometry.monster', 'geometry.pw', 'geometry.report', 'hardboiled.life',
-        'hardshell.life', 'humanorganising.org', 'mathactivity.xyz', 'mathactivity.club', 'mathdrills.info', 'mathdrills.life', 'mathfun.rocks', 'mathgames.world', 'math.international',
+        'eggfacts.fun', 'egghead.institute', 'eggisthenewblack.com', 'eggsarecool.com', 'eggshock.com', 'eggshooter.best', 'eggshooter.com', 'eggwarfare.com', 'geometry.best', 'geometry.monster', 'geometry.pw', 'geometry.report', 'hardboiled.life',
+        'hardshell.life', 'humanorganising.org', 'mathactivity.club', 'mathactivity.xyz', 'mathdrills.info', 'mathdrills.life', 'mathfun.rocks', 'mathgames.world', 'math.international',
         'mathlete.fun', 'mathlete.pro', 'overeasy.club', 'risenegg.com', 'scrambled.tech', 'scrambled.today', 'scrambled.us', 'scrambled.world', 'shellshockers.best', 'shellshockers.club', 'shellshockers.life', 'shellshockers.site',
-        'shellshockers.today', 'shellshockers.us', 'shellshockers.world', 'shellshockers.xyz', 'shellsocks.com', 'softboiled.club', 'urbanegger.com', 'violentegg.club', 'violentegg.fun', 'yolk.best', 'yolk.life',
+        'shellshockers.today', 'shellshockers.us', 'shellshockers.wiki', 'shellshockers.world', 'shellshockers.xyz', 'shellsocks.com', 'softboiled.club', 'urbanegger.com', 'violentegg.club', 'violentegg.fun', 'yolk.best', 'yolk.life',
         'yolk.rocks', 'yolk.tech', 'yolk.quest', 'yolk.today', 'zygote.cafe'
     ];
     proxyList = proxyList.filter(item => item !== unsafeWindow.location.hostname);
