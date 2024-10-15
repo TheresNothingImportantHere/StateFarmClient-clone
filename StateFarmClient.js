@@ -1929,8 +1929,9 @@ debug mode).`},
                 };
             };
         } catch (error) {
-            // alert on screen here useless, onlypuppy already made an html thing for error...
+            // Handle the error and display an error message onscreen
             console.error("An error occurred:", error);
+            alert("Bollocks! If you're getting this message, injection probably failed. To solve this, perform CTRL+F5 - this performs a hard reload. If this does not work, contact the developers.");
         };
     };
     const createPrompt = function(text, buttons, duration) {
