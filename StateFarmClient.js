@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre126
+// @version      3.4.1-pre127
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -145,7 +145,7 @@ let attemptedInjection = false;
     const bottingGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-botting";
     const violentmonkeyURL = "https://violentmonkey.github.io/get-it/";
 
-    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.25.1/babylon.min.js";
+    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.15.0/babylon.min.js";
 
     const replacementLogoURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement.png?raw=true";
     const replacementLogoHalloweenURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement-halloween.png?raw=true";
