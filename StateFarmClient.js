@@ -6,6 +6,7 @@
 // @supportURL   http://github.com/Hydroflame522/StateFarmClient/issues/
 // @license      GPL-3.0
 // @run-at       document-start
+
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -13,6 +14,15 @@
 // @grant        GM_info
 // @grant        GM_setClipboard
 // @grant        GM_openInTab
+
+// @grant        GM.setValue
+// @grant        GM.getValue
+// @grant        GM.deleteValue
+// @grant        GM.listValues
+// @grant        GM.info
+// @grant        GM.setClipboard
+// @grant        GM.openInTab
+
 // @icon         https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png
 
 // @require      https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js
@@ -25,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre127
+// @version      3.4.1-pre129
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -97,16 +107,33 @@
 // @updateURL    https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.meta.js
 // ==/UserScript==
 
-// {{CRACKEDSHELL}}
-// require:"https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js"
-// require:"https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
-// require:"https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"
-// {{!CRACKEDSHELL}}
-
 let attemptedInjection = false;
 // log("StateFarm: running (before function)");
 
 (function () {
+    if (typeof isCrackedShell !== 'undefined') alert('CrackedShell v1 is no longer supported. Upgrade to v2.');
+
+    let crackedShell = typeof $WEBSOCKET !== 'undefined';
+
+    if (crackedShell) {
+        GM_getValue = (name) => {
+            try {
+                return JSON.parse(localStorage.getItem(name));
+            } catch {
+                return localStorage.getItem(name);
+            };
+        };
+        GM_setValue = (name, value) => {
+            if (typeof value === 'object') localStorage.setItem(name, JSON.stringify(value));
+            else localStorage.setItem(name, value);
+        };
+        GM_listValues = () => localStorage;
+        GM_deleteValue = (...a) => localStorage.removeItem(...a);
+        GM_openInTab = (link) => window.open(link, '_blank');
+        GM_setClipboard = (text, _, callback) => navigator.clipboard.writeText(text).then(() => callback());
+        unsafeWindow = window;
+    };
+
     const storageKey = "StateFarm_" + (unsafeWindow.document.location.host.replaceAll(".", "")) + "_";
     const log = function(...args) {
         let condition;
@@ -3487,6 +3514,8 @@ z-index: 999999;
             unsafeWindow.globalSS.GM_listValues = GM_listValues;
             unsafeWindow.globalSS.GM_getValue = GM_getValue;
             unsafeWindow.globalSS.GM_setValue = GM_setValue;
+            unsafeWindow.globalSS.GM = GM;
+            unsafeWindow.globalSS.crackedShell = crackedShell;
             unsafeWindow.globalSS.createPopup = createPopup;
             unsafeWindow.globalSS.remove = remove;
             unsafeWindow.globalSS.change = change;
