@@ -6,13 +6,13 @@
 // @supportURL   http://github.com/Hydroflame522/StateFarmClient/issues/
 // @license      GPL-3.0
 // @run-at       document-start
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_deleteValue
-// @grant        GM_listValues
-// @grant        GM_info
-// @grant        GM_setClipboard
-// @grant        GM_openInTab
+// @grant        GM.setValue
+// @grant        GM.getValue
+// @grant        GM.deleteValue
+// @grant        GM.listValues
+// @grant        GM.info
+// @grant        GM.setClipboard
+// @grant        GM.openInTab
 // @icon         https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png
 
 // @require      https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js
@@ -25,7 +25,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre127
+// @version      3.4.1-pre128
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -97,14 +97,38 @@
 // @updateURL    https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.meta.js
 // ==/UserScript==
 
-// {{CRACKEDSHELL}}
-// require:"https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js"
-// require:"https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
-// require:"https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"
-// {{!CRACKEDSHELL}}
+// $META$
+// &import "https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js"
+// &import "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
+// &import "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"
+// $EMETA$
 
 let attemptedInjection = false;
 // log("StateFarm: running (before function)");
+
+if (typeof isCrackedShell !== 'undefined') alert('CrackedShell v1 is no longer supported. Upgrade to v2.');
+
+let crackedShell = typeof $WEBSOCKET !== 'undefined';
+
+if (crackedShell) GM = {
+    getValue: (name) => {
+        try {
+            return JSON.parse(localStorage.getItem(name));
+        } catch {
+            return localStorage.getItem(name);
+        };
+    },
+    setValue: (name, value) => {
+        if (typeof value === 'object') localStorage.setItem(name, JSON.stringify(value));
+        else localStorage.setItem(name, value);
+    },
+    listValues: () => localStorage,
+    deleteValue: (...a) => localStorage.removeItem(...a),
+    openInTab: (link) => window.open(link, '_blank'),
+    setClipboard: (text, _, callback) => navigator.clipboard.writeText(text).then(() => callback())
+};
+
+if (crackedShell) unsafeWindow = window;
 
 (function () {
     const storageKey = "StateFarm_" + (unsafeWindow.document.location.host.replaceAll(".", "")) + "_";
@@ -113,7 +137,7 @@ let attemptedInjection = false;
         try {
             condition = extract("consoleLogs");
         } catch (error) {
-            condition = GM_getValue(storageKey + "DisableLogs");
+            condition = GM.getValue(storageKey + "DisableLogs");
         };
         if (!condition) {
             console.log(...args);
@@ -133,7 +157,7 @@ let attemptedInjection = false;
     log("StateFarm: running (after function)");
     //script info
     const name = "ЅtateFarm Client";
-    const version = typeof (GM_info) !== 'undefined' ? GM_info.script.version : "3";
+    const version = typeof (GM.info) !== 'undefined' ? GM.info.script.version : "3";
     const menuTitle = name + " v" + version;
     //INIT WEBSITE LINKS: store them here so they are easy to maintain and update!
     const discordURL = "https://dsc.gg/sfnetwork";
@@ -1180,7 +1204,7 @@ But check out the GitHub guide.`},
                 tp.botPanel.hidden = !tp.botPanel.hidden;
             }});
             tp.bottingTab.pages[0].addSeparator();
-            initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", tooltip: "Click for infos on how to get started and free candy", button: "Link", clickFunction: function () { GM_openInTab(bottingGuideURL, { active: true }) }, });
+            initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", tooltip: "Click for infos on how to get started and free candy", button: "Link", clickFunction: function () { GM.openInTab(bottingGuideURL, { active: true }) }, });
         //THEMING MODULES
         initFolder({ location: tp.mainPanel, title: "Theming", storeAs: "themingFolder", });
         initTabs({ location: tp.themingFolder, storeAs: "themingTab" }, [
@@ -1314,7 +1338,7 @@ debug mode).`},
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Login (Login Database)", storeAs: "loginDatabaseFolder", });
                 initModule({ location: tp.loginDatabaseFolder, title: 'Login Next Account', storeAs: 'loginDatabaseLogin', button: 'LOGIN', tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
-                    let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
+                    let loginDB = GM.getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                     let loginDBlength = loginDB.length;
                     if (loginDBlength > 0) {
                         let index = extract("loginDatabaseSelection") == "inorder" ? 0 : Math.ceil((Math.random()*0.75)*(loginDBlength-1));
@@ -1323,7 +1347,7 @@ debug mode).`},
                         loginDB.push(emailPass);
                         log(`deleted and reinserted ${emailPass} at the end.`);
                         loginOrCreateWithEmailPass(emailPass);
-                        GM_setValue("StateFarm_LoginDB", loginDB);
+                        GM.setValue("StateFarm_LoginDB", loginDB);
                         createPopup(`Logging in from index ${index}...`);
                     } else {
                         createPopup("LoginDB is empty!", "error");
@@ -1333,18 +1357,18 @@ debug mode).`},
                 initModule({ location: tp.loginDatabaseFolder, title: "Auto Login", storeAs: "autoLogin", tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled" });
                 tp.loginDatabaseFolder.addSeparator();
                 initModule({ location: tp.loginDatabaseFolder, title: 'Export DB(JSON)', storeAs: 'loginDatabaseExport', tooltip: "Tools for managing accounts in a Database", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
-                    GM_setClipboard(JSON.stringify(GM_getValue("StateFarm_LoginDB") || []), "text", () => log("Clipboard set!"));
+                    GM.setClipboard(JSON.stringify(GM.getValue("StateFarm_LoginDB") || []), "text", () => log("Clipboard set!"));
                     createPopup("Login DB copied to clipboard...");
                 } });
                 initModule({ location: tp.loginDatabaseFolder, title: 'Import Into LoginDB', storeAs: 'loginDatabaseExport', tooltip: "Tools for managing accounts in a Database", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`Input data you would like to add to your LoginDB. This will NOT replace your current data. All data added here will be put at the end of the queue. Also make sure that this data goes here and not into the AccountRecords DB.`, 'Reminder: JSON format!');
                     try {
-                        let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
+                        let loginDB = GM.getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                         let appendedData = JSON.parse(userInput);
                         appendedData.forEach(data => {
                             if (data && !loginDB.includes(data)) loginDB.push(data);
                         });
-                        GM_setValue("StateFarm_LoginDB", loginDB);
+                        GM.setValue("StateFarm_LoginDB", loginDB);
                         createPopup("Success! Data appended to LoginDB.", "success");
                     } catch {
                         createPopup("Failed! Check the formatting.", "error");
@@ -1352,25 +1376,25 @@ debug mode).`},
                 } });
                 initModule({ location: tp.loginDatabaseFolder, title: 'ImportFromRecords', storeAs: 'loginDatabaseImportRecords', tooltip: "Tools for managing accounts in a Database", button: 'APPEND', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("This action will import any Email:Pass combos you have in AccountRecords. Make sure you want to do this, as this will potentially add a lot of new records. Type 'ok' to proceed. This cannot be reversed, export first to be safe. Note: all the new records are added to the end of the queue.") === 'ok') {
-                        let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
-                        let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
+                        let accountRecords = GM.getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
+                        let loginDB = GM.getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                         Object.entries(accountRecords).forEach(([key, account]) => {
                             let emailPass = account.emailPass;
                             if (emailPass && !loginDB.includes(emailPass)) {
                                 loginDB.push(emailPass);
                             };
                         });
-                        GM_setValue("StateFarm_LoginDB", loginDB);
+                        GM.setValue("StateFarm_LoginDB", loginDB);
                         createPopup("Appended from AccountDetails!", "success");
                     };
                 } });
                 initModule({ location: tp.loginDatabaseFolder, title: 'Delete LoginDB', storeAs: 'loginDatabaseDelete', tooltip: "Tools for managing accounts in a Database", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("WARNING! This is a destructive action! Type 'ok' if you are really sure you want to delete your LoginDB! This cannot be reversed, export first to be safe.") === 'ok') {
-                        GM_setValue("StateFarm_LoginDB", []); //o7 data
+                        GM.setValue("StateFarm_LoginDB", []); //o7 data
                     };
                 } });
                 initModule({ location: tp.loginDatabaseFolder, title: 'LoginDB Info', storeAs: 'loginDatabaseInfo', tooltip: "Tools for managing accounts in a Database", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
-                    let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
+                    let loginDB = GM.getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                     alert(`You currently have ${loginDB.length} accounts in LoginDB. For info on what this is, check the guide tab.`);
                 } });
             tp.accountsTab.pages[0].addSeparator();
@@ -1384,18 +1408,18 @@ debug mode).`},
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Records Database", storeAs: "accountRecordsFolder", });
                 initModule({ location: tp.accountRecordsFolder, title: "Disable Logging", storeAs: "accountRecordsLogging", tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", bindLocation: tp.accountsTab.pages[1], });
                 initModule({ location: tp.accountRecordsFolder, title: 'Export DB (JSON)', storeAs: 'accountRecordsExport', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
-                    GM_setClipboard(JSON.stringify(GM_getValue("StateFarm_AccountRecords") || {}), "text", () => log("Clipboard set!"));
+                    GM.setClipboard(JSON.stringify(GM.getValue("StateFarm_AccountRecords") || {}), "text", () => log("Clipboard set!"));
                     createPopup("AccountRecords DB copied to clipboard...");
                 } });
                 initModule({ location: tp.accountRecordsFolder, title: 'Import Into DB', storeAs: 'accountRecordsImport', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`Input data you would like to add to your AccountRecords DB. This will NOT replace your current data. All data added here either be added or replace existing records. Also make sure that this data goes here and not into the LoginDB.`, 'Reminder: JSON format!');
                     try {
-                        let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
+                        let accountRecords = GM.getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
                         let appendedData = JSON.parse(userInput);
                         Object.entries(appendedData).forEach(([key, account]) => {
                             if (account) accountRecords[key] = account;
                         });
-                        GM_setValue("StateFarm_AccountRecords", accountRecords);
+                        GM.setValue("StateFarm_AccountRecords", accountRecords);
                         createPopup("Success! Data appended to AccountRecords.", "success");
                     } catch {
                         createPopup("Failed! Check the formatting.", "error");
@@ -1403,13 +1427,13 @@ debug mode).`},
                 } });
                 initModule({ location: tp.accountRecordsFolder, title: 'Delete DB', storeAs: 'accountRecordsDelete', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("WARNING! This is a destructive action! Type 'ok' if you are really sure you want to delete your AccountRecords DB! This cannot be reversed, export first to be safe.") === 'ok') {
-                        GM_setValue("StateFarm_AccountRecords", {}); //o7 data
+                        GM.setValue("StateFarm_AccountRecords", {}); //o7 data
                     };
                 } });
                 initModule({ location: tp.accountRecordsFolder, title: 'View Info', storeAs: 'accountRecordsInfo', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`This will output some information relating to what information you have in your AccountRecords DB.\nParameters: Enter 1 to only print Email:Pass list of those with items, enter 2 for those with no items.`, '');
-                    let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
-                    let tierCache = GM_getValue("StateFarm_TierCache") || {};
+                    let accountRecords = GM.getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
+                    let tierCache = GM.getValue("StateFarm_TierCache") || {};
                     const itemCounts = {};
                     const tierCounts = {};
                     let emailPassList = [];
@@ -1470,7 +1494,7 @@ debug mode).`},
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (ShellPrint)", storeAs: "shellPrintFolder", });
             initModule({ location: tp.shellPrintFolder, title: 'ShellPrint Key', storeAs: 'shellPrintKey', tooltip: "ShellPrint token. NOTE: ShellPrint is currently unsupported on this version of StateFarm Client", defaultValue: "" });
-            initModule({ location: tp.shellPrintFolder, title: ' ', storeAs: 'getSPKey', tooltip: "ShellPrint help. NOTE: ShellPrint is currently unsupported on this version of StateFarm Client", button: 'Get a Key', clickFunction: () => GM_openInTab(discordURL, { active: true }) });
+            initModule({ location: tp.shellPrintFolder, title: ' ', storeAs: 'getSPKey', tooltip: "ShellPrint help. NOTE: ShellPrint is currently unsupported on this version of StateFarm Client", button: 'Get a Key', clickFunction: () => GM.openInTab(discordURL, { active: true }) });
             initModule({ location: tp.shellPrintFolder, title: 'Create (ShellPrint)', storeAs: 'shellprintGen', tooltip: "Account creation using ShellPrint™ technology. NOTE: ShellPrint is currently unsupported on this version of StateFarm Client", button: 'Generate!', clickFunction: () => F.register(), bindLocation: tp.accountsTab.pages[1] });
             tp.accountsTab.pages[0].addSeparator();
         //MISC MODULES
@@ -1515,9 +1539,9 @@ debug mode).`},
             initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", tooltip: "Shows admin options such as BOOT and BAN in games. no ACTUAL functionality", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Unban", storeAs: "unban", tooltip: "Unbans you by signing out. you will lose skins if you're not signed in", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
-                if (GM_getValue('StateFarm_Unbanned')) unban();
+                if (GM.getValue('StateFarm_Unbanned')) unban();
                 else if (prompt("By proceeding, you will be signed out. If you don't have an account, your stats will be lost.\nEnter 'ok' to confirm this.\nThis popup will not be shown again for future unbans.") === 'ok') {
-                    GM_setValue('StateFarm_Unbanned', 'true');
+                    GM.setValue('StateFarm_Unbanned', 'true');
                     unban();
                 } else {
                     alert('You did not entire "ok", so the unban was cancelled.');
@@ -1713,13 +1737,13 @@ debug mode).`},
                         }
                     });
                     saveString = saveString.substring(0, saveString.length - 1);
-                    GM_setClipboard(saveString, "text", () => log("Clipboard set!"));
+                    GM.setClipboard(saveString, "text", () => log("Clipboard set!"));
                     createPopup("Preset copied to clipboard...");
                 },});
             tp.clientTab.pages[0].addSeparator();
             initFolder({ location: tp.clientTab.pages[0], title: "Creator's Links", storeAs: "linksFolder",});
-                initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", tooltip: "The official StateFarm Client Discord server", button: "Link", clickFunction: () => GM_openInTab(discordURL, { active: true }) });
-                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "The official StateFarm Client GitHub Repository! Check out the devs suffering here", button: "Link", clickFunction: () => GM_openInTab(githubURL, { active: true }) });
+                initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", tooltip: "The official StateFarm Client Discord server", button: "Link", clickFunction: () => GM.openInTab(discordURL, { active: true }) });
+                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "The official StateFarm Client GitHub Repository! Check out the devs suffering here", button: "Link", clickFunction: () => GM.openInTab(githubURL, { active: true }) });
             tp.clientTab.pages[0].addSeparator();
             initModule({ location: tp.clientTab.pages[0], title: "Reset", storeAs: "clear", tooltip: "Powerwashes StateFarm completely", button: "DELETE", clickFunction: function(){
                 const userConfirmed=confirm("Are you sure you want to continue? This will clear all stored module states and keybinds.");
@@ -1730,8 +1754,8 @@ debug mode).`},
             },});
             initModule({ location: tp.clientTab.pages[0], title: "Debug", storeAs: "debug", tooltip: "Converts SFC into a development tool.\nExposes globalSS to the window (allowing you to manipulate many game variables directly) and also enables some extra logs.", bindLocation: tp.clientTab.pages[1], });
         tp.mainPanel.addSeparator();
-        initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", tooltip: "Go to the client's update page", button: "Link", clickFunction: () => GM_openInTab(downloadURL, { active: true }) });
-        initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", tooltip: "A guide with more in-depth information on modules", button: "Link", clickFunction: () => GM_openInTab(featuresGuideURL, { active: true }) });
+        initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", tooltip: "Go to the client's update page", button: "Link", clickFunction: () => GM.openInTab(downloadURL, { active: true }) });
+        initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", tooltip: "A guide with more in-depth information on modules", button: "Link", clickFunction: () => GM.openInTab(featuresGuideURL, { active: true }) });
 
 
         tp.botPanel = new Tweakpane.Pane(); // eslint-disable-line
@@ -2245,7 +2269,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         }
 
         const sendSettings = function () {
-            let settings = GM_getValue("SFCHAT-SETTINGS");
+            let settings = GM.getValue("SFCHAT-SETTINGS");
             if (settings) {
                 sfChatIframe.contentWindow.postMessage("SFCHAT-SETTINGS" + settings, "*");
             } else {
@@ -2275,7 +2299,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         unsafeWindow.addEventListener("message", (e) => {
             if (typeof e.data == "string"){
                 if (e.data.startsWith("SFCHAT-UPDATE")) {
-                    GM_setValue("SFCHAT-SETTINGS", e.data.replace(/SFCHAT-UPDATE/gm, ""));
+                    GM.setValue("SFCHAT-SETTINGS", e.data.replace(/SFCHAT-UPDATE/gm, ""));
                 }
                 if (e.data.startsWith("SFCHAT-REQUEST")) {
                     sendSettings();
@@ -3130,8 +3154,8 @@ z-index: 999999;
     const broadcastToBots = function (command) {
         const commandTime = Date.now();
         log("StateFarm: sending command to bots:", command, "| at time:", commandTime);
-        GM_setValue("StateFarm_Command", command);
-        GM_setValue("StateFarm_CommandTime", commandTime);
+        GM.setValue("StateFarm_Command", command);
+        GM.setValue("StateFarm_CommandTime", commandTime);
     };
 
     const hexToRgb = function (hex) {
@@ -3437,8 +3461,8 @@ z-index: 999999;
         };
         log("the email is:", currentEmail);
 
-        let accountRecords = GM_getValue("StateFarm_AccountRecords") || {};
-        let tierCache = GM_getValue("StateFarm_TierCache") || {};
+        let accountRecords = GM.getValue("StateFarm_AccountRecords") || {};
+        let tierCache = GM.getValue("StateFarm_TierCache") || {};
 
         let accountDetails = accountRecords[currentEmail] || {};
         accountDetails.inventory = JSON.parse(JSON.stringify(unsafeWindow.extern.account.inventory));
@@ -3458,7 +3482,7 @@ z-index: 999999;
         };
 
         accountRecords[currentEmail] = accountDetails;
-        GM_setValue("StateFarm_AccountRecords", accountRecords);
+        GM.setValue("StateFarm_AccountRecords", accountRecords);
     };
     const every15Seconds = function () {
         //i forgot myself what this is for
@@ -3484,14 +3508,14 @@ z-index: 999999;
             unsafeWindow.globalSS.extractDropdownList = extractDropdownList;
             unsafeWindow.globalSS.save = save;
             unsafeWindow.globalSS.load = load;
-            unsafeWindow.globalSS.GM_listValues = GM_listValues;
-            unsafeWindow.globalSS.GM_getValue = GM_getValue;
-            unsafeWindow.globalSS.GM_setValue = GM_setValue;
+            unsafeWindow.globalSS.GM_listValues = GM.listValues;
+            unsafeWindow.globalSS.GM_getValue = GM.getValue;
+            unsafeWindow.globalSS.GM_setValue = GM.setValue;
             unsafeWindow.globalSS.createPopup = createPopup;
             unsafeWindow.globalSS.remove = remove;
             unsafeWindow.globalSS.change = change;
             unsafeWindow.globalSS.unban = unban;
-            if (typeof GM_info !== 'undefined') unsafeWindow.globalSS.GM_info = GM_info;
+            if (!crackedShell) unsafeWindow.globalSS.GM_info = GM.info;
             unsafeWindow.globalSS.getScrambled = getScrambled;
             unsafeWindow.globalSS.soundsSFC = soundsSFC;
             unsafeWindow.globalSS.accountStatus = accountStatus;
@@ -3513,7 +3537,7 @@ z-index: 999999;
             startStateFarmChat(true);
         };
         startUpComplete = (!document.getElementById("progressBar"));
-        let botsDict = GM_getValue("StateFarm_BotStatus");
+        let botsDict = GM.getValue("StateFarm_BotStatus");
         sfChatUsernameSet();
         if (!botsDict) botsDict = {};
         if (AUTOMATED) {
@@ -3589,7 +3613,7 @@ z-index: 999999;
             };
             monitorObjects.botOnline = ((amountOnline) + " bots online.") + monitorObjects.botOnline;
         };
-        GM_setValue("StateFarm_BotStatus", botsDict);
+        GM.setValue("StateFarm_BotStatus", botsDict);
 
         allFolders.forEach(function (name) {
             save(name, tp[name].expanded);
@@ -3812,7 +3836,7 @@ z-index: 999999;
 
         if (startUpComplete) {
             // check if it is a user's first time to run the script
-            if (GM_getValue("StateFarm_firstRun") !== 1) {
+            if (GM.getValue("StateFarm_firstRun") !== 1) {
                 firstExecution = true;
             };
             if ((extract("legacyModels") !== previousLegacyModels)) {
@@ -3855,7 +3879,8 @@ z-index: 999999;
                 favicon.type = 'image/x-icon';
                 favicon.rel = 'shortcut icon';
                 if (extract("titleAnimation")) {
-                    favicon.href = (GM_info?.script?.icon || iconURL);
+                    if (crackedShell) favicon.href = iconURL;
+                    else favicon.href = GM.info.script.icon;
                 } else {
                     favicon.href = 'https://www.google.com/s2/favicons?domain=shellshock.io';
                 };
@@ -4186,16 +4211,16 @@ z-index: 999999;
                                 firstUseElement.parentNode.removeChild(firstUseElement);
                             }, 1000)
                         }
-                        GM_setValue("StateFarm_firstRun", 1);
+                        GM.setValue("StateFarm_firstRun", 1);
                     });
                 }
             };
         };
         if (AUTOMATED) { //i know what youre saying looking at this. i am the greatest programmer to have ever lived
-            if (GM_getValue("StateFarm_CommandTime") > cachedCommandTime) {
+            if (GM.getValue("StateFarm_CommandTime") > cachedCommandTime) {
                 // alert("New command incoming");
-                cachedCommand = GM_getValue("StateFarm_Command");
-                cachedCommandTime = GM_getValue("StateFarm_CommandTime");
+                cachedCommand = GM.getValue("StateFarm_Command");
+                cachedCommandTime = GM.getValue("StateFarm_CommandTime");
                 log("Command received:", cachedCommand);
                 handleCommand(cachedCommand);
             } else {
@@ -4286,15 +4311,15 @@ z-index: 999999;
     const save = function (key, value) {
         if (AUTOMATED) { return undefined };
         if (JSON.parse(localStorage.getItem(key)) !== undefined) { localStorage.removeItem(key) }; //dont need that anymore lmao
-        GM_setValue(storageKey + key, value);
+        GM.setValue(storageKey + key, value);
     };
     const load = function (key) {
         if (AUTOMATED) { key = getScrambled() };
-        return GM_getValue(storageKey + key) || JSON.parse(localStorage.getItem(key)); //localstorage is for legacy purposes *only*
+        return GM.getValue(storageKey + key) || JSON.parse(localStorage.getItem(key)); //localstorage is for legacy purposes *only*
     };
     const remove = function (key) {
         if (AUTOMATED) { return undefined };
-        GM_deleteValue(storageKey + key);
+        GM.deleteValue(storageKey + key);
         if (JSON.parse(localStorage.getItem(key)) !== undefined) { localStorage.removeItem(key) }; //legacy
     };
     const addUserPresets = function (presets) { //adds presets from dict to inbilt presets, can be called multiple times to update
@@ -4373,7 +4398,7 @@ z-index: 999999;
                     nameDiv.style.textDecoration = 'none';
                     nameDiv.addEventListener('mouseover', function () { nameDiv.style.textDecoration = 'underline'; nameDiv.style.color = 'blue' });
                     nameDiv.addEventListener('mouseout', function () { nameDiv.style.textDecoration = 'none'; nameDiv.style.color = 'white' });
-                    nameDiv.addEventListener('click', () => GM_openInTab(hrefValue, { active: true }));
+                    nameDiv.addEventListener('click', () => GM.openInTab(hrefValue, { active: true }));
                     containerDiv.setAttribute('data-name', nameValue);
                     containerDiv.appendChild(nameDiv);
                     containerDiv.appendChild(nameDiv);
@@ -4851,7 +4876,7 @@ z-index: 999999;
                 let itemName = arguments['4'].slice(0, -4);
                 let tier = arguments['4'].slice(-1);
 
-                let accountRecords = GM_getValue("StateFarm_AccountRecords") || {};
+                let accountRecords = GM.getValue("StateFarm_AccountRecords") || {};
                 let itemCount = 0;
                 Object.entries(accountRecords).forEach(([key, account]) => {
                     if (account) {
@@ -4864,9 +4889,9 @@ z-index: 999999;
                 });
 
                 log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw result: item: ${itemName} is tier ${tier} (${itemCount} of this item)`);
-                let tierCache = GM_getValue("StateFarm_TierCache") || {};
+                let tierCache = GM.getValue("StateFarm_TierCache") || {};
                 tierCache[itemName] = tier;
-                GM_setValue("StateFarm_TierCache", tierCache);
+                GM.setValue("StateFarm_TierCache", tierCache);
             };
             if (arguments['3'] == 'Reward amount') {
                 log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw result: eggs: ${arguments['4']}`);
@@ -5217,7 +5242,7 @@ z-index: 999999;
             let clientKeys;
 
             let originalJS = js;
-            if (typeof isCrackedShell !== 'undefined') originalJS = fetchTextContent('/js/shellshock.og.js');
+            if (crackedShell) originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
                 return fetchTextContent(clientKeysURL + hash + ".json");
@@ -5226,8 +5251,8 @@ z-index: 999999;
             hash = L.CryptoJS.SHA256(originalJS).toString(L.CryptoJS.enc.Hex); // eslint-disable-line
             onlineClientKeys = getVardata(hash);
 
-            const vardataCache = GM_getValue("StateFarm_VarDataCache") || {};
-            const previousHash = GM_getValue("StateFarm_PreviousHash") || "";
+            const vardataCache = GM.getValue("StateFarm_VarDataCache") || {};
+            const previousHash = GM.getValue("StateFarm_PreviousHash") || "";
 
             if (onlineClientKeys == "value_undefined" || onlineClientKeys == null) {
                 onlineClientKeys = getVardata("latest");
@@ -5292,12 +5317,12 @@ z-index: 999999;
 
             if (onlineClientKeys && !clientKeys) clientKeys = JSON.parse(onlineClientKeys);
 
-            GM_setValue("StateFarm_PreviousHash", hash);
+            GM.setValue("StateFarm_PreviousHash", hash);
 
             if (vardataCache && onlineClientKeys) {
                 vardataCache[clientKeys.checksum] = onlineClientKeys;
                 vardataCache.latest = onlineClientKeys;
-                GM_setValue("StateFarm_VarDataCache", vardataCache);
+                GM.setValue("StateFarm_VarDataCache", vardataCache);
             };
 
             // removed feature
@@ -5494,10 +5519,10 @@ z-index: 999999;
         updateBotParams();
         if (!load("firstTimeBots")) {
             save("firstTimeBots", true);
-            GM_openInTab(bottingGuideURL, { active: true });
+            GM.openInTab(bottingGuideURL, { active: true });
         };
 
-        GM_setValue("StateFarm_BotStatus", {});
+        GM.setValue("StateFarm_BotStatus", {});
 
         log("Deploying " + extract("numberBots") + " bots...");
 
@@ -5535,7 +5560,7 @@ z-index: 999999;
             addParam("usernameAutoJoin", name, true);
 
             log("PARAMS:", params)
-            if (typeof isCrackedShell === 'undefined') {
+            if (crackedShell) {
                 unsafeWindow.open("https://" + proxyURL + "/" + params, '_blank', `width=${extract("botWindowWidth")}},height=${extract("botWindowHeight")},left=` + leftOffset + ',top=' + topOffset)
             } else {
                 try {
@@ -7097,17 +7122,17 @@ z-index: 999999;
     startUp();
     log("StateFarm: after startUp()", attemptedInjection);
 
-    if (typeof GM_info !== 'undefined' && GM_info?.scriptHandler == "Tampermonkey") {
-        let count = GM_getValue("StateFarm_TampermonkeyWarnings") || 0;
+    if (!crackedShell && GM.info && GM.info.scriptHandler == "Tampermonkey") {
+        let count = GM.getValue("StateFarm_TampermonkeyWarnings") || 0;
         count++;
         if (count <= 3) {
             let userConfirmed = confirm("StateFarm Client: Tampermonkey detected! StateFarm Client does not support this manager, use Violentmonkey instead. Press OK to be redirected to the Violentmonkey website. You can continue to use Tampermonkey, but expect unreliable results. For more information, visit our Discord server: "+discordURL);
             if (userConfirmed) {
-                GM_openInTab(violentmonkeyURL, { active: true });
+                GM.openInTab(violentmonkeyURL, { active: true });
             };
             alert(`This alert will show three times in total. Please install Violentmonkey before reporting issues. ${3-count} more warnings.`);
         };
-        GM_setValue("StateFarm_TampermonkeyWarnings", count); //continue counting for the lulz
+        GM.setValue("StateFarm_TampermonkeyWarnings", count); //continue counting for the lulz
     };
 
     setTimeout(() => {
