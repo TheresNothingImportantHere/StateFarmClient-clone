@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre130
+// @version      3.4.1-pre131
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1594,6 +1594,36 @@ debug mode).`},
             },});
             initModule({ location: tp.miscTab.pages[0], title: "AutoChickenWinner", storeAs: "autoChickenWinner", tooltip: "Automatically plays the chick'n winner minigame when cooldowns are over", bindLocation: tp.miscTab.pages[1],});
             tp.miscTab.pages[0].addSeparator();
+            //GM_getValue("StateFarm_GameHistory");
+            initModule({ location: tp.miscTab.pages[0], title: "Get Game History", storeAs: "getGameHistory", tooltip: "Displays a list of the last few lobbies you were in", bindLocation: tp.miscTab.pages[1], button: "get", clickFunction: function(){
+              let games = GM_getValue("StateFarm_GameHistory");
+              //alert(GM_getValue("StateFarm_GameHistory"));
+              if(!games) {
+              alert("no history!");
+                return;
+              }
+              games = JSON.parse(games);
+              let gString = "";
+              games.forEach(g => {
+                gString+= g.code;
+                if(g.amount>1) gString += ` (${g.amount})`;
+                gString+= ": ";
+                gString+= g.string; //omggggg
+
+                gString+= ` (left at ${new Date(g.time).toLocaleString()} via ${g.closeCode} ${g.message})`
+
+                gString += "\n";
+              });
+              console.log(gString); //debated using log(), but this is a direct user input so yhhhhhhhh
+              gString+="\na copy of this list has been dumped into the console, if you wish to copy a code.";
+              alert(gString);
+            },});
+            initModule({ location: tp.miscTab.pages[0], title: "Clear Game History", storeAs: "clearGameHistory", tooltip: "Clear your stored game history", bindLocation: tp.miscTab.pages[1], button: "clear", clickFunction: function(){
+              if(!GM_getValue("StateFarm_GameHistory")) return;
+              log("deleting game history: " + GM_getValue("StateFarm_GameHistory"));
+              GM_deleteValue("StateFarm_GameHistory");
+              createPopup("game history deleted!");
+            },});
             initModule({ location: tp.miscTab.pages[0], title: "Custom Macro", storeAs: "customMacro", tooltip: "The JavaScript macro executed via executeMacro", defaultValue: "log('cool');" });
             initModule({ location: tp.miscTab.pages[0], title: "Execute Macro", storeAs: "executeMacro", tooltip: "Allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.", bindLocation: tp.miscTab.pages[1], button: "EXECUTE", clickFunction: function(){
                 //use at your own risk, i guess. but is this really any more dangerous than pasting something into console? not really.
@@ -5013,8 +5043,9 @@ z-index: 999999;
             };
         });
         createAnonFunction('onConnectFail', function (ERRORCODE, ERRORARRAY) {
+            const terminationMessage = findKeyByValue(ERRORARRAY, ERRORCODE); //don't want to fuck with errorString so here's a new var! 
             if (ERRORCODE !== ERRORARRAY.mainMenu) {
-                errorString = findKeyByValue(ERRORARRAY, ERRORCODE);
+                errorString = terminationMessage;
                 log("StateFarm has detected a connection error...", errorString, ERRORCODE, ERRORARRAY);
                 if (document.getElementById("genericPopup").textContent === ' Game Not Found Sorry! This game ID is either invalid, or no longer exists.  OK ') {
                     document.getElementById("genericPopup").children[1].textContent = 'joinCode not found! check your autoJoin settings and get a new code';
@@ -5041,6 +5072,31 @@ z-index: 999999;
                 createPopup("Leaving due to connection error " + ERRORCODE + " (" + errorString + ")" + ".");
                 change("leaveGame");
             };
+            //GAME HISTORY gr
+            if(!GAMECODE || GAMECODE==undefined) return;
+            const HISTORY_MAX_ENTRIES = 6;
+            let history = GM_getValue("StateFarm_GameHistory");
+            if(history) history = JSON.parse(history); //should be an ARRAY kxdnfgoisdhngfiosdhjgoisdhgfjo
+            if(!history) history = [];
+            const recent = history[0]; // first indeX
+            if(history.length>0 && recent.code && recent.code == GAMECODE){
+              ++recent.amount;
+              recent.time = Date.now();
+              recent.message = terminationMessage;
+              recent.closeCode = ERRORCODE;
+            } else {
+              const arrElem = {
+                amount: 1,
+                code: GAMECODE,
+                string: getRoomAsString(),
+                time: Date.now(),
+                message: terminationMessage,
+                closeCode: ERRORCODE
+              };
+            history.unshift(arrElem);
+            }
+            while(history.length > HISTORY_MAX_ENTRIES) history.pop();
+            GM_setValue("StateFarm_GameHistory", JSON.stringify(history));
         });
         createAnonFunction('modifyChat', function (msg) {
             if (msg[0] === '%') { //message is a command
