@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre129
+// @version      3.4.1-pre130
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3497,6 +3497,11 @@ z-index: 999999;
             out.send(ss.MYPLAYER.ws);
         };
     };
+
+    const getRoomAsString = function () {
+        return findKeyByValue(unsafeWindow.extern.GameType, unsafeWindow.vueApp.game.gameType) + ", " + unsafeWindow.vueData.currentRegionId + ", " + unsafeWindow.vueApp.game.mapName + ", team" + unsafeWindow.vueApp.game.team;
+    };
+
     const everySecond = function () {
         if (extract("debug")) {
             unsafeWindow.globalSS = {};
@@ -3557,7 +3562,7 @@ z-index: 999999;
                     startTime: startTime,
                     timecode: Date.now(),
                     status: ((isBanned && "banned") ||
-                        (unsafeWindow.extern.inGame && (((ss.MYPLAYER && ss.MYPLAYER[H.playing]) ? "playing " : (unsafeWindow.vueApp.game.respawnTime + "s cooldown ")) + GAMECODE + autoLeave + " (" + findKeyByValue(unsafeWindow.extern.GameType, unsafeWindow.vueApp.game.gameType) + ", " + unsafeWindow.vueData.currentRegionId + ", " + unsafeWindow.vueApp.game.mapName + ", team" + unsafeWindow.vueApp.game.team + ")")) ||
+                        (unsafeWindow.extern.inGame && (((ss.MYPLAYER && ss.MYPLAYER[H.playing]) ? "playing " : (unsafeWindow.vueApp.game.respawnTime + "s cooldown ")) + GAMECODE + autoLeave + " (" + getRoomAsString() + ")")) ||
                         (errorString || "idle")),
                 };
 
@@ -5572,7 +5577,7 @@ z-index: 999999;
                         let data = await fetch(`https://${getScrambled().replace([0-9], '')}.${location.host}/mod/data`);
                         data = await data.json();
                         if (!data.success) {
-                            alert('You are not on verson of CrackedShell that supports botting.');
+                            alert('You are not on a version of CrackedShell that supports botting.');
                             canMassBot = false;
                             return;
                         } else canMassBot = true;
@@ -5580,7 +5585,7 @@ z-index: 999999;
                 } catch (err) {
                     log(err);
                     canMassBot = false;
-                    alert('You are not on verson of CrackedShell that supports botting.');
+                    alert('You are not on a version of CrackedShell that supports botting.');
                 };
 
                 if (canMassBot === true)
