@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre133
+// @version      3.4.1-pre134
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -162,6 +162,7 @@ let attemptedInjection = false;
     const name = "ЅtateFarm Client";
     const version = typeof (GM_info) !== 'undefined' ? GM_info.script.version : "3";
     const menuTitle = name + " v" + version;
+
     //INIT WEBSITE LINKS: store them here so they are easy to maintain and update!
     const discordURL = "https://dsc.gg/sfnetwork";
     const githubURL = "https://github.com/Hydroflame522/StateFarmClient";
@@ -174,20 +175,21 @@ let attemptedInjection = false;
 
     const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.15.0/babylon.min.js";
 
-    const replacementLogoURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement.png?raw=true";
-    const replacementLogoHalloweenURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/icons/shell-logo-replacement-halloween.png?raw=true";
+    const replacementLogoURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement.png";
+    const replacementLogoHalloweenURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-halloween.png";
+    const replacementLogoChristmasURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-christmas.png";
 
     const replacementFeedURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamefeeds/";
     const commitFeedURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/commits?path=StateFarmClient.js";
-    const badgeListURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamebadges/";
-    const iconURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png";
-    const itsOverURL = "https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/its over/ItsOver4Smaller.png?raw=true";
+    const badgeListURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/ingamebadges/";
+    const iconURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/StateFarmClientLogo384px.png";
+    const itsOverURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/assets/its%20over/ItsOver4Smaller.png";
     const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
     const skyboxListURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/skyboxes/";
 
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
-    const jsArchiveURL = 'https://raw.githubusercontent.com/onlypuppy7/ShellShockJSArchives/main/js_archive/';
-    const clientKeysURL = "https://raw.githubusercontent.com/StateFarmNetwork/client-keys/main/statefarm_";
+    const jsArchiveURL = "https://cdn.jsdelivr.net/gh/onlypuppy7/ShellShockJSArchives@main/js_archive/";
+    const clientKeysURL = "https://cdn.jsdelivr.net/gh/StateFarmNetwork/client-keys@main/statefarm_";
     const sfChatURL = "https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html";
 
     //startup sequence
@@ -235,7 +237,7 @@ let attemptedInjection = false;
                     } else if (attempts < maxAttempts) {
                         attempts++;
                         // log(`Attempt ${attempts}/${maxAttempts} failed. Retrying...`);
-                        setTimeout(checkForElement, interval); // Retry after interval
+                        setTimeout(checkForElement, interval); //retry after interval
                     } else {
                         log('Element not found after maximum attempts');
                     }
@@ -292,10 +294,10 @@ let attemptedInjection = false;
                 
                         commitHistory.forEach(commit => {
                             const commitDate = new Date(commit.commit.author.date).toLocaleString();
-                            const authorProfileURL = `https://github.com/${commit.author.login}`; // Replace with actual URL if available
-                            const messageParts = commit.commit.message.split('\n\n', 2); // Split by the first occurrence of '\n\n'
-                            const title = messageParts[0]; // Title part of the message
-                            const description = messageParts[1] || ''; // Description part of the message, defaults to empty string if not present
+                            const authorProfileURL = `https://github.com/${commit.author.login}`; //replace with actual url if available
+                            const messageParts = commit.commit.message.split('\n\n', 2); //split by the first occurrence of '\n\n'
+                            const title = messageParts[0]; //title part of the message
+                            const description = messageParts[1] || ''; //description part of the message, defaults to empty string if not present
                 
                             commitHistoryContent += `
                             <div class="commit-item" style="padding: 0.2em 0.3em; background-color: #95e2fe; border-bottom: 2px solid #0B93BD;">
@@ -3103,6 +3105,7 @@ z-index: 999999;
             let imgURL = replacementLogoURL;
             const month = new Date().getMonth();
             if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9) imgURL = replacementLogoHalloweenURL;
+            if (replacementLogoChristmasURL && replacementLogoChristmasURL !== "" && month == 12) imgURL = replacementLogoChristmasURL;
             
             for (let i = 0; i < images.length; i++) {
                 const src = images[i].getAttribute('src');
