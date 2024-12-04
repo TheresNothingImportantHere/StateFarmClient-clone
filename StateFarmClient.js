@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre132
+// @version      3.4.1-pre133
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -643,19 +643,20 @@ let attemptedInjection = false;
         };
     };
     document.addEventListener('mousedown', function (event) {
+        log(event);
         if (event.button === 2) {
             isRightButtonDown = true;
         } else if (event.button === 0) {
             isLeftButtonDown = true;
         };
-    });
+    }, true);
     document.addEventListener('mouseup', function (event) {
         if (event.button === 2) {
             isRightButtonDown = false;
         } else if (event.button === 0) {
             isLeftButtonDown = false;
         };
-    });
+    }, true);
     //menu
     document.addEventListener("keydown", function (event) {
         event = (event.code.originalReplace("Key", ""));
