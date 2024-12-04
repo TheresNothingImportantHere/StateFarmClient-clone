@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre134
+// @version      3.4.1-pre135
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3105,7 +3105,7 @@ z-index: 999999;
             let imgURL = replacementLogoURL;
             const month = new Date().getMonth();
             if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9) imgURL = replacementLogoHalloweenURL;
-            if (replacementLogoChristmasURL && replacementLogoChristmasURL !== "" && month == 12) imgURL = replacementLogoChristmasURL;
+            if (replacementLogoChristmasURL && replacementLogoChristmasURL !== "" && month == 11) imgURL = replacementLogoChristmasURL;
             
             for (let i = 0; i < images.length; i++) {
                 const src = images[i].getAttribute('src');
