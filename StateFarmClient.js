@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre135
+// @version      3.4.1-pre136
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -189,7 +189,7 @@ let attemptedInjection = false;
 
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
     const jsArchiveURL = "https://cdn.jsdelivr.net/gh/onlypuppy7/ShellShockJSArchives@main/js_archive/";
-    const clientKeysURL = "https://cdn.jsdelivr.net/gh/StateFarmNetwork/client-keys@main/statefarm_";
+    const clientKeysURL = "https://raw.githubusercontent.com/StateFarmNetwork/client-keys/main/statefarm_";
     const sfChatURL = "https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html";
 
     //startup sequence
@@ -4864,6 +4864,109 @@ z-index: 999999;
 
         return direction;
     };
+    const predictGrenade = function (player, grenadeThrowPower) {
+        var rotMat = L.BABYLON.Matrix.RotationYawPitchRoll(player[H.yaw], -player[H.pitch], 0);
+        var vec = L.BABYLON.Matrix.Translation(0, .1, 1).multiply(rotMat).getTranslation();
+        var posMat = L.BABYLON.Matrix.Translation(0, -.05, .2);
+        var pos = (posMat = (posMat = posMat.multiply(rotMat)).add(L.BABYLON.Matrix.Translation(player[H.x], player[H.y] + 0.3, player[H.z]))).getTranslation();
+        var speed = .13 * grenadeThrowPower + .08;
+
+        vec.x *= speed;
+        vec.y *= speed;
+        vec.z *= speed;
+        pos.x = Math.floor(300 * pos.x) / 300;
+        pos.y = Math.floor(300 * pos.y) / 300;
+        pos.z = Math.floor(300 * pos.z) / 300;
+        vec.x = Math.floor(300 * vec.x) / 300;
+        vec.y = Math.floor(300 * vec.y) / 300;
+        vec.z = Math.floor(300 * vec.z) / 300;
+
+        var v1 = new L.BABYLON.Vector3();
+        var v2 = new L.BABYLON.Vector3();
+        var v3 = new L.BABYLON.Vector3();
+        var v4 = new L.BABYLON.Vector3();
+
+        var matrix = new L.BABYLON.Matrix();
+
+        var ttl = 75;
+        var resting = false;
+        var active = true;
+
+        var grenadeCollidesWithCell = ss.RAYS.grenadeCollidesWithCell;
+        var rayCollidesWithMap = ss.RAYS[H.rayCollidesWithMap];
+
+        var x = pos.x;
+        var y = pos.y;
+        var z = pos.z;
+        var dx = -vec.x*2;
+        var dy = vec.y*2;
+        var dz = -vec.z*2;
+
+        const update = function () {
+            if (ttl <= 0) {
+                active = false;
+                return;
+            }
+            if (!resting) {
+                var pdx2 = dx;
+                var pdy = dy;
+                var pdz2 = dz;
+                var ndx = 0.5 * (dx + pdx2);
+                var ndy = 0.5 * (dy + pdy);
+                var ndz = 0.5 * (dz + pdz2);
+                var vel = Math.length3(ndx, ndy, ndz);
+                if (!collidesWithMap()) {
+                    x += ndx;
+                    y += ndy;
+                    z += ndz;
+                    dy -= 0.012;
+                }
+                dx *= 0.96;
+                dz *= 0.96;
+            }
+            ttl -= 1;
+        };
+
+        const collidesWithMap = function () {
+            v1.set(x, y - 0.07, z);
+            v2.set(dx, dy, dz);
+            v3.set(dx, dy, dz);
+            var res = rayCollidesWithMap(v1, v2, grenadeCollidesWithCell);
+            if (res) {
+                if (res.normal.y == 1 && v3.length() < 0.05) {
+                    resting = true;
+                } else {
+                    v3.subtractInPlace(res.normal.scale(1.6 * res.dot));
+                    dx = v3.x * 0.98;
+                    dy = v3.y;
+                    dz = v3.z * 0.98;
+                    return res;
+                }
+            }
+            return false;
+        };
+
+        while (active) {
+            /*
+            log(
+                "pos", {
+                    x, y, z
+                },
+                "velocity", {
+                    dx, dy, dz
+                },
+                "speed", speed,
+                "vec", vec,
+                "ttl", ttl,
+                "resting", resting,
+                "active", active
+            );
+            */
+            update();
+        };
+
+        return pos;
+    };
     const injectScript = function () {
         //TODO: replace with anon functions
         createAnonFunction('fixCamera', function () {
@@ -5314,7 +5417,7 @@ z-index: 999999;
             if (typeof isCrackedShell !== 'undefined') originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
-                return fetchTextContent(clientKeysURL + hash + ".json");
+                return fetchTextContent(clientKeysURL + hash + ".json?v=" + Date.now());
             };
 
             hash = L.CryptoJS.SHA256(originalJS).toString(L.CryptoJS.enc.Hex); // eslint-disable-line
@@ -5540,6 +5643,9 @@ z-index: 999999;
     
                 modifyJS(/tp-/g, '');
                 modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
+
+                // modifyJS(`${H.Grenade}.prototype.remove=function(){`, `${H.Grenade}.prototype.remove=function(){console.log("nade explosion", this, this.x, this.y, this.z);`);
+                // modifyJS(`this.grenadePool.retrieve`, `window.cock=arguments;this.grenadePool.retrieve`);
     
                 //intercept updateParticles for particle speed control
                 //deobf is: updateParticles(manager, delta)
