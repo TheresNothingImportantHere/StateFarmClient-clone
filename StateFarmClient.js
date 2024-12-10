@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre137
+// @version      3.4.1-pre138
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3370,6 +3370,7 @@ z-index: 999999;
             document.querySelector(".chat-container").scrollTop = document.querySelector(".chat-container").scrollHeight;
         };
     };
+    var vertexVector1, vertexVector2, vertexVector3, vertexVector4, vertexVector5, vertexVector6, vertexVector7, vertexVector8;
     const updateOrCreateLinesESP = function (object, type, color) {
         let newPosition, newScene, newParent
         if (type == "playerESP") {
@@ -3403,15 +3404,39 @@ z-index: 999999;
                 pPredESP: 0,
                 ammoESP: -0.05,
             };
+            vertexVector1 = vertexVector1 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector1.x = -boxSize[type].width / 2; vertexVector1.y = boxOffset[type]; vertexVector1.z = -boxSize[type].depth / 2;
+
+            vertexVector2 = vertexVector2 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector2.x = boxSize[type].width / 2; vertexVector2.y = boxOffset[type]; vertexVector2.z = -boxSize[type].depth / 2;
+
+            vertexVector3 = vertexVector3 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector3.x = boxSize[type].width / 2; vertexVector3.y = boxOffset[type] + boxSize[type].height; vertexVector3.z = -boxSize[type].depth / 2;
+
+            vertexVector4 = vertexVector4 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector4.x = -boxSize[type].width / 2; vertexVector4.y = boxOffset[type] + boxSize[type].height; vertexVector4.z = -boxSize[type].depth / 2;
+
+            vertexVector5 = vertexVector5 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector5.x = -boxSize[type].width / 2; vertexVector5.y = boxOffset[type]; vertexVector5.z = boxSize[type].depth / 2;
+
+            vertexVector6 = vertexVector6 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector6.x = boxSize[type].width / 2; vertexVector6.y = boxOffset[type]; vertexVector6.z = boxSize[type].depth / 2;
+
+            vertexVector7 = vertexVector7 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector7.x = boxSize[type].width / 2; vertexVector7.y = boxOffset[type] + boxSize[type].height; vertexVector7.z = boxSize[type].depth / 2;
+
+            vertexVector8 = vertexVector8 || new L.BABYLON.Vector3(0, 0, 0);
+            vertexVector8.x = -boxSize[type].width / 2; vertexVector8.y = boxOffset[type] + boxSize[type].height; vertexVector8.z = boxSize[type].depth / 2;
+
             const vertices = [
-                new L.BABYLON.Vector3(-boxSize[type].width / 2, boxOffset[type], -boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(boxSize[type].width / 2, boxOffset[type], -boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(boxSize[type].width / 2, boxOffset[type] + boxSize[type].height, -boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(-boxSize[type].width / 2, boxOffset[type] + boxSize[type].height, -boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(-boxSize[type].width / 2, boxOffset[type], boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(boxSize[type].width / 2, boxOffset[type], boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(boxSize[type].width / 2, boxOffset[type] + boxSize[type].height, boxSize[type].depth / 2),
-                new L.BABYLON.Vector3(-boxSize[type].width / 2, boxOffset[type] + boxSize[type].height, boxSize[type].depth / 2),
+                vertexVector1,
+                vertexVector2,
+                vertexVector3,
+                vertexVector4,
+                vertexVector5,
+                vertexVector6,
+                vertexVector7,
+                vertexVector8
             ];
             const lines = [];
             for (let i = 0; i < 4; i++) {
@@ -4809,19 +4834,26 @@ z-index: 999999;
             pitchReal: dir.pitchReal + (bloomValues[1] * multiplier),
         };
     };
+    var velocityVector, newPos, cappedVector, rayVector; //assuming that reusing doesnt leak memory
     const predictPosition = function (player) { //outputs the prediction for where a player will be in the time it takes for a bullet to reach them
-        let velocityVector = new L.BABYLON.Vector3(player.dx, player.dy, player.dz);
+        velocityVector = velocityVector || new L.BABYLON.Vector3(0, 0, 0);
+        velocityVector.x = player.dx; velocityVector.y = player.dy; velocityVector.z = player.dz;
         const bulletSpeed = ss.MYPLAYER.weapon.constructor.velocity;
         const timeDiff = distancePlayers(player, 1) / bulletSpeed + 1;
-        let newPos = new L.BABYLON.Vector3(player[H.x], player[H.y], player[H.z]).add(velocityVector.scale(timeDiff));
+        newPos = newPos || new L.BABYLON.Vector3(0, 0, 0)
+        newPos.x = player[H.x], newPos.y = player[H.y], newPos.z = player[H.z],
+        newPos = newPos.add(velocityVector.scale(timeDiff));
         newPos.y = player[H.y];
-        const cappedVector = new L.BABYLON.Vector3(velocityVector.x, 0.29, velocityVector.z);
+        cappedVector = cappedVector || new L.BABYLON.Vector3(0, 0, 0);
+        cappedVector.x = velocityVector.x, cappedVector.y = 0.29, cappedVector.z = velocityVector.z;
         Math.capVector3(cappedVector);
         const terminalVelocity = -cappedVector.y;
         const timeAccelerating = Math.min(timeDiff, (terminalVelocity - velocityVector.y) / -0.012);
         if(player.onGround==0){ //if player on ground we don't need to predict y because it's gonna stay same. the new pos y value has already been set to current y so no need to do anything when on ground.
             const predictedY = velocityVector.y * timeAccelerating + timeAccelerating * (timeAccelerating) * -0.012 / 2 + newPos.y + terminalVelocity * Math.max(timeDiff - timeAccelerating, 0);
-            const rayToGround = ss.RAYS[H.rayCollidesWithMap](newPos, new L.BABYLON.Vector3(0, predictedY - 1 - newPos.y, 0), ss.RAYS.grenadeCollidesWithCell);
+            rayVector = rayVector || new L.BABYLON.Vector3(0, 0, 0);
+            rayVector.x = 0, rayVector.y = predictedY - newPos.y, rayVector.z = 0;
+            const rayToGround = ss.RAYS[H.rayCollidesWithMap](newPos, rayVector, ss.RAYS.grenadeCollidesWithCell);
             newPos.y = Math.max(rayToGround ? rayToGround.pick.pickedPoint.y : 0, predictedY) - 0.072;
         }
         // log(velocityVector, bulletSpeed, timeDiff, cappedVector, terminalVelocity, timeAccelerating, predictedY, rayToGround, newPos);
@@ -4867,6 +4899,7 @@ z-index: 999999;
 
         return direction;
     };
+    var v1grenade, v2grenade, v3grenade, finalPos;
     const predictGrenade = function (player = ss.MYPLAYER, grenadeThrowPower = 0) {
         var rotMat = L.BABYLON.Matrix.RotationYawPitchRoll(player[H.yaw], -player[H.pitch], 0);
         var vec = L.BABYLON.Matrix.Translation(0, .1, 1).multiply(rotMat).getTranslation();
@@ -4884,12 +4917,9 @@ z-index: 999999;
         vec.y = Math.floor(256 * vec.y) / 256;
         vec.z = Math.floor(256 * vec.z) / 256;
 
-        var v1 = new L.BABYLON.Vector3();
-        var v2 = new L.BABYLON.Vector3();
-        var v3 = new L.BABYLON.Vector3();
-        var v4 = new L.BABYLON.Vector3();
-
-        var matrix = new L.BABYLON.Matrix();
+        v1grenade = v1grenade || new L.BABYLON.Vector3();
+        v2grenade = v2grenade || new L.BABYLON.Vector3();
+        v3grenade = v3grenade || new L.BABYLON.Vector3();
 
         var ttl = 75;
         var resting = false;
@@ -4936,23 +4966,23 @@ z-index: 999999;
 
         const collidesWithMap = function () {
             // log("collidesWithMap", 1)
-            v1.set(x, y - 0.07, z);
-            v2.set(dx, dy, dz);
-            v3.set(dx, dy, dz);
+            v1grenade.set(x, y - 0.07, z);
+            v2grenade.set(dx, dy, dz);
+            v3grenade.set(dx, dy, dz);
             // log("collidesWithMap", 2)
-            var res = rayCollidesWithMap(v1, v2, grenadeCollidesWithCell);
+            var res = rayCollidesWithMap(v1grenade, v2grenade, grenadeCollidesWithCell);
             // log("collidesWithMap", 3)
             if (res) {
                 // log("collidesWithMap", 3)
-                if (res.normal.y == 1 && v3.length() < 0.05) {
+                if (res.normal.y == 1 && v3grenade.length() < 0.05) {
                     // log("collidesWithMap", 4)
                     resting = true;
                 } else {
                     // log("collidesWithMap", 5)
-                    v3.subtractInPlace(res.normal.scale(1.6 * res.dot));
-                    dx = v3.x * 0.98;
-                    dy = v3.y;
-                    dz = v3.z * 0.98;
+                    v3grenade.subtractInPlace(res.normal.scale(1.6 * res.dot));
+                    dx = v3grenade.x * 0.98;
+                    dy = v3grenade.y;
+                    dz = v3grenade.z * 0.98;
                     return res;
                 }
             }
@@ -4998,7 +5028,7 @@ z-index: 999999;
             );
             */
             // log(ttl, active, 1);
-            result.positions.push(new L.BABYLON.Vector3(x, y, z));
+            result.positions.push({x, y, z});
             // log(ttl, active, 2);
             update();
             // log(ttl, active, 3);
@@ -5006,7 +5036,10 @@ z-index: 999999;
             // log(ttl, active, 4);
         };
 
-        result.finalPos = new L.BABYLON.Vector3(x, y, z);
+        finalPos = finalPos || new L.BABYLON.Vector3();
+        finalPos.x = x; finalPos.y = y; finalPos.z = z;
+
+        result.finalPos = finalPos;
 
         // log(result);
 
