@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre138
+// @version      3.4.1-pre139
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -931,7 +931,7 @@ sniping and someone sneaks up on you
         ]);
             initModule({ location: tp.combatTab.pages[0], title: "Aimbot", storeAs: "aimbot", tooltip: "Locks onto targeted player", bindLocation: tp.combatTab.pages[1], defaultBind: "V", });
             initFolder({ location: tp.combatTab.pages[0], title: "Aimbot Options", storeAs: "aimbotFolder", });
-                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "Decides the priority for which player aimbot should target", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "Decides the priority for which player aimbot should target", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }, { text: "Lowest HP", value: "lowestHp" }, { text: "Most Kills", value: "mostKills" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
                 initModule({ location: tp.aimbotFolder, title: "TargetVisible", storeAs: "aimbotVisibilityMode", tooltip: "A filter, applied after TargetMode helping to pick the aimbot target", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Prioritise Visible", value: "prioritise" }, { text: "Only Visible", value: "onlyvisible" }], defaultValue: "disabled", enableConditions: [["aimbot", true]] });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "ToggleRM", storeAs: "aimbotRightClick", tooltip: "Modifies aimbot to only lock when the right mouse is held", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
@@ -7275,7 +7275,20 @@ z-index: 999999;
                 });
 
                 candidates.forEach(player => {
-                    const valueToUse = ((targetType == "nearest" && player.adjustedDistance) || (targetType == "pointingat" && player.angleDiff));
+                    const valueToUse = (
+                        (targetType == "nearest" && (
+                            player.adjustedDistance
+                        )) || 
+                        (targetType == "pointingat" && (
+                            player.angleDiff
+                        )) || 
+                        (targetType == "lowestHp" && (
+                            player[H.hp]
+                        )) || 
+                        (targetType == "mostKills" && (
+                            -player.score
+                        ))
+                    );
                     let visibleValue =  ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team));
                     if (visibilityMode == "disabled") { //we dont care about that shit
                         //go ahead
