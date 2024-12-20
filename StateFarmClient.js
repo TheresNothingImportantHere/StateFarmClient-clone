@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre139
+// @version      3.4.1-pre140
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -7061,6 +7061,21 @@ z-index: 999999;
                     ss.CAMERA.position.y = extract("perspective") !== "firstPerson" ? extract("perspectiveY") || 0 : 0;
                     ss.CAMERA.position.z = extract("perspective") !== "firstPerson" ? extract("perspective") == "thirdPerson" ? (extract("perspectiveZ") || 0) : (-extract("perspectiveZ")) || 0 : 0;
                     ss.CAMERA.rotation.x = extract("perspective") == "thirdPersonAlt" ? Math.PI : 0;
+
+                    //adjust for scoping
+                    if (ss.MYPLAYER.scope) {
+                        let finalFov = 0.4;
+                        let ourFov = (extract("fov") * (Math.PI / 180));
+                        let currentFov = ss.CAMERA.fov;
+                        let percentage = (currentFov - finalFov) / ourFov;
+
+                        log(percentage, finalFov, ourFov, currentFov);
+
+                        ss.CAMERA.position.y = ss.CAMERA.position.y * percentage;
+                        ss.CAMERA.position.z = ss.CAMERA.position.z * percentage;
+                        ss.CAMERA.rotation.x = ss.CAMERA.rotation.x * percentage;
+                    };
+
                     //rendering
                     ss.MYPLAYER[H.actor].gunContainer._children[0].renderingGroupId = extract("perspective") !== "firstPerson" ? 0 : 2;
                     ss.MYPLAYER[H.actor].gunContainer._children[2].renderingGroupId = extract("perspective") !== "firstPerson" ? 0 : 2;
