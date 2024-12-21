@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre140
+// @version      3.4.1-pre141
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -587,6 +587,36 @@ let attemptedInjection = false;
         };
     };
 
+    /**
+     * 
+    * @param {String} colorSelectName name of the color module. Will be used for extract. EG. aimbotColor
+    * @param {String} isRainbowName name of the rainbow checkbox mod. Will be used for extract.
+    */
+    const getColor = function(colorSelectName, isRainbowName){
+      //non rainbow
+      if(!extract(isRainbowName)) return extract(colorSelectName);
+      //rainbow
+      const time = Date.now();
+      const r = (time%1000)/1000;
+      const g = (time%2000)/2000;
+      const b = (time%3000)/3000;
+      const rS = time%2000<1000? 1-r: r;
+      const gS = time%4000<2000? 1-g: g;
+      const bS = time%6000<3000? 1-b: b;
+      const rF = Math.round(rS*255);
+      const gF = Math.round(gS*255);
+      const bF = Math.round(bS*255);
+      //hacky bc it's prob gonna get converted back to rgb but not gonna rewrite color code................................
+      const componentToHex = (c) => {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+      }
+      const rgbToHex = (r, g, b)=> {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+      }
+      return rgbToHex(rF, gF, bF);
+    }
+
     const beginBinding = function (value) {
         if (binding == false) {
             binding = value;
@@ -950,6 +980,8 @@ sniping and someone sneaks up on you
                 initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "ESPColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
+                initModule({ location: tp.aimbotFolder, title: "ESPRainbow", storeAs: "aimbotRainbow", tooltip: "should target esp be rainbow?", defaultValue: true, enableConditions: [["aimbot", true]] });
+
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", tooltip: "This automatically reloads your gun if there is no more ammo", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "Smart Refill", storeAs: "smartRefill", tooltip: "This makes your weapon refill at the best moment, which reduces reload time", bindLocation: tp.combatTab.pages[1], showConditions: [["autoRefill", true]], });
@@ -978,12 +1010,22 @@ sniping and someone sneaks up on you
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
                 initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "The mode for how ESP/Tracers are coloured. Different colour options present themselves based on option.\n\nStatic: Just stays as one colour.\nProximity: Fades between three colours based on how close someone is.\nVisibility: Switches between two colours if there is Line of Sight.", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
                 initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "C1 rainbow", storeAs: "tracersColor1Rainbow", tooltip: "rainbwo. 🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], });
+                //TODO: I hate having it like that so maybe a initmodule helper func for color with creates both color opt and rainbow opt. Same with the getColors() btw ~Sq
+                //also speed customisation and shit, people love customization.
+                //-------- 
                 initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "Static: (Unused)\nProximity: Moderately close colour\nVisibility: Visible.", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
+                //initModule({ location: tp.tracersFolder, title: "C2 rainbow", storeAs: "tracersColor2Rainbow", tooltip: "🌈", defaultValue: true, disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
+                //--------
                 initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", tooltip: "Static: (Unused)\nProximity: Furthest colour\nVisibility: (Unused)", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
+                //initModule({ location: tp.tracersFolder, title: "C3 rainbow", storeAs: "tracersColor3Rainbow", tooltip: "🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
+                //-------ä
                 initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", tooltip: "Proximity: Distance from which it fades from 1 to 2. Should be the smaller range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
                 initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", tooltip: "Proximity: Distance from which it fades from 2 to 3. Should be the larger range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
                 tp.tracersFolder.addSeparator();
                 initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", tooltip: "Colour to use for the PredictionESP box", defaultValue: "#ff0000", disableConditions: [ ["predictionESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "PredictionESPColorRainbow", storeAs: "predictionESPColorRainbow", tooltip: "Color to use for the PredictionESP box rainbow?", defaultValue: false, disableConditions: [ ["predictionESP", false]], });
+
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Ammo ESP/Tracers Options", storeAs: "tracersAmmoFolder", });
                 initFolder({ location: tp.tracersAmmoFolder, title: "Ammo", storeAs: "ammoFolder", });
@@ -6696,7 +6738,7 @@ z-index: 999999;
                       if (player.pred && player.pred.getScene()) { //does pred exist and is on a valid scene? not really needed, as we literally
                         //create the thing above if this is not the case, but eh. Better safe than sorry
                         player.pred.setAbsolutePosition(predictPosition(player)); //transformNode is attached to mesh, so we need absolute pos here.
-                        updateOrCreateLinesESP(player.pred, "pPredESP", hexToRgb(extract("predictionESPColor"))); //I love names. pPredESP, pPTransformNode. Truly nice
+                        updateOrCreateLinesESP(player.pred, "pPredESP", hexToRgb(getColor("predictionESPColor", "predictionESPColorRainbow"))); //I love names. pPredESP, pPTransformNode. Truly nice
                         player.pred.exists = objExists; //make sure the lines don't get picked up by the ESPLines Garbage collector afterwards
                         player.pred.tracerLines.visibility = false; //they just don't work for this.
                       };
@@ -6711,7 +6753,7 @@ z-index: 999999;
                         const distance = distancePlayers(player);
                         if (distance < extract("tracersColor1to2")) { //fade between first set
                             progress = (distance / extract("tracersColor1to2"));
-                            color = fadeBetweenColors(extract("tracersColor1"), extract("tracersColor2"), progress);
+                            color = fadeBetweenColors(extract("tracersColor1"), extract("tracersColor2"), progress); //ye fade look dumb dumb with fade
                         } else if (distance < extract("tracersColor2to3")) { //fade between second set
                             progress = ((distance - extract("tracersColor1to2")) / (extract("tracersColor2to3") - extract("tracersColor1to2")));
                             color = fadeBetweenColors(extract("tracersColor2"), extract("tracersColor3"), progress);
@@ -6719,9 +6761,9 @@ z-index: 999999;
                             color = hexToRgb(extract("tracersColor3"));
                         };
                     } else if (tracersType == "static") {
-                        color = hexToRgb(extract("tracersColor1"));
+                        color = hexToRgb(getColor("tracersColor1", "tracersColor1Rainbow"));
                     } else if (tracersType == "visibility") {
-                        color = getLineOfSight(player) ? hexToRgb(extract("tracersColor2")) : hexToRgb(extract("tracersColor1"))
+                        color = getLineOfSight(player) ? hexToRgb(getColor("tracersColor2", "tracersColor2Rainbow")) : hexToRgb(getColor("tracersColor1", "tracersColor1Rainbow") )
                     };
                     updateOrCreateLinesESP(player, "playerESP", color);
 
@@ -7327,10 +7369,10 @@ z-index: 999999;
                         didAimbot = true;
                         if (currentlyTargeting.generatedESP) {
                             if (extract("tracers")) {
-                                currentlyTargeting.tracerLines.color = new L.BABYLON.Color3(...hexToRgb(extract("aimbotColor")));
+                                currentlyTargeting.tracerLines.color = new L.BABYLON.Color3(...hexToRgb(getColor("aimbotColor", "aimbotRainbow")));
                             };
                             if (extract("playerESP")) {
-                                currentlyTargeting.box.color = new L.BABYLON.Color3(...hexToRgb(extract("aimbotColor")));
+                                currentlyTargeting.box.color = new L.BABYLON.Color3(...hexToRgb(getColor("aimbotColor", "aimbotRainbow")));
                             };
                         };
                         if ((!extract("silentAimbot")) && (!extract("noWallTrack") || getLineOfSight(player, true)) && (targetingComplete || (deg2rad(extract("aimbotMinAngle")) > currentlyTargeting?.angleDiff))) {
