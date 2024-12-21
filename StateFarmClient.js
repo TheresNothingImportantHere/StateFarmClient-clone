@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre141
+// @version      3.4.1-pre142
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -986,9 +986,10 @@ sniping and someone sneaks up on you
             initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", tooltip: "This automatically reloads your gun if there is no more ammo", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "Smart Refill", storeAs: "smartRefill", tooltip: "This makes your weapon refill at the best moment, which reduces reload time", bindLocation: tp.combatTab.pages[1], showConditions: [["autoRefill", true]], });
             tp.combatTab.pages[0].addSeparator();
-            initModule({ location: tp.combatTab.pages[0], title: "Auto Fire", storeAs: "enableAutoFire", tooltip: "Automatically shoot the gun", bindLocation: tp.combatTab.pages[1], });
-            initModule({ location: tp.combatTab.pages[0], title: "AutoFireType", storeAs: "autoFireType", tooltip: "Picks how to shoot the gun", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Force Automatic", value: "forceAutomatic" }, { text: "While Visible", value: "whileVisible" }, { text: "While Aimbotting", value: "whileAimbot" }, { text: "Visible and Aimbotting", value: "whileVisAimbot" }, { text: "Always", value: "always" }], defaultValue: "leftMouse", showConditions: [["enableAutoFire", true]] });
-            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", tooltip: "Minimum spread/accuracy before shooting. Helpful for sniper guns, bad for automatics. Leave at 0 for default.", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, });
+            initModule({ location: tp.combatTab.pages[0], title: "Auto Fire", storeAs: "enableAutomatic", tooltip: "Makes every gun act like an automatic one", bindLocation: tp.combatTab.pages[1], });
+            initModule({ location: tp.combatTab.pages[0], title: "Triggerbot", storeAs: "enableAutoFire", tooltip: "Automatically shoot the gun", bindLocation: tp.combatTab.pages[1], });
+            initModule({ location: tp.combatTab.pages[0], title: "TriggerType", storeAs: "autoFireType", tooltip: "Picks how to shoot the gun", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Force Automatic", value: "forceAutomatic" }, { text: "While Visible", value: "whileVisible" }, { text: "While Aimbotting", value: "whileAimbot" }, { text: "Visible and Aimbotting", value: "whileVisAimbot" }, { text: "Always", value: "always" }], defaultValue: "leftMouse", enableConditions: [["enableAutoFire", true]] });
+            initModule({ location: tp.combatTab.pages[0], title: "MinAccuracy%", storeAs: "autoFireAccuracy", tooltip: "Minimum spread/accuracy before shooting. Helpful for sniper guns, bad for automatics. Leave at 0 for default.", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 0, enableConditions: [["enableAutoFire", true]], });
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "GrenadeMAX", storeAs: "grenadeMax", tooltip: "Sets grenades to be thrown to max power immediately without the need of charging", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "Nade Power", storeAs: "grenadePower", tooltip: "porcupane hijinks ensue — Today at 6:33 PM• goo/ber grenade power override for how long you hold ot", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 1, });
@@ -7450,16 +7451,16 @@ z-index: 999999;
                             ss.MYPLAYER.melee();
                         };
                     };
-                    //method by de_Neuublue
-                    if (autoFireType == "forceAutomatic") {
-                        if (ss.MYPLAYER.weapon.constructor.originallySemi == null) {
-                            ss.MYPLAYER.weapon.constructor.originallySemi = !ss.MYPLAYER.weapon.constructor.automatic;
-                        };
-                        ss.MYPLAYER.weapon.constructor.automatic = true;
-                    } else if (ss.MYPLAYER.weapon.constructor.originallySemi) {
-                        ss.MYPLAYER.weapon.constructor.originallySemi = null;
-                        ss.MYPLAYER.weapon.constructor.automatic = false;
+                };
+                //method by de_Neuublue
+                if (extract("enableAutomatic")) {
+                    if (ss.MYPLAYER.weapon.constructor.originallySemi == null) {
+                        ss.MYPLAYER.weapon.constructor.originallySemi = !ss.MYPLAYER.weapon.constructor.automatic;
                     };
+                    ss.MYPLAYER.weapon.constructor.automatic = true;
+                } else if (ss.MYPLAYER.weapon.constructor.originallySemi) {
+                    ss.MYPLAYER.weapon.constructor.originallySemi = null;
+                    ss.MYPLAYER.weapon.constructor.automatic = false;
                 };
 
                 if (updateMenu) {
