@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre142
+// @version      3.4.1-pre143
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -976,11 +976,9 @@ sniping and someone sneaks up on you
                 initModule({ location: tp.aimbotFolder, title: "1 Kill", storeAs: "oneKill", tooltip: "Disables aimbot when the targeted player dies", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "MinAngle", storeAs: "aimbotMinAngle", tooltip: "Prevents you from snapping if the angle between you and the player is greater than this value (in degrees)", slider: { min: 0.05, max: 360, step: 1 }, defaultValue: 360, enableConditions: [["aimbot", true]], });
-                initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "This makes snapping smooth at higher values. useful to avoid being spotted", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
                 initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
-                initModule({ location: tp.aimbotFolder, title: "ESPColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
-                initModule({ location: tp.aimbotFolder, title: "ESPRainbow", storeAs: "aimbotRainbow", tooltip: "should target esp be rainbow?", defaultValue: true, enableConditions: [["aimbot", true]] });
+                initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "This makes snapping smooth at higher values. useful to avoid being spotted", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
 
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", tooltip: "This automatically reloads your gun if there is no more ammo", bindLocation: tp.combatTab.pages[1], });
@@ -1009,9 +1007,12 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "Creates an ESP box at the predicted position of the player", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
+                initModule({ location: tp.tracersFolder, title: "TargetedColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
+                initModule({ location: tp.tracersFolder, title: "Targeted RGB", storeAs: "aimbotRainbow", tooltip: "Adds RGB to the ESP, for fun", defaultValue: true, enableConditions: [["aimbot", true]], bindLocation: tp.renderTab.pages[1] });
+                tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "The mode for how ESP/Tracers are coloured. Different colour options present themselves based on option.\n\nStatic: Just stays as one colour.\nProximity: Fades between three colours based on how close someone is.\nVisibility: Switches between two colours if there is Line of Sight.", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], });
-                initModule({ location: tp.tracersFolder, title: "C1 rainbow", storeAs: "tracersColor1Rainbow", tooltip: "rainbwo. 🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "RGB Color 1", storeAs: "tracersColor1Rainbow", tooltip: "rainbow. 🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersColor1Rainbow", false]], });
                 //TODO: I hate having it like that so maybe a initmodule helper func for color with creates both color opt and rainbow opt. Same with the getColors() btw ~Sq
                 //also speed customisation and shit, people love customization.
                 //-------- 
@@ -5112,10 +5113,10 @@ z-index: 999999;
             } catch {
                 return false;
             };
-         });
+        });
         createAnonFunction('shouldNotCull', function () {
             return true;
-         });
+        });
         createAnonFunction('shouldInputSpace', function () {
             return !document.activeElement.classList.contains('tp-txtv_i');
         });
