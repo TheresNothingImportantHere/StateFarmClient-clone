@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre144
+// @version      3.4.1-pre145
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3385,6 +3385,14 @@ z-index: 999999;
     const createAnonFunction = function (name, func) {
         const funcName = getScrambled();
         unsafeWindow[funcName] = func;
+        unsafeWindow[funcName] = function () {
+            try {
+                return func.apply(this, arguments);
+            } catch (error) {
+                log("Error in anonymous function:", error);
+            }
+        };
+    
         F[name] = unsafeWindow[funcName];
         functionNames[name] = funcName
     };
@@ -5146,7 +5154,7 @@ z-index: 999999;
                 //streak and kdr (middle top)
                 actor.drawTextOnNameTexture(
                     `${player.bestGameStreak} | ${(Math.min(player.totalKills / (player.totalDeaths || 1), 99)).toFixed(1)}`,                  // text
-                    -20, 100,                             // x/y
+                    -20, 100,                           // x/y
                     25,                                 // size
                     "yellow",                           // colour
                     true                                // center
