@@ -23,7 +23,7 @@
 // @grant        GM.setClipboard
 // @grant        GM.openInTab
 
-// @icon         https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png
+// @icon         https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png?v=1
 
 // @require      https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js
 // @require      https://cdn.jsdelivr.net/npm/@tweakpane/plugin-essentials@0.1.8/dist/tweakpane-plugin-essentials.min.js
@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre143
+// @version      3.4.1-pre144
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -398,6 +398,7 @@ let attemptedInjection = false;
     log("Save key:", storageKey);
     let binding = false;
     let previousFrame = 0;
+    let framesPassed = 0;
     let previousLogin = 0;
     let lastSpamMessage = [0, ""];
     let startTime = Date.now();
@@ -410,6 +411,7 @@ let attemptedInjection = false;
     let lastSentMessage = "";
     let spamDelay = 0;
     let URLParams = "";
+    let playerInfoCache = {};
     let retrievedSFX = [{ text: "Default", value: "default" }];
     let soundsSFC = {};
     let targetingComplete = false;
@@ -1001,14 +1003,17 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", tooltip: "Creates boxes around enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", tooltip: "Creates lines pointing from the center of the screen to the location of enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: "Renders players through walls", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Nametags", storeAs: "nametags", tooltip: "Enlarges nametags and makes them appear through walls", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Trajectories", storeAs: "trajectories", tooltip: "Shows the path your grenade will take when thrown", bindLocation: tp.renderTab.pages[1], });
             //initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", tooltip: "It's borked rn", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "Creates an ESP box at the predicted position of the player", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
+            initModule({ location: tp.renderTab.pages[0], title: "NametagESP", storeAs: "nametags", tooltip: "Enlarges nametags and makes them appear through walls", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "NametagInfo", storeAs: "nametagInfo", tooltip: "Adds extra info to nametags such as HP and score stats", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Info Update Interval", storeAs: "nametagInfoInterval", tooltip: "If the info updater lags you, increase this value to make it update less often.", slider: { min: 1, max: 180, step: 1 }, defaultValue: 20, showConditions: [["nametagInfo", true]], });
+            tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
-                initModule({ location: tp.tracersFolder, title: "TargetedColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", enableConditions: [["aimbot", true]] });
-                initModule({ location: tp.tracersFolder, title: "Targeted RGB", storeAs: "aimbotRainbow", tooltip: "Adds RGB to the ESP, for fun", defaultValue: true, enableConditions: [["aimbot", true]], bindLocation: tp.renderTab.pages[1] });
+                initModule({ location: tp.tracersFolder, title: "TargetedColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", showConditions: [["aimbotRainbow", false]] });
+                initModule({ location: tp.tracersFolder, title: "Targeted RGB", storeAs: "aimbotRainbow", tooltip: "Adds RGB to the ESP, for fun", defaultValue: true, bindLocation: tp.renderTab.pages[1] });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "The mode for how ESP/Tracers are coloured. Different colour options present themselves based on option.\n\nStatic: Just stays as one colour.\nProximity: Fades between three colours based on how close someone is.\nVisibility: Switches between two colours if there is Line of Sight.", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
                 initModule({ location: tp.tracersFolder, title: "RGB Color 1", storeAs: "tracersColor1Rainbow", tooltip: "rainbow. 🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], });
@@ -3395,7 +3400,7 @@ z-index: 999999;
         playerNameSpan.classList.add("chat-player-name", "ss_marginright_xs");
         playerNameSpan.textContent = playerName + " ";
 
-        playerInfoContainer.style.color = TEAMCOLORS[playerTeam];
+        playerInfoContainer.style.color = ss.teamColors.text[playerTeam];
         playerInfoContainer.appendChild(serverIcon);
         playerInfoContainer.appendChild(playerNameSpan);
 
@@ -5089,6 +5094,89 @@ z-index: 999999;
 
         return result;
     };
+
+    const setupNameSpriteNew = function (actor) {
+        let player = actor[H.player_];
+
+        log("hrmmmm setupNameSpriteNew", player.name);
+
+        var tx = player.id % 4 * 512;
+        var ty = 2048 - Math.floor(player.id / 4) * 256;
+
+        if (actor && actor?.nameSprite && actor?.nameSprite?.color) {
+            ss.nameTexture.clearRect(tx, ty - 256, 512, 256);
+
+            let teamColorsNameSprite = [
+                "white",
+                "rgba(0, 191, 255, 1)",
+                "rgba(255, 64, 64, 1)",
+            ];
+
+            if (extract("nametagInfo")) {
+                actor.drawTextOnNameTexture(
+                    player.name,                       // text
+                    0, 32,                             // x/y
+                    50,                                // size
+                    teamColorsNameSprite[player.team], // colour
+                    true                               // center
+                );
+
+                let health = player[H.hp] + player.hardBoiledValue;
+                let healthColour = (player.hardBoiledValue > 0) ? "blue" : (health > 30 ? "white" : "red");
+                if (player[H.hp] > 100) healthColour = "green";
+
+                //health (right side)
+                actor.drawTextOnNameTexture(
+                    health.toFixed(0),                  // text
+                    85, 75,                             // x/y
+                    60,                                 // size
+                    healthColour,                       // colour
+                    true                                // center
+                );
+
+                //current kills
+                actor.drawTextOnNameTexture(
+                    player.score,                        // text
+                    -95, 75,                             // x/y
+                    60,                                  // size
+                    "yellow",                            // colour
+                    true                                 // center
+                );
+
+                //streak and kdr (middle top)
+                actor.drawTextOnNameTexture(
+                    `${player.bestGameStreak} | ${(Math.min(player.totalKills / (player.totalDeaths || 1), 99)).toFixed(1)}`,                  // text
+                    -20, 100,                             // x/y
+                    25,                                 // size
+                    "yellow",                           // colour
+                    true                                // center
+                );
+
+                //ammo (middle bottom)
+                actor.drawTextOnNameTexture(
+                    `${player.weapon.ammo.rounds} / ${player.weapon.ammo.store}`,                  // text
+                    -20, 75,                              // x/y
+                    25,                                 // size
+                    "yellow",                       // colour
+                    true                                // center
+                );
+            } else {
+                actor.drawTextOnNameTexture(
+                    player.name,                       // text
+                    0, 32,                             // x/y
+                    60,                                // size
+                    "white",                           // colour
+                    true                               // center
+                );
+            };
+        };
+    };
+    // const updateTeamNew = function (actor, oldUpdateTeam) {
+    //     log("aaaaaa updateTeamNew");
+    //     oldUpdateTeam();
+    //     actor.nameSprite.color = ss.teamColors.textColor[0];
+    // };
+
     const injectScript = function () {
         //TODO: replace with anon functions
         createAnonFunction('fixCamera', function () {
@@ -6814,7 +6902,56 @@ z-index: 999999;
                             };
                         };
                         onlinePlayersArray.push([player, player.name, player.team]);
+                        
+                        player[H.actor].setupNameSprite = (()=>{
+                            setupNameSpriteNew(player[H.actor])
+                        });
+                        player[H.actor].setupNameSprite();
+                        // let oldUpdateTeam = player[H.actor].updateTeam;
+                        // player[H.actor].updateTeam = (()=>{
+                        //     updateTeamNew(player[H.actor], oldUpdateTeam)
+                        // });
                     };
+
+                    if (framesPassed % extract("nametagInfoInterval") === 0) {
+                        //cache triggers
+                        let playerInfo = {
+                            score: player.score,
+                            totalDeaths: player.totalDeaths,
+                            bestGameStreak: player.bestGameStreak,
+    
+                            team: player.team,
+    
+                            hp: player[H.hp],
+                            hardBoiledValue: player.hardBoiledValue,
+
+                            shouldReplace: extract("nametagInfo"), //replace with the extract l8r
+                        };
+    
+                        let playerInfoOld = playerInfoCache[player.uniqueId];
+    
+                        if ((playerInfoOld) && (
+                            (playerInfo.shouldReplace != playerInfoOld.shouldReplace) || ((playerInfo.shouldReplace) && (
+                                (playerInfo.score != playerInfoOld.score) ||
+                                (playerInfo.totalDeaths != playerInfoOld.totalDeaths) ||
+                                (playerInfo.bestGameStreak != playerInfoOld.bestGameStreak) ||
+                                (playerInfo.team != playerInfoOld.team) ||
+                                (playerInfo.hp != playerInfoOld.hp) ||
+                                (playerInfo.hardBoiledValue != playerInfoOld.hardBoiledValue)
+                            ))
+                        )) {
+                            player[H.actor].setupNameSprite();
+                        };
+    
+                        playerInfoCache[player.uniqueId] = playerInfo;
+
+                        if (player[H.actor]?.nameSprite?.color) {
+                            playerInfo.shouldReplace ? 
+                                (player[H.actor].nameSprite.color = ss.teamColors.textColor[0]) :
+                                (player[H.actor].nameSprite.color = ss.teamColors.textColor[player.team]);
+                        }
+                    };
+
                     player.isOnline = objExists;
                 };
             });
@@ -7065,6 +7202,9 @@ z-index: 999999;
 
         createAnonFunction("STATEFARM", function () {
             ss.PLAYERS.forEach((PLAYER) => (PLAYER.hasOwnProperty("ws")) ? (ss.MYPLAYER = PLAYER) : null);
+
+            ss.PLAYERS.forEach((PLAYER) => {
+            });
 
             if (!ranOneTime) {
                 oneTime();
@@ -7476,6 +7616,8 @@ z-index: 999999;
                 } else {
                     previousFrame = Date.now();
                 };
+
+                framesPassed++;
 
                 return (!doRender);
             };
