@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre145
+// @version      3.4.1-pre146
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -404,6 +404,7 @@ let attemptedInjection = false;
     let startTime = Date.now();
     let lastAutoJump = 0;
     let lastAntiAFKMessage = 0;
+    let miniCamera;
     let spamMessageCount = 0;
     let currentFrameIndex = 0;
     let deciSecondsPassed = 0;
@@ -1089,6 +1090,10 @@ sniping and someone sneaks up on you
             initModule({ location: tp.hudTab.pages[0], title: "PlayerInfo", storeAs: "playerInfo", tooltip: "Displays added information about the player you're targeting", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "GameInfo", storeAs: "gameInfo", tooltip: "Displays extra game information", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "ShowStream", storeAs: "showStreams", tooltip: "Detects & displays ongoing twitch streamers", bindLocation: tp.hudTab.pages[1], });
+            tp.hudTab.pages[0].addSeparator();
+            initModule({ location: tp.hudTab.pages[0], title: "MiniMap", storeAs: "minimap", tooltip: "Displays a top down view of your game", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "MiniMap Zoom", storeAs: "minimapZoom", tooltip: "How much the minimap camera should zoom in", slider: { min: 0.1, max: 20, step: 0.1 }, defaultValue: 5, showConditions: [["minimap", true]], });
+            initModule({ location: tp.hudTab.pages[0], title: "MiniMap Size", storeAs: "minimapSize", tooltip: "How big the minimap should be on the screen", slider: { min: 0.1, max: 5, step: 0.1 }, defaultValue: 1, showConditions: [["minimap", true]], });
         //CHAT MODULES
         initFolder({ location: tp.mainPanel, title: "Chat", storeAs: "chatFolder", });
         initTabs({ location: tp.chatFolder, storeAs: "chatTab" }, [
@@ -3653,6 +3658,7 @@ z-index: 999999;
             unsafeWindow.globalSS.badgeList = badgeList;
             unsafeWindow.globalSS.crosshairsPosition = crosshairsPosition;
             unsafeWindow.globalSS.predictGrenade = predictGrenade;
+            unsafeWindow.globalSS.miniCamera = miniCamera;
             unsafeWindow.globalSS.pathfindingInfo = {
                 activePath: activePath,
                 pathfindingTargetOverride: pathfindingTargetOverride,
@@ -3909,7 +3915,6 @@ z-index: 999999;
                 };
             };
 
-
             Array.from(document.getElementById("playerList").children).forEach(playerListItem => {
                 const playerSlotNameElement = playerListItem.children[0];
                 if (playerSlotNameElement) {
@@ -3940,6 +3945,33 @@ z-index: 999999;
             } else if ((!extract("restoreScroll")) && (hasZIndex10000 || !hasZIndex1)) {
                 pausedGameUI.classList.remove('z-index-1', 'z-index-10000');
                 pausedGameUI.classList.add("z-index-1");
+            };
+
+            if (extract("minimap")) {
+                if (!miniCamera) {
+                    var camPos = new L.BABYLON.Vector3(0, -20, 0);
+                    miniCamera = new L.BABYLON.ArcRotateCamera("minimapCamera", L.BABYLON.Tools.ToRadians(-90), L.BABYLON.Tools.ToRadians(0), 30, camPos, ss.SCENE);
+                    miniCamera.mode = L.BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+                    ss.SCENE.activeCameras.push(miniCamera);
+                    miniCamera.parent = ss.MYPLAYER[H.actor][H.mesh];
+                };
+                miniCamera._skipRendering = false;
+                
+                let cameraScale = extract("minimapZoom");
+
+                miniCamera.orthoLeft = -cameraScale;
+                miniCamera.orthoRight = cameraScale;
+                miniCamera.orthoBottom =- cameraScale;
+                miniCamera.orthoTop = cameraScale;
+
+                let mapScale = extract("minimapSize");
+
+                var relativeWidth = 200 / window.innerWidth;
+                var relativeHeight = 200 / window.innerHeight;
+
+                miniCamera.viewport = new L.BABYLON.Viewport(0.2, 0.2, relativeWidth * mapScale, relativeHeight * mapScale);
+            } else if (miniCamera) {
+                miniCamera._skipRendering = true;
             };
         } else {
             if ((!document.getElementById("progressBar"))) {
@@ -5106,7 +5138,7 @@ z-index: 999999;
     const setupNameSpriteNew = function (actor) {
         let player = actor[H.player_];
 
-        log("hrmmmm setupNameSpriteNew", player.name);
+        // log("hrmmmm setupNameSpriteNew", player.name);
 
         var tx = player.id % 4 * 512;
         var ty = 2048 - Math.floor(player.id / 4) * 256;
@@ -7261,7 +7293,7 @@ z-index: 999999;
                         let currentFov = ss.CAMERA.fov;
                         let percentage = (currentFov - finalFov) / ourFov;
 
-                        log(percentage, finalFov, ourFov, currentFov);
+                        // log(percentage, finalFov, ourFov, currentFov);
 
                         ss.CAMERA.position.y = ss.CAMERA.position.y * percentage;
                         ss.CAMERA.position.z = ss.CAMERA.position.z * percentage;
