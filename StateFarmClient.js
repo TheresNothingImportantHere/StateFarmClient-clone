@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre146
+// @version      3.4.1-pre147
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -6795,6 +6795,7 @@ z-index: 999999;
 
             if (newGame) {
                 onlinePlayersArray = [];
+                miniCamera = null;
             };
             if (extract("debug") && (typeof playerLogger === 'undefined')) {
                 playerLogger = [];
