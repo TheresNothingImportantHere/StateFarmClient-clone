@@ -20,7 +20,7 @@ StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), includ
 <h3 align='center'>Join our <a href='https://dsc.gg/sfnetwork'>Discord Server</a> for the latest news!</h3>
 <br>
 
-The information below is accurate as of StateFarm version **3.4.1-pre98**. 
+The information below is accurate as of StateFarm version **3.4.1-pre147**. 
 <br><br>
 
 <h1 align='center'>Table of Contents</h1>
@@ -192,9 +192,9 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
 - **NameTagInfo** - adds extra info to player nametags such as HP, Score, KDR, and ammo.
   - **Info Update Interval** - updates nametaginfo every set interval, recommend increasing the value on lowend devices
 - **Player ESP/Tracers options** - various options for the modules above.
-  - **TargetedRGB** - makes the aimbot target esp rainbow 🌈🌈
+  - **TargetedRGB** - makes the aimbot target ESP rainbow 
   - **Type** - how should PlayerESP color behave. Options are self-explanatory.
-  - **RGBColor1** - oooo rainbbbowwwww, makes the esp RGB
+  - **RGBColor1** - makes the esp RGB
   - **PredictionESP Color** - what color to use for the PredictionESP box
 - **Ammo ESP/Tracers options** - displays where ammo/grenades are on the map
   - **ESP** - outlines the ammo/grenades
@@ -204,12 +204,11 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
 	- **Render Above** - renders above obstacles
 - **FOV** - controls the FOV of the game.
 - **ZoomFOV** - controls how zoomed in/out you are. default is **C** to zoom
-- **Perspective** - Allows you to switch between third and first person. Think Minecraft F5! Default bind is the DIGIT **5** (`5`), no, not f5, that refreshes the page you eggshell.
+- **Perspective** - Allows you to switch between third and first person. Default bind is **5** (`5`).
 - **Perspective Options** - options for the Perspective.
   - **Alpha Effect** - Makes your own player a bit transparent (currently affects ALL players though!).
   - **Y Offset** - offset of the camera in y-direction (how far behind should it be?)
   - **Z Offset** - offset of the camera in z-direction (how far above should it be?)
-  <!-- no X Offset? 🤨🤨 -->
 - **CamWIP** - Work-in-progress module. Not recommended if you are not a dev. 
 - **Wireframe** - outlines map objects to allow you to see directly though walls.
 - **EggSize** - changes how big eggs are. This does not affect hitboxes and is client-side 
@@ -252,7 +251,7 @@ only.
   - **Spam Text** - the message to spam.
 - **Trolling**
   - **Mock** - rudely mocks people talking in chat.
-  - **Announcer** - announces when you change GUI config. <!-- so you can rub it in more that youre superior then get banned 3 seconds later -->
+  - **Announcer** - announces when you change GUI config.
   - **AutoEZ** - gloats on people when you kill them.
   - **CheatAccuse** - accuses your killer of cheating.
 - **Join/Leave Messages**
@@ -406,16 +405,16 @@ Various account management tools
 - **Custom Macro** - allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.
 - **DoAtStartup** - executes the entered macro at client startup.
 - **RandomPath** - forces a new random path (pathfinding currently disabled).
-- **SilentRoll** - Rolls around without showing it client sided (will cause you to look up if you move your mouse however)
+- **SilentRoll** - Rolls around without showing it client sided (will cause you to look up if you move your mouse)
 - **SeizureX** - rotates the player by the specified amount around the y-axis (yaw).
 - **SeizureY** - rotates the player by the specified amount around the x-axis (pitch).
 
 ## [](#client-&-about) Client & About:
-- **HideGUI** - hides the big scary StateFarm menu. default key to do this is `H`.
+- **HideGUI** - hides the big StateFarm menu. default key to do this is `H`.
 - **Hide at Startup** - hides the StateFarm menu by default.
 - **No Console Logs** - blocks the client from sending messages to the browser console.
 - **Popups** - disables/enables popups and notifications
-- **Panic** - allows you to quickly exit to a set URL. great for hacking in class if youre that eggstravagant🥚
+- **Panic** - allows you to quickly exit to a set URL. great for hacking in class
 - **Presets**
   - **Preset List** - pick a preset from the list including the dev teams configs & apply it to get a custom configuration 
   - **Save** - saves your current settings as a preset.
@@ -456,8 +455,7 @@ Various account management tools
  - **Hydroflame521** - for founding the project.
  - **onlypuppy7** - for leading developement.
  - **porcupane**, **not_food** , **de_Neuublue**, **OakSwingZZZ**, **1ust** , **Seq** for code contributions & developement.
- - **susdung** - for the current version of the readme.
- - **portending** - for updating and keeping the current version of the readme accurate.
+ - **susdung**, **portending** - for updating and maintaining the readme.
  - **gus/yk0_0** - for some skyboxes used in StateFarm Client.
 <!-- **Zertalious** - old code in old versions. -->
 <!-- oops i commented this out! what a horrible mistake! someone should really fix this idk... -->
