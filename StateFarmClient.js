@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre147
+// @version      3.4.1-pre148
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -592,36 +592,6 @@ let attemptedInjection = false;
         };
     };
 
-    /**
-     * 
-    * @param {String} colorSelectName name of the color module. Will be used for extract. EG. aimbotColor
-    * @param {String} isRainbowName name of the rainbow checkbox mod. Will be used for extract.
-    */
-    const getColor = function(colorSelectName, isRainbowName){
-      //non rainbow
-      if(!extract(isRainbowName)) return extract(colorSelectName);
-      //rainbow
-      const time = Date.now();
-      const r = (time%1000)/1000;
-      const g = (time%2000)/2000;
-      const b = (time%3000)/3000;
-      const rS = time%2000<1000? 1-r: r;
-      const gS = time%4000<2000? 1-g: g;
-      const bS = time%6000<3000? 1-b: b;
-      const rF = Math.round(rS*255);
-      const gF = Math.round(gS*255);
-      const bF = Math.round(bS*255);
-      //hacky bc it's prob gonna get converted back to rgb but not gonna rewrite color code................................
-      const componentToHex = (c) => {
-        var hex = c.toString(16);
-        return hex.length == 1 ? "0" + hex : hex;
-      }
-      const rgbToHex = (r, g, b)=> {
-        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-      }
-      return rgbToHex(rF, gF, bF);
-    }
-
     const beginBinding = function (value) {
         if (binding == false) {
             binding = value;
@@ -1062,8 +1032,8 @@ sniping and someone sneaks up on you
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "Perspective", storeAs: "perspective", tooltip: "Allows you to switch between third and first person. Think Minecraft F5!", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "1st Person (Default)", value: "firstPerson" }, { text: "3rd Person", value: "thirdPerson" }, { text: "3rd Person (Alt)", value: "thirdPersonAlt" } ], defaultValue: "disabled", defaultBind: "Digit5", });
             initFolder({ location: tp.renderTab.pages[0], title: "Perspective Options", storeAs: "perspectiveFolder", });
-                initModule({ location: tp.perspectiveFolder, title: "Alpha Effect", storeAs: "perspectiveAlpha", tooltip: "Makes players a bit transparent when in third person", bindLocation: tp.renderTab.pages[1], });
-                tp.perspectiveFolder.addSeparator();
+                // initModule({ location: tp.perspectiveFolder, title: "Alpha Effect", storeAs: "perspectiveAlpha", tooltip: "Makes players a bit transparent when in third person", bindLocation: tp.renderTab.pages[1], });
+                // tp.perspectiveFolder.addSeparator();
                 initModule({ location: tp.perspectiveFolder, title: "Y Offset", storeAs: "perspectiveY", tooltip: "Offset of the camera in y-direction (how far behind should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 0.5});
                 initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", tooltip: "Offset of the camera in z-direction (how far above should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2});
             initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", tooltip: "Still a WIP (lazy devs lmaooooooooooo)", bindLocation: tp.renderTab.pages[1], });
@@ -1321,6 +1291,8 @@ But check out the GitHub guide.`},
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Enable Party Lights", storeAs: "partyLightsEnabled", tooltip: "🥳🥳 Let the party begin 🎉🎉", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Party Lights Intensity", storeAs: "partyLightsIntensity", tooltip: "Intensity of the party 🥳", slider: { min: 0.01, max: 20, step: 0.01 }, defaultValue: 0.5, });
+            tp.themingTab.pages[0].addSeparator();
+            initModule({ location: tp.themingTab.pages[0], title: "World Flattening", storeAs: "worldFlattening", tooltip: "Make the world F-L-A-T", slider: { min: 0.05, max: 10, step: 0.05 }, defaultValue: 1, });
             //ACCOUNT MODULES
         initFolder({ location: tp.mainPanel, title: "Accounts", storeAs: "accountsFolder", });
         initTabs({ location: tp.accountsFolder, storeAs: "accountsTab" }, [
@@ -3092,7 +3064,7 @@ z-index: 999999;
             document.body.appendChild(temp.children[0]);
         }
     });
-    function updateMiniMap(player, myPlayer) {
+    function updateRadar(player, myPlayer) {
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         // Check if a player dot with the unique ID already exists, then do flow of control
@@ -3156,6 +3128,35 @@ z-index: 999999;
             b = hue2rgb(p, q, h - 1 / 3);
         };
         return new L.BABYLON.Color3(r, g, b);
+    };
+    /**
+     * 
+     * @param {String} colorSelectName name of the color module. Will be used for extract. EG. aimbotColor
+     * @param {String} isRainbowName name of the rainbow checkbox mod. Will be used for extract.
+     */
+    const getColor = function (colorSelectName, isRainbowName) {
+        //non rainbow
+        if (!extract(isRainbowName)) return extract(colorSelectName);
+        //rainbow
+        const time = Date.now();
+        const r = (time % 1000) / 1000;
+        const g = (time % 2000) / 2000;
+        const b = (time % 3000) / 3000;
+        const rS = time % 2000 < 1000 ? 1 - r : r;
+        const gS = time % 4000 < 2000 ? 1 - g : g;
+        const bS = time % 6000 < 3000 ? 1 - b : b;
+        const rF = Math.round(rS * 255);
+        const gF = Math.round(gS * 255);
+        const bF = Math.round(bS * 255);
+        //hacky bc it's prob gonna get converted back to rgb but not gonna rewrite color code................................
+        const componentToHex = (c) => {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
+        };
+        const rgbToHex = (r, g, b) => {
+            return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        };
+        return rgbToHex(rF, gF, bF);
     };
     const applyStateFarmLogo = function () {
         if (extract("replaceLogo")) {
@@ -3434,6 +3435,7 @@ z-index: 999999;
             document.querySelector(".chat-container").scrollTop = document.querySelector(".chat-container").scrollHeight;
         };
     };
+
     var vertexVector1, vertexVector2, vertexVector3, vertexVector4, vertexVector5, vertexVector6, vertexVector7, vertexVector8;
     const updateOrCreateLinesESP = function (object, type, color) {
         let newPosition, newScene, newParent
@@ -3570,6 +3572,7 @@ z-index: 999999;
           object.tracerLines.color = new L.BABYLON.Color3(...color);
           object.box.color = new L.BABYLON.Color3(...color);
     };
+
     const obfuscateEmail = function(email) {
         const parts = email.split('@');
         const modifiedFirstPart = parts[0].substring(0, 1) +
@@ -3612,6 +3615,11 @@ z-index: 999999;
         accountRecords[currentEmail] = accountDetails;
         GM_setValue("StateFarm_AccountRecords", accountRecords);
     };
+
+    const getRoomAsString = function () {
+        return findKeyByValue(unsafeWindow.extern.GameType, unsafeWindow.vueApp.game.gameType) + ", " + unsafeWindow.vueData.currentRegionId + ", " + unsafeWindow.vueApp.game.mapName + ", team" + unsafeWindow.vueApp.game.team;
+    };
+
     const every15Seconds = function () {
         //i forgot myself what this is for
         // if (extract("debug")) log("goodness", extract("antiAFK"), extern.inGame, (document.getElementById("spectate").style.display == "none"), ss, ss.MYPLAYER, ss.MYPLAYER.ws, (!ss.MYPLAYER[H.playing]));
@@ -3622,11 +3630,6 @@ z-index: 999999;
             out.send(ss.MYPLAYER.ws);
         };
     };
-
-    const getRoomAsString = function () {
-        return findKeyByValue(unsafeWindow.extern.GameType, unsafeWindow.vueApp.game.gameType) + ", " + unsafeWindow.vueData.currentRegionId + ", " + unsafeWindow.vueApp.game.mapName + ", team" + unsafeWindow.vueApp.game.team;
-    };
-
     const everySecond = function () {
         if (extract("debug")) {
             unsafeWindow.globalSS = {};
@@ -3661,13 +3664,13 @@ z-index: 999999;
             unsafeWindow.globalSS.crosshairsPosition = crosshairsPosition;
             unsafeWindow.globalSS.predictGrenade = predictGrenade;
             unsafeWindow.globalSS.miniCamera = miniCamera;
-            unsafeWindow.globalSS.pathfindingInfo = {
-                activePath: activePath,
-                pathfindingTargetOverride: pathfindingTargetOverride,
-                activePath: activePath,
-                activeNodeTarget: activeNodeTarget,
-                mapNodes: GLOBAL_NODE_LIST,
-            };
+            // unsafeWindow.globalSS.pathfindingInfo = {
+            //     activePath: activePath,
+            //     pathfindingTargetOverride: pathfindingTargetOverride,
+            //     activePath: activePath,
+            //     activeNodeTarget: activeNodeTarget,
+            //     mapNodes: GLOBAL_NODE_LIST,
+            // };
         };
         save("DisableLogs", extract("consoleLogs"));
         if (extract('sfChatAutoStart') && !sfChatContainer){
@@ -3762,10 +3765,12 @@ z-index: 999999;
         playerinfoElement.style.display = "none";
         redCircle.style.display = "none";
         firstUseElement.style.display = "none";
+
         makeHudElementDragable(coordElement);
         makeHudElementDragable(gameInfoElement);
         makeHudElementDragable(playerstatsElement);
         makeHudElementDragable(playerinfoElement);
+
         if (extract("gameBlacklistCodes") != "" && extract("gameBlacklistCodes") != undefined) {
             let input = extract("gameBlacklistCodes");
             input = input.split(",");
@@ -3796,7 +3801,7 @@ z-index: 999999;
             `;
             document.head.appendChild(styleElement);
             annoyancesRemoved = true;
-        }
+        };
 
         const fetchAndProcessAudioFromZip = async function (zipURL) {
             try {
@@ -3936,9 +3941,10 @@ z-index: 999999;
                     };
                 };
             });
+
             // addStreamsToInGameUI(); //broken rn anyways
 
-            const pausedGameUI = document.querySelector('.paused-game-ui');
+            const pausedGameUI   = document.querySelector('.paused-game-ui');
             const hasZIndex1     = pausedGameUI.classList.contains('z-index-1');
             const hasZIndex10000 = pausedGameUI.classList.contains('z-index-10000');
             if (extract("restoreScroll") && (hasZIndex1 || !hasZIndex10000)) {
@@ -3976,7 +3982,7 @@ z-index: 999999;
                 miniCamera._skipRendering = true;
             };
         } else {
-            if ((!document.getElementById("progressBar"))) {
+            if (!document.getElementById("progressBar")) {
                 if (extract("autoJoin") && (extract("autoLogin") == "disabled" || unsafeWindow.vueApp.accountCreated !== null)) {
                     unsafeWindow.vueApp.externPlayObject(
                         (extract("joinCode").length === 7) ? 2 : 0,
@@ -4002,6 +4008,7 @@ z-index: 999999;
             if (GM_getValue("StateFarm_firstRun") !== 1) {
                 firstExecution = true;
             };
+
             if ((extract("legacyModels") !== previousLegacyModels)) {
                 let models = [3000, 3100, 3400, 3600, 3800, 4000, 4200];
                 models.forEach(ID => {
@@ -4055,7 +4062,7 @@ z-index: 999999;
         if (attemptedInjection && banPopup && unsafeWindow.vueApp?.bannedPopup?.expire && (unsafeWindow.vueApp.bannedPopup.expire !== "")) isBanned = true;
         if (isBanned && extract("autoUnban") && (!attemptedAutoUnban) && unsafeWindow.vueApp?.bannedPopup) {
             log("eep!");
-            banPopup.textContent = 'StateFarm AutoUnban:\nPLEASE RELOAD FOR THE NEXT\n20s to 1min for new database\nID for unban. Enjoy! :)\nBan message will be automatically removed from screen in 15 seconds.';
+            banPopup.textContent = 'StateFarm AutoUnban:\nYou now have a new database\nID for unban. Enjoy! :)\nBan message will be automatically removed from screen in 15 seconds.';
             unban();
             attemptedAutoUnban = true;
             createPopup("AutoUnban: Attempting to Unban...");
@@ -4150,106 +4157,16 @@ z-index: 999999;
         //block ads or something kek
         localStorage.timesPlayed = 0;
     };
-    const handleCommand = function (command) {
-        let args = command.split(" ");
-
-        switch (args[0]) {
-            case "setconfig":
-                let receivedConfig = decodeURIComponent(unsafeWindow.escape(window.atob(args[1]))); // eslint-disable-line
-                if (URLParams !== "") { receivedConfig = URLParams + "<" + receivedConfig };
-                log("StateFarm: Change in Bot Panel detected.", receivedConfig);
-                applySettings(receivedConfig);
-                configNotSet = false;
-                break;
-            case "ping":
-                createPopup("Pong! " + ((Date.now() - cachedCommandTime)) + "ms", "success");
-                break;
-            case "kill":
-                unsafeWindow.close();
-                break;
-            case "leave":
-                change("leaveGame");
-                break;
-            case "unban":
-                unban();
-                break;
-            case "newproxy":
-                newProxy();
-                break;
-            case "refresh":
-                reloadPage();
-                break;
-            case "report":
-                spamReport();
-                break;
-            case "join":
-                if (args[1]) unsafeWindow.vueApp.externPlayObject(0, 0, unsafeWindow.vueApp.playerName, -1, args[1]);
-                else alert("Invalid code");
-                break;
-            case "pathtarget": // pathfinding target
-                let option = args[1]; // eslint-disable-line
-                if (option) {
-                    if (option === "set") {
-                        let x = args[2];
-                        let y = args[3];
-                        let z = args[4];
-                        if (x && y && z) {
-                            pathfindingTargetOverride = { x: x, y: y, z: z };
-                            isFirstFrameAttemptingToPathfind = true;
-                        } else {
-                            sendChatMessage("Invalid pathtarget coordinates")
-                        };
-                    };
-                };
-                break;
-
-            case "clearpath":
-                clearPath();
-                break;
-            case "clearpath_t":
-                clearPath_andTarget();
-                break;
-            case "repeat":
-                if (args[1]) {
-                    sendChatMessage(args.slice(1).join(" "));
-                } else {
-                    sendChatMessage("Invalid repeat message");
-                }
-                break;
-            case "setpathdespawn":
-                if (args[1]) {
-                    if (args[1] === "true") {
-                        despawnIfNoPath = true;
-                    } else if (args[1] === "false") {
-                        despawnIfNoPath = false;
-                    } else if (args[1] === "toggle") {
-                        despawnIfNoPath = !despawnIfNoPath;
-                    } else {
-                        sendChatMessage("Invalid setpathdespawn argument");
-                    }
-                } else {
-                    sendChatMessage("Invalid setpathdespawn message");
-                };
-        };
-    };
-    const clearPath = function () {
-        activePath = undefined;
-        activeNodeTarget = undefined;
-    }
-    const clearPath_andTarget = function () {
-        clearPath();
-        pathfindingTargetOverride = undefined;
-    };
     const everyDecisecond = function () {
-        updateConfig(); deciSecondsPassed += 1;
+        updateConfig(); deciSecondsPassed++;
 
         if (extract("titleAnimation")) {
             if (deciSecondsPassed % 3 == 0) {
                 unsafeWindow.document.title = titleAnimationFrames[currentFrameIndex];
                 currentFrameIndex = (currentFrameIndex + 1) % titleAnimationFrames.length;
             };
-        } else {
-            unsafeWindow.document.title = "Shell Shockers 🍳 Multiplayer .io game";
+        } else if (unsafeWindow.document.title != "Shell Shockers 🍳 Multiplayer io game") {
+            unsafeWindow.document.title = "Shell Shockers 🍳 Multiplayer io game";
         };
 
         if (startUpComplete && (!unsafeWindow.extern.inGame) && extract("autoLogin") !== "disabled" && (extract("autoLogin") == "always" || extract("autoLogin") == "noaccount" && unsafeWindow.vueApp.accountCreated == null)) {
@@ -4260,7 +4177,7 @@ z-index: 999999;
             };
         };
 
-        if (ss && ss.MYPLAYER && unsafeWindow.extern.inGame) {
+        if (ss && ss?.MYPLAYER && unsafeWindow?.extern?.inGame) {
             //innertext stuff, fairly resource intensive. disable these for performance
             if (extract("playerStats")) {
                 let playerStates = "";
@@ -4298,84 +4215,84 @@ z-index: 999999;
                 coordElement.innerText = personalCoordinate;
                 void coordElement.offsetWidth;
                 coordElement.style.display = '';
-                // create an info box for the first execution, i have 69697935 iq
-                if (firstExecution == true) {
-                    firstUseElement.innerHTML = `
-                <style>
-                @font-face {
-                    font-family: "Bahnschrift";
-                    src: url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.eot");
-                    src: url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.eot?#iefix")format("embedded-opentype"),
-                    url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.woff2")format("woff2"),
-                    url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.woff")format("woff"),
-                    url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.ttf")format("truetype"),
-                    url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.svg#Bahnschrift")format("svg");
-                }
-                .overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.7);
-                    z-index: 9999;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    opacity: 1;
-                }
-                .overlay-content {
-                    text-align: center;
-                    color: white;
-                }
-                h100 {
-                    color: white;
-                    font-weight: bold;
-                    font-family: Bahnschrift;
-                    font-size: 36px;
-                }
-                a {
-                    text-decoration: none;
-                    font-family: Bahnschrift;
-                    font-size: 24px;
-                }
-                p {
-                    text-decoration: none;
-                    font-family: Bahnschrift;
-                    font-size: 15px;
-                }
-            </style>
-            </head>
-            <body>
+            };
+            // create an info box for the first execution, i have 69697935 iq
+            if (firstExecution == true) {
+                firstUseElement.innerHTML = `
+            <style>
+            @font-face {
+                font-family: "Bahnschrift";
+                src: url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.eot");
+                src: url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.eot?#iefix")format("embedded-opentype"),
+                url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.woff2")format("woff2"),
+                url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.woff")format("woff"),
+                url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.ttf")format("truetype"),
+                url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.svg#Bahnschrift")format("svg");
+            }
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                z-index: 9999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                opacity: 1;
+            }
+            .overlay-content {
+                text-align: center;
+                color: white;
+            }
+            h100 {
+                color: white;
+                font-weight: bold;
+                font-family: Bahnschrift;
+                font-size: 36px;
+            }
+            a {
+                text-decoration: none;
+                font-family: Bahnschrift;
+                font-size: 24px;
+            }
+            p {
+                text-decoration: none;
+                font-family: Bahnschrift;
+                font-size: 15px;
+            }
+        </style>
+        </head>
+        <body>
 
-                <div class="overlay">
-                    <div class="overlay-content">
-                        <h100>Welcome to StateFarmClient V3</h100>
-                        <br>
-                        <br>
-                        <a href="https://discord.gg/EMy9swEwB6">Discord&emsp;</a>
-                        <a href="https://github.com/Hydroflame522/StateFarmClient">Github&emsp;</a>
-                        <a href="https://greasyfork.org/en/scripts/482982">Greasyfork&emsp;</a>
-                        <a href="https://www.youtube.com/channel/UCGWtU3Dp3unyefuaBpwGMDw">Youtube</a>
-                        <br>
-                        <br>
-                        <p>Press 'Escape' to close</p>
-                    </div>
+            <div class="overlay">
+                <div class="overlay-content">
+                    <h100>Welcome to StateFarmClient V3</h100>
+                    <br>
+                    <br>
+                    <a href="https://discord.gg/EMy9swEwB6">Discord&emsp;</a>
+                    <a href="https://github.com/Hydroflame522/StateFarmClient">Github&emsp;</a>
+                    <a href="https://greasyfork.org/en/scripts/482982">Greasyfork&emsp;</a>
+                    <a href="https://www.youtube.com/channel/UCGWtU3Dp3unyefuaBpwGMDw">Youtube</a>
+                    <br>
+                    <br>
+                    <p>Press 'Escape' to close</p>
                 </div>
-            </body>
-                `
-                    firstUseElement.style.display = '';
-                    document.addEventListener('keydown', function (event) {
-                        if (event.keyCode === 27) {
-                            firstUseElement.style.opacity = '0';
-                            firstUseElement.style.display = "none";
-                            setTimeout(function () {
-                                firstUseElement.parentNode.removeChild(firstUseElement);
-                            }, 1000)
-                        }
-                        GM_setValue("StateFarm_firstRun", 1);
-                    });
-                }
+            </div>
+        </body>
+            `
+                firstUseElement.style.display = '';
+                document.addEventListener('keydown', function (event) {
+                    if (event.keyCode === 27) {
+                        firstUseElement.style.opacity = '0';
+                        firstUseElement.style.display = "none";
+                        setTimeout(function () {
+                            firstUseElement.parentNode.removeChild(firstUseElement);
+                        }, 1000)
+                    }
+                    GM_setValue("StateFarm_firstRun", 1);
+                });
             };
         };
         if (AUTOMATED) { //i know what youre saying looking at this. i am the greatest programmer to have ever lived
@@ -4391,10 +4308,96 @@ z-index: 999999;
             };
         };
     };
+
+    const handleCommand = function (command) {
+        let args = command.split(" ");
+
+        switch (args[0]) {
+            case "setconfig":
+                let receivedConfig = decodeURIComponent(unsafeWindow.escape(window.atob(args[1]))); // eslint-disable-line
+                if (URLParams !== "") { receivedConfig = URLParams + "<" + receivedConfig };
+                log("StateFarm: Change in Bot Panel detected.", receivedConfig);
+                applySettings(receivedConfig);
+                configNotSet = false;
+                break;
+            case "ping":
+                createPopup("Pong! " + ((Date.now() - cachedCommandTime)) + "ms", "success");
+                break;
+            case "kill":
+                unsafeWindow.close();
+                break;
+            case "leave":
+                change("leaveGame");
+                break;
+            case "unban":
+                unban();
+                break;
+            case "newproxy":
+                newProxy();
+                break;
+            case "refresh":
+                reloadPage();
+                break;
+            case "report":
+                spamReport();
+                break;
+            case "join":
+                if (args[1]) unsafeWindow.vueApp.externPlayObject(0, 0, unsafeWindow.vueApp.playerName, -1, args[1]);
+                else alert("Invalid code");
+                break;
+            case "repeat":
+                if (args[1]) {
+                    sendChatMessage(args.slice(1).join(" "));
+                } else {
+                    sendChatMessage("Invalid repeat message");
+                }
+                break;
+                /*
+            case "pathtarget": // pathfinding target
+                let option = args[1]; // eslint-disable-line
+                if (option) {
+                    if (option === "set") {
+                        let x = args[2];
+                        let y = args[3];
+                        let z = args[4];
+                        if (x && y && z) {
+                            pathfindingTargetOverride = { x: x, y: y, z: z };
+                            isFirstFrameAttemptingToPathfind = true;
+                        } else {
+                            sendChatMessage("Invalid pathtarget coordinates")
+                        };
+                    };
+                };
+                break;
+            case "clearpath":
+                clearPath();
+                break;
+            case "clearpath_t":
+                clearPath_andTarget();
+                break;
+            case "setpathdespawn":
+                if (args[1]) {
+                    if (args[1] === "true") {
+                        despawnIfNoPath = true;
+                    } else if (args[1] === "false") {
+                        despawnIfNoPath = false;
+                    } else if (args[1] === "toggle") {
+                        despawnIfNoPath = !despawnIfNoPath;
+                    } else {
+                        sendChatMessage("Invalid setpathdespawn argument");
+                    }
+                } else {
+                    sendChatMessage("Invalid setpathdespawn message");
+                };
+                */
+        };
+    };
+
     const updateConfig = function () {
         configMain = tp.mainPanel.exportPreset();
         configBots = tp.botPanel.exportPreset();
     };
+
     const updateHiddenAndDisabledHelper = function (array) { //determines if all conditions are met
         let conditionMet = false;
         array.forEach(condition => {
@@ -4404,7 +4407,7 @@ z-index: 999999;
             };
         });
         return conditionMet;
-    }
+    };
     const updateHiddenAndDisabled = function () {
         //the format for hidden/disabled modules is as follows:
         //hidden/disabled is an array of arrays. within each of the items, there is the condition required for the module to be shown
@@ -4863,6 +4866,8 @@ z-index: 999999;
 
         return data;
     };
+    //dead code
+    /*
     const is39Packet = function (packetData) { // packet only sent if we are in-game
         if (packetData instanceof String) { // avoid server comm, ping, etc. necessary to load
             return false;
@@ -4877,18 +4882,23 @@ z-index: 999999;
     };
     const ghostSpamToggle = function () { }
     ghostSpamToggle.enabled = false;
+    */
     WebSocket.prototype._send = WebSocket.prototype.send;
     WebSocket.prototype.send = function (data) {
-
         var modified = modifyPacket(data);
         this._send(modified);
 
+        /*
         if (is39Packet(data) && ghostSpamToggle.enabled) {
             for (var i = 0; i < 5; i++) {
                 this._send(constructChatPacket("spammeroonie number #" + new Date().getTime() % 1000));
             };
         };
+        */
     };
+
+    // [sfc] PREDICTION CODE
+
     const predictBloom = function (yaw, pitch) { //outputs the difference in yaw/pitch from the bloom
         let seed = ss.MYPLAYER[H.randomGen].seed;
         let numbers = [];
@@ -4907,7 +4917,8 @@ z-index: 999999;
         const bulletYaw = calculateYaw(finalBulletTranslation);
         const bulletPitch = calculatePitch(finalBulletTranslation);
         const bulletYawDiff = radianAngleDiff(yaw, bulletYaw)
-        const bulletPitchDiff = radianAngleDiff(pitch, bulletPitch)
+        const bulletPitchDiff = radianAngleDiff(pitch, bulletPitch);
+
         //log("current accuracy: ",accuracy)
         //log("input yaw: ",yaw)
         //log("input pitch: ",pitch)
@@ -5213,11 +5224,13 @@ z-index: 999999;
             };
         };
     };
-    // const updateTeamNew = function (actor, oldUpdateTeam) {
-    //     log("aaaaaa updateTeamNew");
-    //     oldUpdateTeam();
-    //     actor.nameSprite.color = ss.teamColors.textColor[0];
-    // };
+    /*
+    const updateTeamNew = function (actor, oldUpdateTeam) {
+        log("aaaaaa updateTeamNew");
+        oldUpdateTeam();
+        actor.nameSprite.color = ss.teamColors.textColor[0];
+    };
+    */
 
     const injectScript = function () {
         //TODO: replace with anon functions
@@ -5931,6 +5944,8 @@ z-index: 999999;
         };
     };
 
+    //dead code
+    /*
     JSON.safeStringify = (obj, indent = 2) => {
         let cache = [];
         const retVal = JSON.stringify(
@@ -5946,6 +5961,7 @@ z-index: 999999;
         cache = null;
         return retVal;
     };
+    */
 
     const deployBots = async () => {
         updateBotParams();
@@ -6085,7 +6101,6 @@ z-index: 999999;
     };
 
     const detectURLParams = function () {
-
         if (getSearchParam("AUTOMATED") == "true") {
             log("Automated Window!");
             AUTOMATED = true;
@@ -6095,13 +6110,15 @@ z-index: 999999;
             customSettings = customSettings.split("|");
             URLParams = customSettings[0];
             log("StateFarm: Custom Settings in URL!", URLParams);
-            // let setVars=[];
-            // let setBinds=[];
-            // if (customSettings[0]) {setVars=customSettings[0].split("<")};
-            // if (customSettings[1]) {setVars=customSettings[0].split("<")};
-            // log(setVars,setBinds);
-            // setBinds.forEach(element=>{ //not yet done
-            // });
+            /*
+            let setVars=[];
+            let setBinds=[];
+            if (customSettings[0]) {setVars=customSettings[0].split("<")};
+            if (customSettings[1]) {setVars=customSettings[0].split("<")};
+            log(setVars,setBinds);
+            setBinds.forEach(element=>{ //not yet done
+            });
+            */
         };
     };
 
@@ -6144,427 +6161,598 @@ z-index: 999999;
         return mapNames[Math.floor(Math.random() * mapNames.length)];
     };
 
-    loggedGameMap = false;
-
-    // begin pathfinding
-
-    const BinaryHeap = function(scoreFunction) {
-        this.content = [];
-        this.scoreFunction = scoreFunction;
-    };
-
-    BinaryHeap.prototype = {
-        push: function (element) {
-            // Add the new element to the end of the array.
-            this.content.push(element);
-            // Allow it to bubble up.
-            this.bubbleUp(this.content.length - 1);
-        },
-
-        rescoreElement: function (node) {
-            this.sinkDown(this.content.indexOf(node));
-        },
-
-        pop: function () {
-            // Store the first element so we can return it later.
-            var result = this.content[0];
-            // Get the element at the end of the array.
-            var end = this.content.pop();
-            // If there are any elements left, put the end element at the
-            // start, and let it sink down.
-            if (this.content.length > 0) {
-                this.content[0] = end;
-                this.sinkDown(0);
-            }
-            return result;
-        },
-
-        remove: function (node) {
-            var length = this.content.length;
-            // To remove a value, we must search through the array to find
-            // it.
-            for (var i = 0; i < length; i++) {
-                if (this.content[i] != node) continue;
-                // When it is found, the process seen in 'pop' is repeated
-                // to fill up the hole.
-                var end = this.content.pop();
-                // If the element we popped was the one we needed to remove,
-                // we're done.
-                if (i == length - 1) break;
-                // Otherwise, we replace the removed element with the popped
-                // one, and allow it to float up or sink down as appropriate.
-                this.content[i] = end;
-                this.bubbleUp(i);
-                this.sinkDown(i);
-                break;
-            }
-        },
-
-        size: function () {
-            return this.content.length;
-        },
-
-        bubbleUp: function (n) {
-            // Fetch the element that has to be moved.
-            var element = this.content[n], score = this.scoreFunction(element);
-            // When at 0, an element can not go up any further.
-            while (n > 0) {
-                // Compute the parent element's index, and fetch it.
-                var parentN = Math.floor((n + 1) / 2) - 1,
-                    parent = this.content[parentN];
-                // If the parent has a lesser score, things are in order and we
-                // are done.
-                if (score >= this.scoreFunction(parent)) break;
-
-                // Otherwise, swap the parent with the current element and
-                // continue.
-                this.content[parentN] = element;
-                this.content[n] = parent;
-                n = parentN;
-            }
-        },
-
-        includes: function (n) {
-            return this.content.includes(n);
-        },
-
-        sinkDown: function (n) {
-            // Look up the target element and its score.
-            var length = this.content.length,
-                element = this.content[n],
-                elemScore = this.scoreFunction(element);
-
-            while (true) {
-                // Compute the indices of the child elements.
-                var child2N = (n + 1) * 2, child1N = child2N - 1;
-                // This is used to store the new position of the element,
-                // if any.
-                var swap = null;
-                // If the first child exists (is inside the array)...
-                if (child1N < length) {
-                    // Look it up and compute its score.
-                    var child1 = this.content[child1N],
-                        child1Score = this.scoreFunction(child1);
-                    // If the score is less than our element's, we need to swap.
-                    if (child1Score < elemScore) swap = child1N;
-                }
-                // Do the same checks for the other child.
-                if (child2N < length) {
-                    var child2 = this.content[child2N],
-                        child2Score = this.scoreFunction(child2);
-                    if (child2Score < (swap == null ? elemScore : child1Score)) swap = child2N;
-                }
-
-                // No need to swap further, we are done.
-                if (swap == null) break;
-
-                // Otherwise, swap and continue.
-                this.content[n] = this.content[swap];
-                this.content[swap] = element;
-                n = swap;
-            };
-        }
-    };
-
-    const isNodeAir = function(item) {
-        return item.mesh === undefined
-    };
-
-    const canTravelThroughNode = function(item) {
-        return isNodeAir(item) || item.mesh.name.includes("none")
-    };
-
-    class Position {
-        constructor(x, y, z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-    }
-
-    var GLOBAL_NODE_LIST = [];
-
-    class MapNode {
-        constructor(position, linked, map) {
-            this.position = position;
-            this.linked = linked;
-            GLOBAL_NODE_LIST.push(this);
-            this.add_children_from_map_data(map);
-            this.f = undefined;
-            this.g = undefined;
-            this.h = undefined;
-        }
-        add_link(node) {
-            this.linked.push(node);
-        }
-        remove_link(node) {
-            this.linked = this.linked.filter(item => item !== node);
-        }
-        can_move(node) {
-            return this.linked.includes(node);
-        }
-        add_children_from_map_data(map_data) {
-            // for each thing around us in a 3x3x3 cube, add a link if it's air and it's not above us
-            let found_node = 0; let found_link = 0
-            for (var x = -1; x <= 1; x++) {
-                for (var y = -1; y <= 0; y++) {
-                    for (var z = -1; z <= 1; z++) {
-                        if (x == 0 && y == 0 && z == 0) {
-                            continue;
-                        };
-                        if (Math.abs(x) + Math.abs(y) + Math.abs(z) > 1) {
-                            continue;
-                        };
-                        var map_data_x = this.position.x + x;
-                        var map_data_y = this.position.y + y;
-                        var map_data_z = this.position.z + z;
-                        if (map_data_x < 0 || map_data_y < 0 || map_data_z < 0) {
-                            continue;
-
-                        };
-                        if (map_data_x >= map_data.length || map_data_y >= map_data[0].length || map_data_z >= map_data[0][0].length) {
-                            continue;
-                        };
-
-                        var attemptedNode = map_data[map_data_x][map_data_y][map_data_z];
-
-                        if (!canTravelThroughNode(attemptedNode)) {
-                            ;continue;
-                        }
-
-                        /* for the tested node:
-                            continue if:
-                                can't travel through it
-                                a nonsolid is directly below it
-                        */
-
-                        try {
-                            var node_below_checked_node = map_data[map_data_x][map_data_y - 1][map_data_z];
-                        } catch (error) {
-                            log(error)
-                            continue;
-                        };
-
-                        var is_air_directly_below = isNodeAir(node_below_checked_node); // self explanatory
-                        var is_solid_directly_below = !is_air_directly_below ? node_below_checked_node.mesh.name.includes("full") : false;
-                        var is_partial_directly_below = !is_air_directly_below && !is_solid_directly_below
-
-                        var node_directly_below_node_doing_the_checking;
-
-                        try {
-                            node_directly_below_node_doing_the_checking = map_data[this.position.x][this.position.y - 1][this.position.z];
-                        } catch (error) {
-                            log(error);
-                            node_directly_below_node_doing_the_checking = {};
-                        };
-
-                        var is_solid_directly_below_node_doing_checking = !isNodeAir(node_directly_below_node_doing_the_checking) && node_directly_below_node_doing_the_checking.mesh.name.includes("full");
-
-                        var is_valid_candidate = (
-                            is_solid_directly_below ||
-                            y == -1 && !is_partial_directly_below ||
-                            (is_air_directly_below || is_solid_directly_below) && is_solid_directly_below_node_doing_checking
-                            // TODO: when falling long distances this can cause it to crash
-                            // ideally if there's a partial below it prunes back to the start of the fall
-                            // that's hard
-                            // i just want this to work
-                        );
-
-                        if (y == -1 && !is_partial_directly_below) {
-                            // log('weird case, looking downwards to x/y/z from x/y/z', map_data_x, map_data_y, map_data_z, this.position.x, this.position.y, this.position.z, 'is air directly below?', is_air_directly_below, 'is solid directly below?', is_solid_directly_below, 'is partial directly below?', is_partial_directly_below, 'is valid candidate?', is_valid_candidate)
-                            //shit lags, lol
-                        };
-
-                        // if the node is already in the list, add a link to it. Otherwise create it and then add a link to it.
-                        // if it's air / equivalent to air we can create it (but not necessarily link to it)
-                        if (GLOBAL_NODE_LIST.some(item => item.position.x == map_data_x && item.position.y == map_data_y && item.position.z == map_data_z)) { // eslint-disable-line
-                            // ^^ this node already exists, link to it
-                            if (is_valid_candidate) {
-                                found_link++;
-                                this.add_link(GLOBAL_NODE_LIST.find(item => item.position.x == map_data_x && item.position.y == map_data_y && item.position.z == map_data_z)); // eslint-disable-line
-                                }
-
-                            } else {
-
-                                found_node++;
-
-                                var new_node = new MapNode(new Position(map_data_x, map_data_y, map_data_z), [], map_data);
-                                // the new node doesn't exist yet
-                                // we create it
-                                // if it's possible to move to we add the link
-
-                                if (is_valid_candidate) {
-                                    found_link++;
-                                    this.add_link(new_node);
-
-                                };
-                            };
-                    };
-                };
-            };
-            // log("done with recursive for node at x/y/z", this.position.x, this.position.y, this.position.z, "found", found_node, "new nodes and", found_link, "links, this is the nth node created", GLOBAL_NODE_LIST.length)
-            //shit lags, lol
-        }
-    };
-
-    const get_node_at = function(position) {
-        return GLOBAL_NODE_LIST.find(item => item.position.x == position.x && item.position.y == position.y && item.position.z == position.z);
-    };
-
-    const get_player_position = function(player) {
-        var x = Math.floor(player[H.actor][H.mesh].position.x);
-        var y = Math.floor(player[H.actor][H.mesh].position.y);
-        var z = Math.floor(player[H.actor][H.mesh].position.z);
-        return new Position(x, y, z);
-    }
-
-    const get_player_linked_nodes = function(player) {
-        var position = get_player_position(player);
-        var node = get_node_at(position);
-        if (node) {
-            return node.linked;
-        } else {
-            return [];
-        };
-    };
-
-    var map_data_created = false;
-
-    // kazowie
-
-    const TaxicabDist3D = function(pos1, pos2) {
-        return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y) + Math.abs(pos1.z - pos2.z);
-    };
-
-    const pathTo = function(node) {
-        var current = node;
-        var path = [];
-        while (current.parent) {
-            path.unshift(current);
-            if (current.parent === undefined) { log("parent undefined; path nodes successfully acquired:", path.length) }
-            current = current.parent;
-        }
-        //log("done")
-        return path;
-    };
-
-    const getHeap = function() {
-        return new BinaryHeap(function (node) {
-            return node.f;
-        });
-    };
-
-    const cleanList = function(items) {
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            item.f = undefined;
-            item.g = undefined;
-            item.h = undefined;
-            item.closed = undefined;
-            item.parent = undefined;
-            item.visited = undefined;
-        };
-    };
-
-    const AStar = function(start, goal) {
-        log("astar called")
-        cleanList(GLOBAL_NODE_LIST)
-        // start and goal are map nodes
-        // map data is the list of all the nodes
-        // each node has a .linked indicating which nodes can be traveled to from it
-        // returns a list of nodes to travel through, ordered from start to goal
-        // if no path is found, returns null
-
-        var closed_set = [];
-
-
-        var heuristic = TaxicabDist3D;
-        var open_heap = getHeap();
-
-        start.h = heuristic(start.position, goal.position);
-        start.g = 0;
-        start.f = start.g + start.h;
-
-        open_heap.push(start);
-
-
-        while (open_heap.size() != 0) {
-            var current = open_heap.pop();
-
-            if (current === goal) {
-                log("done with astar - path found")
-                var val = pathTo(current);
-                log("path length:", val.length)
-                print_node_list(val);
-                return val;
-            }
-
-            closed_set.push(current);
-
-            var neighbors = current.linked;
-
-            for (var i = 0; i < neighbors.length; i++) {
-                var neighbor = neighbors[i];
-
-                if (closed_set.includes(neighbor)) {
-                    continue;
-                }
-
-                var tentative_g_score = current.g + 1;
-                var visited = neighbor.visited;
-                if (!visited || tentative_g_score < neighbor.g) {
-                    neighbor.visited = true;
-                    neighbor.parent = current;
-                    neighbor.g = tentative_g_score;
-                    neighbor.h = heuristic(neighbor.position, goal.position);
-                    neighbor.f = neighbor.g + neighbor.h;
-                    if (!visited) {
-                        open_heap.push(neighbor);
-                    } else {
-                        open_heap.rescoreElement(neighbor);
-                    };
-                };
-            };
-        };
-
-        log("done with astar - no path found")
-        // return null if no path has been found
-        return null
-    };
-
-    const print_node_list = function(list) {
-        var output = "";
-        log("printing node list, length:", list.length, "list:", list);
-        for (var i = 0; i < list.length; i++) {
-            output += list[i].position.x + ", " + list[i].position.y + ", " + list[i].position.z + "\n";
-        };
-        log(output);
-    };
-
-    const create_red_line_between_nodes = function(ss, node1, node2) {
-        // const tracerLines = L.BABYLON.MeshBuilder.CreateLines("tracerLines", { points: [newPosition, crosshairsPosition] }, newScene);
-        let pos1 = [node1.position.x - 0.5, node1.position.y - 0.5, node1.position.z - 0.5];
-        let pos2 = [node2.position.x - 0.5, node2.position.y - 0.5, node2.position.z - 0.5];
-        if (window.pathLines === undefined) {
-            let node_lines = L.BABYLON.MeshBuilder.CreateLines(new Date().getTime().toString(), { points: [ss.MYPLAYER[H.actor][H.mesh].position, pos2] }, ss.MYPLAYER[H.actor].scene);
-            node_lines.color = new L.BABYLON.Color3(1, 0, 0);
-            node_lines.renderingGroupId = 1;
-            window.pathLines = [node_lines];
-        } else {
-            let node_lines = L.BABYLON.MeshBuilder.CreateLines(new Date().getTime().toString(), { points: [ss.MYPLAYER[H.actor][H.mesh].position, pos2] }, ss.MYPLAYER[H.actor].scene);
-            node_lines.color = new L.BABYLON.Color3(1, 0, 0);
-            node_lines.renderingGroupId = 1;
-            window.pathLines.push(node_lines);
-        };
-    };
-
-    const create_pathfinding_lines = function(ss, path) {
-        for (var i = 0; i < path.length - 1; i++) {
-            create_red_line_between_nodes(ss, path[i], path[i + 1]);
-        };
-    };
-
-    // end pathfinding
+    //dead code (for now ig)
+
+    // const pathfindingCode = function () { //wrapped in a function just to stop its execution
+    //     loggedGameMap = false;
+    
+    //     // begin pathfinding
+    
+    //     const BinaryHeap = function(scoreFunction) {
+    //         this.content = [];
+    //         this.scoreFunction = scoreFunction;
+    //     };
+    
+    //     BinaryHeap.prototype = {
+    //         push: function (element) {
+    //             // Add the new element to the end of the array.
+    //             this.content.push(element);
+    //             // Allow it to bubble up.
+    //             this.bubbleUp(this.content.length - 1);
+    //         },
+    
+    //         rescoreElement: function (node) {
+    //             this.sinkDown(this.content.indexOf(node));
+    //         },
+    
+    //         pop: function () {
+    //             // Store the first element so we can return it later.
+    //             var result = this.content[0];
+    //             // Get the element at the end of the array.
+    //             var end = this.content.pop();
+    //             // If there are any elements left, put the end element at the
+    //             // start, and let it sink down.
+    //             if (this.content.length > 0) {
+    //                 this.content[0] = end;
+    //                 this.sinkDown(0);
+    //             }
+    //             return result;
+    //         },
+    
+    //         remove: function (node) {
+    //             var length = this.content.length;
+    //             // To remove a value, we must search through the array to find
+    //             // it.
+    //             for (var i = 0; i < length; i++) {
+    //                 if (this.content[i] != node) continue;
+    //                 // When it is found, the process seen in 'pop' is repeated
+    //                 // to fill up the hole.
+    //                 var end = this.content.pop();
+    //                 // If the element we popped was the one we needed to remove,
+    //                 // we're done.
+    //                 if (i == length - 1) break;
+    //                 // Otherwise, we replace the removed element with the popped
+    //                 // one, and allow it to float up or sink down as appropriate.
+    //                 this.content[i] = end;
+    //                 this.bubbleUp(i);
+    //                 this.sinkDown(i);
+    //                 break;
+    //             }
+    //         },
+    
+    //         size: function () {
+    //             return this.content.length;
+    //         },
+    
+    //         bubbleUp: function (n) {
+    //             // Fetch the element that has to be moved.
+    //             var element = this.content[n], score = this.scoreFunction(element);
+    //             // When at 0, an element can not go up any further.
+    //             while (n > 0) {
+    //                 // Compute the parent element's index, and fetch it.
+    //                 var parentN = Math.floor((n + 1) / 2) - 1,
+    //                     parent = this.content[parentN];
+    //                 // If the parent has a lesser score, things are in order and we
+    //                 // are done.
+    //                 if (score >= this.scoreFunction(parent)) break;
+    
+    //                 // Otherwise, swap the parent with the current element and
+    //                 // continue.
+    //                 this.content[parentN] = element;
+    //                 this.content[n] = parent;
+    //                 n = parentN;
+    //             }
+    //         },
+    
+    //         includes: function (n) {
+    //             return this.content.includes(n);
+    //         },
+    
+    //         sinkDown: function (n) {
+    //             // Look up the target element and its score.
+    //             var length = this.content.length,
+    //                 element = this.content[n],
+    //                 elemScore = this.scoreFunction(element);
+    
+    //             while (true) {
+    //                 // Compute the indices of the child elements.
+    //                 var child2N = (n + 1) * 2, child1N = child2N - 1;
+    //                 // This is used to store the new position of the element,
+    //                 // if any.
+    //                 var swap = null;
+    //                 // If the first child exists (is inside the array)...
+    //                 if (child1N < length) {
+    //                     // Look it up and compute its score.
+    //                     var child1 = this.content[child1N],
+    //                         child1Score = this.scoreFunction(child1);
+    //                     // If the score is less than our element's, we need to swap.
+    //                     if (child1Score < elemScore) swap = child1N;
+    //                 }
+    //                 // Do the same checks for the other child.
+    //                 if (child2N < length) {
+    //                     var child2 = this.content[child2N],
+    //                         child2Score = this.scoreFunction(child2);
+    //                     if (child2Score < (swap == null ? elemScore : child1Score)) swap = child2N;
+    //                 }
+    
+    //                 // No need to swap further, we are done.
+    //                 if (swap == null) break;
+    
+    //                 // Otherwise, swap and continue.
+    //                 this.content[n] = this.content[swap];
+    //                 this.content[swap] = element;
+    //                 n = swap;
+    //             };
+    //         }
+    //     };
+    
+    //     const isNodeAir = function(item) {
+    //         return item.mesh === undefined
+    //     };
+    
+    //     const canTravelThroughNode = function(item) {
+    //         return isNodeAir(item) || item.mesh.name.includes("none")
+    //     };
+    
+    //     class Position {
+    //         constructor(x, y, z) {
+    //             this.x = x;
+    //             this.y = y;
+    //             this.z = z;
+    //         }
+    //     }
+    
+    //     var GLOBAL_NODE_LIST = [];
+    
+    //     class MapNode {
+    //         constructor(position, linked, map) {
+    //             this.position = position;
+    //             this.linked = linked;
+    //             GLOBAL_NODE_LIST.push(this);
+    //             this.add_children_from_map_data(map);
+    //             this.f = undefined;
+    //             this.g = undefined;
+    //             this.h = undefined;
+    //         }
+    //         add_link(node) {
+    //             this.linked.push(node);
+    //         }
+    //         remove_link(node) {
+    //             this.linked = this.linked.filter(item => item !== node);
+    //         }
+    //         can_move(node) {
+    //             return this.linked.includes(node);
+    //         }
+    //         add_children_from_map_data(map_data) {
+    //             // for each thing around us in a 3x3x3 cube, add a link if it's air and it's not above us
+    //             let found_node = 0; let found_link = 0
+    //             for (var x = -1; x <= 1; x++) {
+    //                 for (var y = -1; y <= 0; y++) {
+    //                     for (var z = -1; z <= 1; z++) {
+    //                         if (x == 0 && y == 0 && z == 0) {
+    //                             continue;
+    //                         };
+    //                         if (Math.abs(x) + Math.abs(y) + Math.abs(z) > 1) {
+    //                             continue;
+    //                         };
+    //                         var map_data_x = this.position.x + x;
+    //                         var map_data_y = this.position.y + y;
+    //                         var map_data_z = this.position.z + z;
+    //                         if (map_data_x < 0 || map_data_y < 0 || map_data_z < 0) {
+    //                             continue;
+    
+    //                         };
+    //                         if (map_data_x >= map_data.length || map_data_y >= map_data[0].length || map_data_z >= map_data[0][0].length) {
+    //                             continue;
+    //                         };
+    
+    //                         var attemptedNode = map_data[map_data_x][map_data_y][map_data_z];
+    
+    //                         if (!canTravelThroughNode(attemptedNode)) {
+    //                             ;continue;
+    //                         }
+    
+    //                         /* for the tested node:
+    //                             continue if:
+    //                                 can't travel through it
+    //                                 a nonsolid is directly below it
+    //                         */
+    
+    //                         try {
+    //                             var node_below_checked_node = map_data[map_data_x][map_data_y - 1][map_data_z];
+    //                         } catch (error) {
+    //                             log(error)
+    //                             continue;
+    //                         };
+    
+    //                         var is_air_directly_below = isNodeAir(node_below_checked_node); // self explanatory
+    //                         var is_solid_directly_below = !is_air_directly_below ? node_below_checked_node.mesh.name.includes("full") : false;
+    //                         var is_partial_directly_below = !is_air_directly_below && !is_solid_directly_below
+    
+    //                         var node_directly_below_node_doing_the_checking;
+    
+    //                         try {
+    //                             node_directly_below_node_doing_the_checking = map_data[this.position.x][this.position.y - 1][this.position.z];
+    //                         } catch (error) {
+    //                             log(error);
+    //                             node_directly_below_node_doing_the_checking = {};
+    //                         };
+    
+    //                         var is_solid_directly_below_node_doing_checking = !isNodeAir(node_directly_below_node_doing_the_checking) && node_directly_below_node_doing_the_checking.mesh.name.includes("full");
+    
+    //                         var is_valid_candidate = (
+    //                             is_solid_directly_below ||
+    //                             y == -1 && !is_partial_directly_below ||
+    //                             (is_air_directly_below || is_solid_directly_below) && is_solid_directly_below_node_doing_checking
+    //                             // TODO: when falling long distances this can cause it to crash
+    //                             // ideally if there's a partial below it prunes back to the start of the fall
+    //                             // that's hard
+    //                             // i just want this to work
+    //                         );
+    
+    //                         if (y == -1 && !is_partial_directly_below) {
+    //                             // log('weird case, looking downwards to x/y/z from x/y/z', map_data_x, map_data_y, map_data_z, this.position.x, this.position.y, this.position.z, 'is air directly below?', is_air_directly_below, 'is solid directly below?', is_solid_directly_below, 'is partial directly below?', is_partial_directly_below, 'is valid candidate?', is_valid_candidate)
+    //                             //shit lags, lol
+    //                         };
+    
+    //                         // if the node is already in the list, add a link to it. Otherwise create it and then add a link to it.
+    //                         // if it's air / equivalent to air we can create it (but not necessarily link to it)
+    //                         if (GLOBAL_NODE_LIST.some(item => item.position.x == map_data_x && item.position.y == map_data_y && item.position.z == map_data_z)) { // eslint-disable-line
+    //                             // ^^ this node already exists, link to it
+    //                             if (is_valid_candidate) {
+    //                                 found_link++;
+    //                                 this.add_link(GLOBAL_NODE_LIST.find(item => item.position.x == map_data_x && item.position.y == map_data_y && item.position.z == map_data_z)); // eslint-disable-line
+    //                                 }
+    
+    //                             } else {
+    
+    //                                 found_node++;
+    
+    //                                 var new_node = new MapNode(new Position(map_data_x, map_data_y, map_data_z), [], map_data);
+    //                                 // the new node doesn't exist yet
+    //                                 // we create it
+    //                                 // if it's possible to move to we add the link
+    
+    //                                 if (is_valid_candidate) {
+    //                                     found_link++;
+    //                                     this.add_link(new_node);
+    
+    //                                 };
+    //                             };
+    //                     };
+    //                 };
+    //             };
+    //             // log("done with recursive for node at x/y/z", this.position.x, this.position.y, this.position.z, "found", found_node, "new nodes and", found_link, "links, this is the nth node created", GLOBAL_NODE_LIST.length)
+    //             //shit lags, lol
+    //         }
+    //     };
+    
+    //     const get_node_at = function(position) {
+    //         return GLOBAL_NODE_LIST.find(item => item.position.x == position.x && item.position.y == position.y && item.position.z == position.z);
+    //     };
+    
+    //     const get_player_position = function(player) {
+    //         var x = Math.floor(player[H.actor][H.mesh].position.x);
+    //         var y = Math.floor(player[H.actor][H.mesh].position.y);
+    //         var z = Math.floor(player[H.actor][H.mesh].position.z);
+    //         return new Position(x, y, z);
+    //     }
+    
+    //     const get_player_linked_nodes = function(player) {
+    //         var position = get_player_position(player);
+    //         var node = get_node_at(position);
+    //         if (node) {
+    //             return node.linked;
+    //         } else {
+    //             return [];
+    //         };
+    //     };
+    
+    //     var map_data_created = false;
+    
+    //     // kazowie
+    
+    //     const TaxicabDist3D = function(pos1, pos2) {
+    //         return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y) + Math.abs(pos1.z - pos2.z);
+    //     };
+    
+    //     const pathTo = function(node) {
+    //         var current = node;
+    //         var path = [];
+    //         while (current.parent) {
+    //             path.unshift(current);
+    //             if (current.parent === undefined) { log("parent undefined; path nodes successfully acquired:", path.length) }
+    //             current = current.parent;
+    //         }
+    //         //log("done")
+    //         return path;
+    //     };
+    
+    //     const getHeap = function() {
+    //         return new BinaryHeap(function (node) {
+    //             return node.f;
+    //         });
+    //     };
+    
+    //     const cleanList = function(items) {
+    //         for (var i = 0; i < items.length; i++) {
+    //             var item = items[i];
+    //             item.f = undefined;
+    //             item.g = undefined;
+    //             item.h = undefined;
+    //             item.closed = undefined;
+    //             item.parent = undefined;
+    //             item.visited = undefined;
+    //         };
+    //     };
+    
+    //     const AStar = function(start, goal) {
+    //         log("astar called")
+    //         cleanList(GLOBAL_NODE_LIST)
+    //         // start and goal are map nodes
+    //         // map data is the list of all the nodes
+    //         // each node has a .linked indicating which nodes can be traveled to from it
+    //         // returns a list of nodes to travel through, ordered from start to goal
+    //         // if no path is found, returns null
+    
+    //         var closed_set = [];
+    
+    
+    //         var heuristic = TaxicabDist3D;
+    //         var open_heap = getHeap();
+    
+    //         start.h = heuristic(start.position, goal.position);
+    //         start.g = 0;
+    //         start.f = start.g + start.h;
+    
+    //         open_heap.push(start);
+    
+    
+    //         while (open_heap.size() != 0) {
+    //             var current = open_heap.pop();
+    
+    //             if (current === goal) {
+    //                 log("done with astar - path found")
+    //                 var val = pathTo(current);
+    //                 log("path length:", val.length)
+    //                 print_node_list(val);
+    //                 return val;
+    //             }
+    
+    //             closed_set.push(current);
+    
+    //             var neighbors = current.linked;
+    
+    //             for (var i = 0; i < neighbors.length; i++) {
+    //                 var neighbor = neighbors[i];
+    
+    //                 if (closed_set.includes(neighbor)) {
+    //                     continue;
+    //                 }
+    
+    //                 var tentative_g_score = current.g + 1;
+    //                 var visited = neighbor.visited;
+    //                 if (!visited || tentative_g_score < neighbor.g) {
+    //                     neighbor.visited = true;
+    //                     neighbor.parent = current;
+    //                     neighbor.g = tentative_g_score;
+    //                     neighbor.h = heuristic(neighbor.position, goal.position);
+    //                     neighbor.f = neighbor.g + neighbor.h;
+    //                     if (!visited) {
+    //                         open_heap.push(neighbor);
+    //                     } else {
+    //                         open_heap.rescoreElement(neighbor);
+    //                     };
+    //                 };
+    //             };
+    //         };
+    
+    //         log("done with astar - no path found")
+    //         // return null if no path has been found
+    //         return null
+    //     };
+    
+    //     const print_node_list = function(list) {
+    //         var output = "";
+    //         log("printing node list, length:", list.length, "list:", list);
+    //         for (var i = 0; i < list.length; i++) {
+    //             output += list[i].position.x + ", " + list[i].position.y + ", " + list[i].position.z + "\n";
+    //         };
+    //         log(output);
+    //     };
+    
+    //     const create_red_line_between_nodes = function(ss, node1, node2) {
+    //         // const tracerLines = L.BABYLON.MeshBuilder.CreateLines("tracerLines", { points: [newPosition, crosshairsPosition] }, newScene);
+    //         let pos1 = [node1.position.x - 0.5, node1.position.y - 0.5, node1.position.z - 0.5];
+    //         let pos2 = [node2.position.x - 0.5, node2.position.y - 0.5, node2.position.z - 0.5];
+    //         if (window.pathLines === undefined) {
+    //             let node_lines = L.BABYLON.MeshBuilder.CreateLines(new Date().getTime().toString(), { points: [ss.MYPLAYER[H.actor][H.mesh].position, pos2] }, ss.MYPLAYER[H.actor].scene);
+    //             node_lines.color = new L.BABYLON.Color3(1, 0, 0);
+    //             node_lines.renderingGroupId = 1;
+    //             window.pathLines = [node_lines];
+    //         } else {
+    //             let node_lines = L.BABYLON.MeshBuilder.CreateLines(new Date().getTime().toString(), { points: [ss.MYPLAYER[H.actor][H.mesh].position, pos2] }, ss.MYPLAYER[H.actor].scene);
+    //             node_lines.color = new L.BABYLON.Color3(1, 0, 0);
+    //             node_lines.renderingGroupId = 1;
+    //             window.pathLines.push(node_lines);
+    //         };
+    //     };
+    
+    //     const create_pathfinding_lines = function(ss, path) {
+    //         for (var i = 0; i < path.length - 1; i++) {
+    //             create_red_line_between_nodes(ss, path[i], path[i + 1]);
+    //         };
+    //     };
+    
+    //     // end pathfinding
+
+    //     const createMapData = function () {
+    //         if (!map_data_created) {
+    //             log("Creating map data");
+    //             new MapNode(new Position(ss.GAMEMAP.data.length - 1, ss.GAMEMAP.data[0].length - 1, ss.GAMEMAP.data[0][0].length - 1), [], ss.GAMEMAP.data);
+    //             map_data_created = true;
+    //             return true;
+    //         }
+    //     }
+
+    //     const mapStuff = function () {
+
+    //         //log("node = " + get_node_at(get_player_position(ss.MYPLAYER)), "nodelist len = " + GLOBAL_NODE_LIST.length);
+
+    //         if (findNewPath && !activePath && !activeNodeTarget && get_node_at(get_player_position(ss.MYPLAYER))) {
+
+    //             let player_pos = get_player_position(ss.MYPLAYER);
+    //             let player_node = get_node_at(player_pos);
+    //             if (player_node) {
+    //                 let position = {
+    //                     x: player_pos.x + Math.floor(Math.random() * 5) - 1,
+    //                     y: player_pos.y,
+    //                     z: player_pos.z + Math.floor(Math.random() * 5) - 1
+    //                 }
+    //                 // check if node at position exists
+    //                 let random_node = get_node_at(position);
+
+    //                 if (!(player_node === random_node) && random_node) {
+    //                     log("location, target:")
+    //                     print_node_list([player_node, random_node])
+    //                     activePath = AStar(player_node, random_node);
+    //                     if (activePath) {
+    //                         log("setting active node target");
+    //                         print_node_list(activePath);
+    //                         activeNodeTarget = activePath[0];
+    //                         log("list printed, target set, creating pathfinding lines")
+    //                         create_pathfinding_lines(ss, activePath);
+    //                         findNewPath = false;
+    //                         log("found path to random node")
+    //                     } else {
+    //                         log("unable to find path to random node")
+    //                     }
+    //                 } else {
+    //                     log("player node / random node not air")
+    //                 }
+    //             } else {
+    //                 log("player not on air node currently")
+    //             }
+    //         }
+
+
+    //         if (pathfindingTargetOverride !== undefined) {
+    //             createMapData();
+    //             let player_node = get_node_at(get_player_position(ss.MYPLAYER));
+    //             let target_node = get_node_at(pathfindingTargetOverride);
+    //             if (player_node && target_node && !activePath) {
+    //                 let path = AStar(player_node, target_node);
+
+    //                 if (path) {
+    //                     if (path.length > 0) {
+    //                         activePath = path;
+    //                         activeNodeTarget = path[0];
+    //                     } else {
+    //                         log('already at target')
+    //                         activePath = null;
+    //                         activeNodeTarget = null;
+    //                         pathfindingTargetOverride = undefined;
+    //                     }
+    //                 } else {
+    //                     if (despawnIfNoPath) {
+    //                         sendChatMessage("despawnIfNoPath");
+    //                     }
+    //                 }
+    //             } else {
+    //                 if (!activePath) {
+    //                     if (player_node) {
+    //                         log("playernode good")
+    //                     }
+    //                     if (target_node) {
+    //                         log("targetnode good")
+    //                     }
+    //                     if (!player_node) {
+    //                         log("playernode bad")
+    //                     }
+    //                     if (!target_node) {
+    //                         log("targetnode bad")
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         if (activeNodeTarget && activePath) {
+    //             //log("found target and path");
+    //             let player_node = get_node_at(get_player_position(ss.MYPLAYER));
+    //             if (player_node == activeNodeTarget || activePath.includes(player_node)) { // if we are at the target or have somehow skipped ahead in the list
+    //                 if (player_node == activeNodeTarget) {
+    //                     activeNodeTarget = activePath.shift();
+    //                     log("update target");
+    //                     if (activePath.length == 0) {
+    //                         log("path completed");
+    //                         activePath = null;
+    //                         activeNodeTarget = null;
+    //                         pathfindingTargetOverride = undefined;
+    //                     }
+    //                 } else {
+    //                     while (activePath.includes(player_node)) {
+    //                         activeNodeTarget = activePath.shift();
+    //                     }
+    //                     if (activePath.length == 0) {
+    //                         log("path completed");
+    //                         activePath = null;
+    //                         activeNodeTarget = null;
+    //                         pathfindingTargetOverride = undefined;
+    //                     }
+
+    //                 }
+    //             } else {
+    //                 //log("not at target");
+    //             }
+    //             /* if (!(activePath.includes(get_node_at(get_player_position(ss.MYPLAYER))))) { // went off path somehow, need to find new path
+    //                 findNewPath = true;
+    //                 activePath = null;
+    //                 activeNodeTarget = null;
+    //                 log("went off path, finding new path")
+    //             } */
+    //         }
+
+    //         if (activeNodeTarget) {
+    //             // look towards the node
+    //             if (isFirstFrameAttemptingToPathfind) {
+    //                 /* let vec = new L.BABYLON.Vector3(0, 0, 1)
+    //                 let calcYaw = calculateYaw(vec);
+    //                 let calcPitch = calculatePitch(vec);
+    //                 ss.MYPLAYER[H.yaw] = 0;
+    //                 ss.MYPLAYER[H.pitch] = 0; */
+    //                 isFirstFrameAttemptingToPathfind = false;
+
+    //             } else {
+    //                 //log("looking towards node");
+
+    //                 let playerPosition = get_player_position(ss.MYPLAYER);
+    //                 let directionVector = new L.BABYLON.Vector3(activeNodeTarget.position.x - playerPosition.x, activeNodeTarget.position.y - playerPosition.y, activeNodeTarget.position.z - playerPosition.z);
+    //                 /* log(`
+    //                 --PATHING UPDATE--
+    //                 target: ${activeNodeTarget.position.x}, ${activeNodeTarget.position.y}, ${activeNodeTarget.position.z}
+    //                 current: ${playerPosition.x}, ${playerPosition.y}, ${playerPosition.z}
+    //                 directionVector: ${directionVector.x}, ${directionVector.y}, ${directionVector.z}
+    //                     calc yaw: ${calculateYaw(directionVector)}
+    //                 targ -> current diff:
+    //                     `) */
+    //                 //shit lags, lol
+    //                 ss.MYPLAYER[H.yaw] = calculateYaw(directionVector);
+    //                 ss.MYPLAYER[H.pitch] = 0;
+    //                 forceControlKeys = ss.CONTROLKEYSENUM.up;
+    //             }
+    //         };
+    //     };
+        
+    //     const clearPath = function () {
+    //         activePath = undefined;
+    //         activeNodeTarget = undefined;
+    //     };
+    //     const clearPath_andTarget = function () {
+    //         clearPath();
+    //         pathfindingTargetOverride = undefined;
+    //     };
+    // };
+
 
     const findKeyWithProperty = function (obj, propertyToFind) {
         for (const key in obj) {
@@ -6633,162 +6821,7 @@ z-index: 999999;
             };
         };
 
-        const createMapData = function () {
-            if (!map_data_created) {
-                log("Creating map data");
-                new MapNode(new Position(ss.GAMEMAP.data.length - 1, ss.GAMEMAP.data[0].length - 1, ss.GAMEMAP.data[0][0].length - 1), [], ss.GAMEMAP.data);
-                map_data_created = true;
-                return true;
-            }
-        }
 
-        const mapStuff = function () {
-
-            //log("node = " + get_node_at(get_player_position(ss.MYPLAYER)), "nodelist len = " + GLOBAL_NODE_LIST.length);
-
-            if (findNewPath && !activePath && !activeNodeTarget && get_node_at(get_player_position(ss.MYPLAYER))) {
-
-                let player_pos = get_player_position(ss.MYPLAYER);
-                let player_node = get_node_at(player_pos);
-                if (player_node) {
-                    let position = {
-                        x: player_pos.x + Math.floor(Math.random() * 5) - 1,
-                        y: player_pos.y,
-                        z: player_pos.z + Math.floor(Math.random() * 5) - 1
-                    }
-                    // check if node at position exists
-                    let random_node = get_node_at(position);
-
-                    if (!(player_node === random_node) && random_node) {
-                        log("location, target:")
-                        print_node_list([player_node, random_node])
-                        activePath = AStar(player_node, random_node);
-                        if (activePath) {
-                            log("setting active node target");
-                            print_node_list(activePath);
-                            activeNodeTarget = activePath[0];
-                            log("list printed, target set, creating pathfinding lines")
-                            create_pathfinding_lines(ss, activePath);
-                            findNewPath = false;
-                            log("found path to random node")
-                        } else {
-                            log("unable to find path to random node")
-                        }
-                    } else {
-                        log("player node / random node not air")
-                    }
-                } else {
-                    log("player not on air node currently")
-                }
-            }
-
-
-            if (pathfindingTargetOverride !== undefined) {
-                createMapData();
-                let player_node = get_node_at(get_player_position(ss.MYPLAYER));
-                let target_node = get_node_at(pathfindingTargetOverride);
-                if (player_node && target_node && !activePath) {
-                    let path = AStar(player_node, target_node);
-
-                    if (path) {
-                        if (path.length > 0) {
-                            activePath = path;
-                            activeNodeTarget = path[0];
-                        } else {
-                            log('already at target')
-                            activePath = null;
-                            activeNodeTarget = null;
-                            pathfindingTargetOverride = undefined;
-                        }
-                    } else {
-                        if (despawnIfNoPath) {
-                            sendChatMessage("despawnIfNoPath");
-                        }
-                    }
-                } else {
-                    if (!activePath) {
-                        if (player_node) {
-                            log("playernode good")
-                        }
-                        if (target_node) {
-                            log("targetnode good")
-                        }
-                        if (!player_node) {
-                            log("playernode bad")
-                        }
-                        if (!target_node) {
-                            log("targetnode bad")
-                        }
-                    }
-                }
-            }
-
-            if (activeNodeTarget && activePath) {
-                //log("found target and path");
-                let player_node = get_node_at(get_player_position(ss.MYPLAYER));
-                if (player_node == activeNodeTarget || activePath.includes(player_node)) { // if we are at the target or have somehow skipped ahead in the list
-                    if (player_node == activeNodeTarget) {
-                        activeNodeTarget = activePath.shift();
-                        log("update target");
-                        if (activePath.length == 0) {
-                            log("path completed");
-                            activePath = null;
-                            activeNodeTarget = null;
-                            pathfindingTargetOverride = undefined;
-                        }
-                    } else {
-                        while (activePath.includes(player_node)) {
-                            activeNodeTarget = activePath.shift();
-                        }
-                        if (activePath.length == 0) {
-                            log("path completed");
-                            activePath = null;
-                            activeNodeTarget = null;
-                            pathfindingTargetOverride = undefined;
-                        }
-
-                    }
-                } else {
-                    //log("not at target");
-                }
-                /* if (!(activePath.includes(get_node_at(get_player_position(ss.MYPLAYER))))) { // went off path somehow, need to find new path
-                    findNewPath = true;
-                    activePath = null;
-                    activeNodeTarget = null;
-                    log("went off path, finding new path")
-                } */
-            }
-
-            if (activeNodeTarget) {
-                // look towards the node
-                if (isFirstFrameAttemptingToPathfind) {
-                    /* let vec = new L.BABYLON.Vector3(0, 0, 1)
-                    let calcYaw = calculateYaw(vec);
-                    let calcPitch = calculatePitch(vec);
-                    ss.MYPLAYER[H.yaw] = 0;
-                    ss.MYPLAYER[H.pitch] = 0; */
-                    isFirstFrameAttemptingToPathfind = false;
-
-                } else {
-                    //log("looking towards node");
-
-                    let playerPosition = get_player_position(ss.MYPLAYER);
-                    let directionVector = new L.BABYLON.Vector3(activeNodeTarget.position.x - playerPosition.x, activeNodeTarget.position.y - playerPosition.y, activeNodeTarget.position.z - playerPosition.z);
-                    /* log(`
-                    --PATHING UPDATE--
-                    target: ${activeNodeTarget.position.x}, ${activeNodeTarget.position.y}, ${activeNodeTarget.position.z}
-                    current: ${playerPosition.x}, ${playerPosition.y}, ${playerPosition.z}
-                    directionVector: ${directionVector.x}, ${directionVector.y}, ${directionVector.z}
-                        calc yaw: ${calculateYaw(directionVector)}
-                    targ -> current diff:
-                        `) */
-                    //shit lags, lol
-                    ss.MYPLAYER[H.yaw] = calculateYaw(directionVector);
-                    ss.MYPLAYER[H.pitch] = 0;
-                    forceControlKeys = ss.CONTROLKEYSENUM.up;
-                }
-            };
-        };
         const initVars = function () {
 
             isBanned = false; //cant be banned if in a game /shrug
@@ -7222,18 +7255,18 @@ z-index: 999999;
 
         const applySkybox = () => {
             //check if we should switch
-            const delta2 = Date.now()-lastRandomSkyBoxChangeTime;
-            const desire = extract("randomSkyBoxInterval")? extract("randomSkyBoxInterval")*60*1000 : -1; //stored in minutes, so *60 -> seconds *1000 -> milliseconds.
-            if(
-                extract("randomSkyBox") 
-                &&delta2!=-1
-                &&delta2>desire
-            ){
-                const newIdx = randomInt(0, loadedSkyboxes.length-1);
-                log("skybox change overdue for " +(delta2-desire)+ "ms. New skybox index chosen: " +newIdx);
+            const delta2 = Date.now() - lastRandomSkyBoxChangeTime;
+            const desire = extract("randomSkyBoxInterval") ? extract("randomSkyBoxInterval") * 60 * 1000 : -1; //stored in minutes, so *60 -> seconds *1000 -> milliseconds.
+            if (
+                extract("randomSkyBox") &&
+                delta2 != -1 &&
+                delta2 > desire
+            ) {
+                const newIdx = randomInt(0, loadedSkyboxes.length - 1);
+                log("skybox change overdue for " + (delta2 - desire) + "ms. New skybox index chosen: " + newIdx);
                 change("skybox", newIdx); //maybe not the best to overwrite the actual module setting, but eh, don't want to rewrite the entire thing....
                 lastRandomSkyBoxChangeTime = Date.now();
-            }
+            };
             if (!unsafeWindow[skyboxName]) return;
             if (!(extract('skybox') === 'default' || extract('skybox') === true || ss.SCENE.skyboxTextureThing == extract('skybox'))) {
                 let url = `${atob(extract("skybox"))}/skybox`;
@@ -7246,15 +7279,12 @@ z-index: 999999;
         createAnonFunction("STATEFARM", function () {
             ss.PLAYERS.forEach((PLAYER) => (PLAYER.hasOwnProperty("ws")) ? (ss.MYPLAYER = PLAYER) : null);
 
-            ss.PLAYERS.forEach((PLAYER) => {
-            });
-
             if (!ranOneTime) {
                 oneTime();
             } else if (typeof (L.BABYLON) !== 'undefined') {
                 initVars();
                 updateLinesESP();
-                mapStuff();
+                // mapStuff();
                 applySkybox();
 
                 let isVisible;
@@ -7266,7 +7296,7 @@ z-index: 999999;
 
                 if (extract("radar")) {
                     myPlayerDot.style.display = 'block';
-                    ss.PLAYERS.forEach(player => { updateMiniMap(player, ss.MYPLAYER) });
+                    ss.PLAYERS.forEach(player => { updateRadar(player, ss.MYPLAYER) });
                 } else {
                     ss.PLAYERS.forEach(player => {
                         if (playerDotsMap.has(player.uniqueId)) {
@@ -7298,7 +7328,7 @@ z-index: 999999;
 
                         // log(percentage, finalFov, ourFov, currentFov);
 
-                        ss.CAMERA.position.y = ss.CAMERA.position.y * percentage;
+                        ss.CAMERA.position.y = ss.CAMERA.position.y * percentage; //i thought this would make a sick transition but it actually wasnt that cool
                         ss.CAMERA.position.z = ss.CAMERA.position.z * percentage;
                         ss.CAMERA.rotation.x = ss.CAMERA.rotation.x * percentage;
                     };
@@ -7312,11 +7342,13 @@ z-index: 999999;
                     } else {
                         ss.MYPLAYER[H.actor].hat.visibility = extract("perspective") !== "firstPerson" ? 1 : 0;
                     };
-                    //alpha effect
+                    //alpha effect, it sucks and doesnt work the way i wanted it to
+                    /*
                     ss.MYPLAYER[H.actor].hands.material.alphaMode = 5;
                     ss.MYPLAYER[H.actor][H.bodyMesh].material.alphaMode = 5;
                     ss.MYPLAYER[H.actor].hands.material.alpha = ((extract("perspective") !== "firstPerson") && extract("perspectiveAlpha")) ? .5 : 1;
                     ss.MYPLAYER[H.actor][H.bodyMesh].material.alpha = ((extract("perspective") !== "firstPerson") && extract("perspectiveAlpha")) ? .5 : 1;
+                    */
                 };
 
                 let filter = typeof(extract("filter")) == 'number' ? extract("filter") : 2;
@@ -7327,7 +7359,8 @@ z-index: 999999;
                 };
 
                 if (ss.MYPLAYER && ss.MYPLAYER[H.actor] && ss.MYPLAYER[H.actor][H.mesh]) {
-                    ss.MYPLAYER[H.actor][H.mesh].scaling._x = (extract("gunPosition") == "left" ? -1 : 1);
+                    ss.MYPLAYER[H.actor][H.mesh].scaling._y = extract("worldFlattening"); //this used to be left side gun but for some reason it just affects the world IDK
+
                     ss.MYPLAYER[H.actor].gunContainer.scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
                     ss.MYPLAYER[H.actor].gunContainer.scaling._y = extract("gunPosition") == "hidden" ? 0 : 1;
                     ss.MYPLAYER[H.actor].gunContainer.scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
