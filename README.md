@@ -16,7 +16,7 @@ StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), includ
 
 > StateFarm Client V3 is based off [LibertyMutual Client](https://github.com/onlypuppy7/LibertyMutualShellShockers) <br>
 > This is a simpler template client, intended to be a base for StateFarm but anyone is welcome to use it in their own projects. <br>
- 
+
 <h3 align='center'>Join our <a href='https://dsc.gg/sfnetwork'>Discord Server</a> for the latest news!</h3>
 <br>
 
@@ -65,13 +65,13 @@ The information below is accurate as of StateFarm version **3.4.1-pre98**.
 - [GreasyFork](https://greasyfork.org/scripts/482982)
 ![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)
 
-<br>
+<br><b>!! Violentmonkey is at risk of being removed from the Chrome Web Store !!</b><br>- If this occurs and you're using the version from the Web Store, download Violentmonkey from the <a href="https://github.com/violentmonkey/violentmonkey/releases">GitHub page</a>.
 
 # [](#installation-tutorial)Installation Tutorial:
 Before you can install the client, there are a few things you must set up to be able to run userscripts.
 1. Install Violentmonkey from [https://violentmonkey.github.io/get-it/](https://violentmonkey.github.io/get-it/) or any other userscript manager. (**DO NOT** use Tampermonkey unless no other option available!)
 
-3. Open the Violentmonkey dashboard.
+3. Open the Violentmonkey dashboard. 
 4. Visit the [GreasyFork](https://greasyfork.org/scripts/482982) page & click `Install this script`.
     - Alternatively, use the raw version from [Github](https://github.com/Hydroflame522/StateFarmClient/raw/main/StateFarmClient.js).
 5. Visit [https://shellshock.io](https://shellshock.io/) (or another Shell Shockers link), & use StateFarm!
@@ -105,7 +105,7 @@ To configure ESP, open the `Render` tab.
 - To see eggs through walls with **boxes**, enable `PlayerESP`.
 - To see all players easily with **lines**, enable `Tracers`.
 - To see players' eggs through walls (not guns), enable `Chams`.
-- To see nametags through walls, enable `Nametags`.
+- To see nametags through walls, enable `NameTagESP`.
 - You also may want to adjust your FOV with the slider. The default for Shell Shockers is **72**.
 
 <br>
@@ -118,7 +118,7 @@ With the exception of the color pickers and some links, each option should all b
 3. Find the cheat name, and choose `Set Bind` to the right.
    - Some cheats already have binds. To change these, click on the preset key
 4. Press the key to bind! It's that simple.
-> If you want to remove a bind, press your 'Delete' key instead of a bind.
+> If you want to remove a bind, press your 'Delete' key while you're editing the bind.
 
 ## [](#badges) Badges:
 StateFarm Client version 3.4.1-pre71 added custom badges. These badges are displayed to yourself and other StateFarm users next to the respective username, like the golden VIP egg.
@@ -151,26 +151,29 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
   - **TargetMode** - decides the priority for which player aimbot should target.
     - **Pointing At** - closest to direction the camera is pointing.
     - **Nearest** - closest to the player in proximity.
+    - **Lowest HP** - players with the lowest hp
+    - **Most Kills** - players with the most kills in the server
   - **TargetVisibile** - a filter, applied after TargetMode helping to pick the aimbot target
     - **Disabled** - track the person TargetMode strictly decides
     - **Prioritise Visible** - visible players are the PRIORITY, only targets players behind walls if none are visible.
     - **Only Visible** - only targets visible players. if none are visible, nobody is targeted.
-  - **ToggleRM** - modifies aimbot to only lock when the right mouse is held.
+  - **ToggleRM** - modifies aimbot to only lock when the right mouse button is held.
   - **SilentAim** - shoots without moving the camera. ONLY visual, VERY blatant cheating. [more information](https://youtu.be/R1NkSsi2LrI?t=20)
   - **SemiSilent** - SilentAimbot behavior, but will move the camera after a shot has been fired.
   - **NoWallTrack** - aimbot ignores the player if they're behind obstacles.
-  - **Prediction** - predicts where the player will be when the bullet hits them and ajusts aimbot accordingly
-  - **AntiBloom** - locks onto the predicted bloom point. good for shooting & moving.
+  - **Prediction** - predicts where the player will be when the bullet reaches them and adjusts the aimbot accordingly.
+  - **AntiBloom** - calculates and adjusts for weapon bloom to ensure shots are more accurate. Ideal for accuracy while moving.
   - **AntiSwitch** - prevents the aimbot from changing the target until they die.
   - **1Kill** - disables aimbot when the targeted player dies.
-  - **MinAngle** - prevents you from snapping if the angle between you and the player is greater than this value.
+  - **MinAngle** - prevents you from targetting a player if the angle between you and the player is greater than the value.
   - **AntiSnap** - this makes snapping smooth at higher values. useful to avoid being spotted.
   - **AntiSneak** - recommended distance under 2. this automatically kills players in this range.
-  - **ESPColor** - the color used to highlight the ESP line of a targeted player. useless if PlayerESP is disabled.
+  - **ESPColor** - the color used to highlight the ESP line of a targeted player. does nothing if PlayerESP is disabled.
 - **AutoRefill** - this automatically reloads your gun if there is no more ammo.
 - **SmartRefill** - this makes your weapon refill at the best moment, which reduces reload time.
 - **AutoFire** - automatically shoot the gun.
 - **AutoFireType** - picks how to shoot the gun
+- **Triggerbot** - Automatically shoots the gun based off TriggerType
   - **Force Automatic** - changes guns which normally aren't automatic into ones that are.
   - **While Visible** - automatically shoots the gun when a player is visible.
   - **While Aimbotting** - automatically shoot the gun when you're aimbotting.
@@ -182,11 +185,16 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
 - **PlayerESP** - creates boxes around enemy players.
 - **Tracers** - creates lines pointing from the center of the screen to the location of enemy players.
 - **Chams** - renders players through walls.
-- **Nametags** - enlarges nametags and makes them appear through walls.
+- **Trajectories** - generates the path your granade will take once thrown 
 - **Targets** - render a red sphere inside players that deals the most damage to them when shot.
 - **PredictionESP** - creates an ESP box at the predicted position of the player.
+- **NameTagESP** - enlarges nametags and makes them visible through walls.
+- **NameTagInfo** - adds extra info to player nametags such as HP, Score, KDR, and ammo.
+  - **Info Update Interval** - updates nametaginfo every set interval, recommend increasing the value on lowend devices
 - **Player ESP/Tracers options** - various options for the modules above.
+  - **TargetedRGB** - makes the aimbot target esp rainbow 🌈🌈
   - **Type** - how should PlayerESP color behave. Options are self-explanatory.
+  - **RGBColor1** - oooo rainbbbowwwww, makes the esp RGB
   - **PredictionESP Color** - what color to use for the PredictionESP box
 - **Ammo ESP/Tracers options** - displays where ammo/grenades are on the map
   - **ESP** - outlines the ammo/grenades
@@ -196,12 +204,13 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
 	- **Render Above** - renders above obstacles
 - **FOV** - controls the FOV of the game.
 - **ZoomFOV** - controls how zoomed in/out you are. default is **C** to zoom
-- **Perspective** - Allows you to switch between third and first person. Think Minecraft F5! Default bind is the DIGIT **5** (`5`).
+- **Perspective** - Allows you to switch between third and first person. Think Minecraft F5! Default bind is the DIGIT **5** (`5`), no, not f5, that refreshes the page you eggshell.
 - **Perspective Options** - options for the Perspective.
   - **Alpha Effect** - Makes your own player a bit transparent (currently affects ALL players though!).
   - **Y Offset** - offset of the camera in y-direction (how far behind should it be?)
   - **Z Offset** - offset of the camera in z-direction (how far above should it be?)
-- **CamWIP** - Work-in-progress module. You should leave this off if you are not a dev. 
+  <!-- no X Offset? 🤨🤨 -->
+- **CamWIP** - Work-in-progress module. Not recommended if you are not a dev. 
 - **Wireframe** - outlines map objects to allow you to see directly though walls.
 - **EggSize** - changes how big eggs are. This does not affect hitboxes and is client-side 
 only.
@@ -220,16 +229,18 @@ only.
 - **PlayerInfo** - displays added information about the player you're targeting.
 - **GameInfo** - displays extra game information.
 - **ShowStream** - detects & displays ongoing twitch streamers.
-
+- **MiniMap** - displays a minimap in the corner of the screen displaying the map around you
+  - **MiniMapZoom** - slider for how much the minimap should zoom in, up to 5
+  - **MiniMapSize** - slider to scale minimap size up to 5
 ## [](#chat-tab) Chat:
 - **InfiniHistory** - disables the default limiting of message history.
 - **HighlightTxt** - allows you to highlight text from the chat to copy somewhere else.
-- **Max Ingame** - the number of messages to show ingame (if unset, infinite history will cause issues)
-- **ShowFiltered** - view messages that are caught by the game filter in red.
+- **Max Ingame** - the number of chat messages to show ingame (if unset, infinite history will cause issues)
+- **ShowFiltered** - view messages that are caught by the game filter, highlighted in red.
 - **UnfilterNames** - see filtered people's real names, highlighed in the leaderboard.
 - **BypassFilter** - bypass naughty word game message filter!
 - **TallChat** - makes the chat text taller, appends a character to all sent messages.
-- **AntiAFK** - prevents you from automatically leaving the lobby.
+- **AntiAFK** - prevents you from automatically leaving the lobby while idle.
 - **Fake Message** - allows sending messages as MOD or SERVER (client sided only)
 	- **Send as**  - who to send fake message as
 	- **Refresh List** - refreshes list
@@ -241,12 +252,12 @@ only.
   - **Spam Text** - the message to spam.
 - **Trolling**
   - **Mock** - rudely mocks people talking in chat.
-  - **Announcer** - announces when you change GUI config.
+  - **Announcer** - announces when you change GUI config. <!-- so you can rub it in more that youre superior then get banned 3 seconds later -->
   - **AutoEZ** - gloats on people when you kill them.
   - **CheatAccuse** - accuses your killer of cheating.
 - **Join/Leave Messages**
-  - **Join Msgs** - notify you when players join.
-  - **Leave Msgs** - notify you when players leave.
+  - **Join Msgs** - notifies you when players join.
+  - **Leave Msgs** - notifies you when players leave.
   - **Send2Chat** - decides if these messages are shown to only you or everyone.
   - **[SFC]Added** - if send2chat is enabled, this will add `[SFC]` to the beginning of the join/leave messages.
 
@@ -267,7 +278,7 @@ only.
 
 ## [](#automation) Automation:
 - **FloodReport** - mass reports everyone. o7, comrade.
-- **Bunnyhop** - makes you automatically bunnyhop when holding down the jump button.
+- **Bunnyhop** - makes you automatically bunnyhop when holding down the jump button. ( bhops while typing in chat as well, be cautious)
 - **AutoWalk** - walks forward automatically.
 - **AutoStrafe** - strafes automatically.
 - **AutoJump** - jumps on the specified interval (`JumpDelay`).
@@ -323,8 +334,8 @@ only.
 - **NewProxies** - moves bots to new proxies.
 - **UnbanAll** - unbans all bots.
 - **AutoUnbanBot** - automatically unbans all bots when they're banned.
-- **Don'tKillMe** - forces bots to ignore you.
-- **Don'tKillBot** - forces bots to ignore other bots.
+- **DontKillMe** - forces bots to ignore you.
+- **DontKillBot** - forces bots to ignore other bots.
 - **LeaveGames** - makes all bots leave their games.
 - **LeaveEmpty** - makes bots leave empty games.
 - **AutoLeave** - makes bots leave after the specified interval.
@@ -379,13 +390,13 @@ Various account management tools
 - **NoAnnoyances** - removes ads.
 - **NoTrack** - removes some user data tracking code.
 - **Quick Respawn** - respawns quicker than usual
-- **Sneaky Despawn** - Despawns, similar to the `Esc` key, but you can move while despawning, not that you cannot deal damage while sneaky despawning. Default key is **`** (backtick)
+- **Sneaky Despawn** - Despawns, similar to the `Esc` key, but you can move while despawning, note that you can not deal damage while sneaky despawning. Default key is **`** (backtick)
 - **StateFarm updates** shows a element at the home screen about statefarm's update history, notifies you when update is available.
 - **ReplaceFeeds** - replaces the game menu's news and videos feed with content by the StateFarm dev team.
 - **CustomBadges** - enables custom StateFarm badges. [more info](#-badges)
 - **UnlockSkins** - unlocks all skins in locally (other players will not see these).
 - **AdminSpoof** - shows admin options such as `BOOT` and `BAN` in games. no ACTUAL functionality.
-- **Unban** - unbans you by signing out. you will lose skins if you're not signed in.
+- **Unban** - unbans you by signing out. you will lose skins if you're not signed in. (DOES NOT UNBAN YOUR ACCOUNT)
 - **AutoUnban** - automatically detects bans & unbans in above fashion.
 - **NewProxy** - switches to a new shell shockers link. SF config won't be transferred.
 - **ReloadPage** - reloads the page.
@@ -395,18 +406,18 @@ Various account management tools
 - **Custom Macro** - allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.
 - **DoAtStartup** - executes the entered macro at client startup.
 - **RandomPath** - forces a new random path (pathfinding currently disabled).
-- **SilentRoll** - Rolls around without showing it client sided
+- **SilentRoll** - Rolls around without showing it client sided (will cause you to look up if you move your mouse however)
 - **SeizureX** - rotates the player by the specified amount around the y-axis (yaw).
 - **SeizureY** - rotates the player by the specified amount around the x-axis (pitch).
 
 ## [](#client-&-about) Client & About:
-- **HideGUI** - hides the big StateFarm menu. default key to do this is `H`.
+- **HideGUI** - hides the big scary StateFarm menu. default key to do this is `H`.
 - **Hide at Startup** - hides the StateFarm menu by default.
-- **No Console Logs** - blocks the client frome sending messages to the browser console.
-- **Popups** - disables/enables bottom-left corner popups of configs changed & notifications.
-- **Panic** - allows you to quickly exit to a set URL. great for hacking in class.
+- **No Console Logs** - blocks the client from sending messages to the browser console.
+- **Popups** - disables/enables popups and notifications
+- **Panic** - allows you to quickly exit to a set URL. great for hacking in class if youre that eggstravagant🥚
 - **Presets**
-  - **Preset List** - pick a preset from the dev team & apply it to get custom settings from us.
+  - **Preset List** - pick a preset from the list including the dev teams configs & apply it to get a custom configuration 
   - **Save** - saves your current settings as a preset.
   - **Delete** - deletes a preset.
   - **Import** - imports a custom preset.
@@ -445,7 +456,8 @@ Various account management tools
  - **Hydroflame521** - for founding the project.
  - **onlypuppy7** - for leading developement.
  - **porcupane**, **not_food** , **de_Neuublue**, **OakSwingZZZ**, **1ust** , **Seq** for code contributions & developement.
- - **susdung** - for the current version of the readme
+ - **susdung** - for the current version of the readme.
+ - **portending** - for updating and keeping the current version of the readme accurate.
  - **gus/yk0_0** - for some skyboxes used in StateFarm Client.
 <!-- **Zertalious** - old code in old versions. -->
 <!-- oops i commented this out! what a horrible mistake! someone should really fix this idk... -->
