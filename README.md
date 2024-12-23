@@ -23,7 +23,7 @@ StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), includ
 The information below is accurate as of StateFarm version **3.4.1-pre147**. 
 <br><br>
 
-<h1 align='center'>Table of Contents</h1>
+# [](#table-of-contents)Table of Contents:
 <br>
 
 - [Download Sources:](#download-sources)
@@ -59,15 +59,17 @@ The information below is accurate as of StateFarm version **3.4.1-pre147**.
 <br>
    
 # [](#download-sources)Download Sources:
-- [GitHub](https://github.com/Hydroflame522/StateFarmClient)
+- [GitHub](https://github.com/Hydroflame522/StateFarmClient)<br>
 ![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)
 
-- [GreasyFork](https://greasyfork.org/scripts/482982)
+- [GreasyFork](https://greasyfork.org/scripts/482982)<br>
 ![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)
 
-<br><b>!! Violentmonkey is at risk of being removed from the Chrome Web Store !!</b><br>- If this occurs and you're using the version from the Web Store, download Violentmonkey from the <a href="https://github.com/violentmonkey/violentmonkey/releases">GitHub page</a>.
+<br>
 
 # [](#installation-tutorial)Installation Tutorial:
+> If Violent Monkey's Chrome Webstore version is outdated, you can access the latest version from <a href="https://github.com/violentmonkey/violentmonkey/releases">their GitHub repository</a>
+
 Before you can install the client, there are a few things you must set up to be able to run userscripts.
 1. Install Violentmonkey from [https://violentmonkey.github.io/get-it/](https://violentmonkey.github.io/get-it/) or any other userscript manager. (**DO NOT** use Tampermonkey unless no other option available!)
 
@@ -425,7 +427,7 @@ Various account management tools
 
 <br>
 
-# [](#adblocking)Adblocking
+# [](#adblocking)Adblocking:
 > Ads are quite an annoying feature. Use the steps below to add a good ad-blocker.<br>
 > Use the `Ad Block` feature in the **Misc** tab to disable Ad Blocker detection.
 > Use the `NoAnnoyances` feature to block other annoyances
@@ -440,17 +442,18 @@ Various account management tools
 
 <br>
 
-# [](#issues-and-troubleshooting)Issues and Troubleshooting
+# [](#issues-and-troubleshooting)Issues and Troubleshooting:
 
 |       Issue        |  Solution                                                |
 |----------------|---------------------------------------------|
 |Stuck on loading screen|Press CTRL+F5 (or FN+F5) until "Script Injected" is shown.|
+|Skin hacks not working|This feature is only clientsided and will not show your skins to other players.|
 
 > If you have any issues, contact us in our [Discord server](https://dsc.gg/sfnetwork).
 
 <br>
 
-# [](#credits-and-disclaimer)Credits & Disclaimer
+# [](#credits-and-disclaimer)Credits and Disclaimer:
 
  - **Hydroflame521** - for founding the project.
  - **onlypuppy7** - for leading developement.
