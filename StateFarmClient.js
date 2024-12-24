@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre148
+// @version      3.4.1-pre149
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -458,10 +458,12 @@ let attemptedInjection = false;
     var trajectoryNade = null;
     let onlinePlayersArray = [];
     let bindsArray = {};
-    let H = {}; // obfuscated shit lol
-    const tp = {}; // <-- tp = tweakpane
+    let currentAimTime = 0;
+    let nowOld = 0;
     // blank variables
     let ss = {};
+    let H = {}; // obfuscated shit lol
+    const tp = {}; // <-- tp = tweakpane
     let msgElement, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
@@ -954,6 +956,9 @@ sniping and someone sneaks up on you
                 initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "This makes snapping smooth at higher values. useful to avoid being spotted", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                initFolder({ location: tp.aimbotFolder, title: "AntiSnap Options", storeAs: "antisnapFolder", });
+                    initModule({ location: tp.antisnapFolder, title: "AntiSnap Regime", storeAs: "aimbotAntiSnapRegime", tooltip: "Changes the method of smoothing\n\nCredit to de_Neuublue for this code", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Linear", value: "linear" }, { text: "Slow End", value: "slowEnd" }, { text: "Fast End", value: "fastEnd" }, { text: "Time Based", value: "timeBased" }], defaultValue: "linear", enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                    initModule({ location: tp.antisnapFolder, title: "Max Aim Time (ms)", storeAs: "maxAimTime", tooltip: "How long to aim for until you force the locking.", slider: { min: 10, max: 5000, step: 1 }, defaultValue: 700, enableConditions: [["aimbot", true], ["silentAimbot", false]], showConditions: [["aimbotAntiSnapRegime", "timeBased"]], });
 
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", tooltip: "This automatically reloads your gun if there is no more ammo", bindLocation: tp.combatTab.pages[1], });
@@ -7582,9 +7587,13 @@ z-index: 999999;
                     };
                 });
 
+                const deltaTime = performance.now() - nowOld;
+                nowOld += deltaTime;
+
                 if (isDoingAimbot) {
                     if (currentlyTargeting && currentlyTargeting[H.playing] && currentlyTargeting[H.actor]) { //found a target
                         didAimbot = true;
+                        currentAimTime += deltaTime;
                         if (currentlyTargeting.generatedESP) {
                             if (extract("tracers")) {
                                 currentlyTargeting.tracerLines.color = new L.BABYLON.Color3(...hexToRgb(getColor("aimbotColor", "aimbotRainbow")));
@@ -7594,14 +7603,30 @@ z-index: 999999;
                             };
                         };
                         if ((!extract("silentAimbot")) && (!extract("noWallTrack") || getLineOfSight(player, true)) && (targetingComplete || (deg2rad(extract("aimbotMinAngle")) > currentlyTargeting?.angleDiff))) {
-                            const distanceBetweenPlayers = distancePlayers(currentlyTargeting);
-
                             const aimbot = getAimbot(currentlyTargeting);
 
-                            const antiSnap = (1 - (extract("aimbotAntiSnap") || 0));
+                            let antiSnap = (1 - (extract("aimbotAntiSnap") || 0));
+            
+                            //new method: neuublue / https://github.com/AimTuxOfficial/AimTux/blob/master/src/Hacks/aimbot.cpp
+    
+                            const yawDiff = Math.radDifference(aimbot.yawReal, ss.MYPLAYER[H.yaw]);
+                            const pitchDiff = Math.radDifference(aimbot.pitchReal, ss.MYPLAYER[H.pitch]);
+
+                            if (extract("aimbotAntiSnapRegime") != "slowEnd") { // not slow end
+                                antiSnap /= ((yawDiff ** 2 + pitchDiff ** 2) ** 0.5) * 4; // constant
+                                if (extract("aimbotAntiSnapRegime") == "fastEnd") antiSnap *= antiSnap * 10; // fast end
+                                else if (extract("aimbotAntiSnapRegime") == "timeBased") antiSnap *= currentAimTime / extract("maxAimTime"); // time based
+                                antiSnap = Math.min(1, antiSnap);
+                            };
+    
+                            ss.MYPLAYER[H.yaw] = setPrecision(ss.MYPLAYER[H.yaw] + yawDiff * antiSnap);
+                            ss.MYPLAYER[H.pitch] = setPrecision(ss.MYPLAYER[H.pitch] + pitchDiff * antiSnap);
 
                             if (previousTarget !== currentlyTargeting) { targetingComplete = false };
 
+                            //old method for antisnap
+                            /*
+                            const distanceBetweenPlayers = distancePlayers(currentlyTargeting);
                             const lerp = function (start, end, alpha) {
                                 let value = (1 - alpha) * start + alpha * end;
                                 if ((Math.abs(end - start) < (0.2 / (distanceBetweenPlayers))) || (targetingComplete)) {
@@ -7610,9 +7635,9 @@ z-index: 999999;
                                 return value;
                             };
 
-                            // Exponential lerp towards the target rotation
                             ss.MYPLAYER[H.yaw] = setPrecision(lerp(ss.MYPLAYER[H.yaw], aimbot.yawReal, antiSnap));
                             ss.MYPLAYER[H.pitch] = setPrecision(lerp(ss.MYPLAYER[H.pitch], aimbot.pitchReal, antiSnap));
+                            */
                         };
                         if (enemyMinimumDistance < extract("antiSneak")) {
                             currentlyTargeting = enemyNearest;
@@ -7624,6 +7649,7 @@ z-index: 999999;
                             // log("ANTISNEAK---->", enemyNearest?.name, enemyMinimumDistance);
                         };
                     } else {
+                        currentAimTime -= deltaTime;
                         if (extract("oneKill")) {
                             currentlyTargeting = "dead";
                         } else {
@@ -7631,6 +7657,7 @@ z-index: 999999;
                         };
                     };
                 } else {
+                    currentAimTime -= deltaTime;
                     currentlyTargeting = false;
                     targetingComplete = false;
                     if (extract("enableSeizureX")) {
@@ -7640,6 +7667,7 @@ z-index: 999999;
                         ss.MYPLAYER[H.pitch] += extract("amountSeizureY")
                     };
                 };
+                currentAimTime = Math.clamp(currentAimTime, 0, extract("maxAimTime"));
                 highlightTargetOnLeaderboard(currentlyTargeting, (extract("highlightLeaderboard")) ? didAimbot : false);
                 if (extract("upsideDown")) { //sorta useless
                     if (ss.MYPLAYER[H.pitch] < 1.5 && ss.MYPLAYER[H.pitch] > -1.5) {
