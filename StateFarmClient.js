@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre149
+// @version      3.4.1-pre150
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -178,6 +178,7 @@ let attemptedInjection = false;
     const replacementLogoURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement.png";
     const replacementLogoHalloweenURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-halloween.png";
     const replacementLogoChristmasURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-christmas.png";
+    const replacementLogoNewYearsURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-new-years.png";
 
     const replacementFeedURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamefeeds/";
     const commitFeedURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/commits?path=StateFarmClient.js";
@@ -3168,8 +3169,9 @@ z-index: 999999;
             const images = document.getElementsByTagName('img');
             let imgURL = replacementLogoURL;
             const month = new Date().getMonth();
-            if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9) imgURL = replacementLogoHalloweenURL;
+            if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9)  imgURL = replacementLogoHalloweenURL;
             if (replacementLogoChristmasURL && replacementLogoChristmasURL !== "" && month == 11) imgURL = replacementLogoChristmasURL;
+            if (replacementLogoNewYearsURL  && replacementLogoNewYearsURL  !== "" && month == 0)  imgURL = replacementLogoNewYearsURL;
             
             for (let i = 0; i < images.length; i++) {
                 const src = images[i].getAttribute('src');

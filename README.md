@@ -1,4 +1,4 @@
-<div align='center'>﻿<img src='https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/sfc%20banner/shell%20logo%20christmas%20(transparent%20for%20white%20backgrounds).png?raw=true' width='80%'></div>
+<div align='center'>﻿<img src='https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/sfc%20banner/shell%20logo%20new%20years%202025%20(transparent%20for%20white%20backgrounds).png?raw=true' width='80%'></div>
 <h1 align='center'>StateFarm Client</h1>
 <h3 align='center'>for Shell Shockers</h3>
 <br><br>
@@ -26,6 +26,7 @@ The information below is accurate as of StateFarm version **3.4.1-pre147**.
 # [](#table-of-contents)Table of Contents:
 <br>
 
+- [Table of Contents:](#table-of-contents)
 - [Download Sources:](#download-sources)
 - [Installation Tutorial:](#installation-tutorial)
 - [Getting Started:](#getting-started)
@@ -52,9 +53,9 @@ The information below is accurate as of StateFarm version **3.4.1-pre147**.
   - [ Accounts:](#-accounts)
   - [ Miscellaneous:](#-miscellaneous)
   - [ Client \& About:](#-client--about)
-- [Adblocking](#adblocking)
-- [Issues and Troubleshooting](#issues-and-troubleshooting)
-- [Credits \& Disclaimer](#credits--disclaimer)
+- [Adblocking:](#adblocking)
+- [Issues and Troubleshooting:](#issues-and-troubleshooting)
+- [Credits and Disclaimer:](#credits-and-disclaimer)
 
 <br>
    
