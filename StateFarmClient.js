@@ -1551,6 +1551,8 @@ debug mode).`},
             initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", tooltip: "Removes ads", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", tooltip: "Removes some user data tracking code", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
+            initModule({ location: tp.miscTab.pages[0], title: "NoBob", storeAs: "noBob", tooltip: "Disables view bobbing when walking", bindLocation: tp.miscTab.pages[1], });
+            //uhhhh... so..... is this still supposed to be stored in chatTab?
             initModule({ location: tp.chatTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "Bypasses AFK kicks", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", tooltip: "Respawns quicker than usual", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", tooltip: "Despawns, similar to the Esc key, but you can move while despawning, not that you cannot deal damage while sneaky despawning", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
@@ -7714,6 +7716,11 @@ z-index: 999999;
                     updateMenu = false; initMenu(false);
                     tp.mainPanel.hidden = extract("hideAtStartup");
                 };
+
+                //nobob
+                if(extract("noBob")){
+                    ss.MYPLAYER[H.actor].bobbleIntensity = 0;
+                }
 
                 let doRender = true;
 
