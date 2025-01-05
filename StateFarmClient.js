@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre152
+// @version      3.4.1-pre153
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -7737,7 +7737,7 @@ z-index: 999999;
                 if (extract("bobModifierEnabled")) {
                     let modifier = extract("bobModifier") || 0;
                     if (!(extract("bobModifierWhenStill") && ss.CONTROLKEYS !== 0))
-                        ss.MYPLAYER[H.actor].bobbleIntensity = lerp(ss.MYPLAYER[H.actor].bobbleIntensity, modifier, modifier);
+                        ss.MYPLAYER[H.actor].bobbleIntensity = modifier;
                     // log(ss.MYPLAYER[H.actor].bobbleIntensity, modifier);
                 };
 
