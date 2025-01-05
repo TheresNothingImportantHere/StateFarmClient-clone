@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre153
+// @version      3.4.1-pre154
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -380,7 +380,7 @@ let attemptedInjection = false;
     
     //INIT VARS
     const inbuiltPresets = { //Don't delete onlypuppy7's Config
-        "onlypuppy7's Config": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>true<aimbotMinAngle>174<aimbotAntiSnap>0.75<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0<grenadeMax>true<grenadePower>1<playerESP>true<tracers>true<chams>false<nametags>true<targets>false<predictionESP>false<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<fakeMessageID>12<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre94 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre71 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<skybox>9<randomSkyBox>false<randomSkyBoxInterval>3<legacyModels>true<filter>0<gunPosition>0<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>1<replaceLogo>true<titleAnimation>true<themeType>5<partyLightsEnabled>true<partyLightsIntensity>3.6999999999999997<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>true<spoofVIP>false<noAnnoyances>true<noTrack>true<antiAFK>false<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoUnban>true<autoChickenWinner>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
+        "onlypuppy7's Config": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>360<antiSneak>1.8<aimbotAntiSnap>0<aimbotAntiSnapRegime>3<maxAimTime>64<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.05<grenadeMax>true<grenadePower>1<playerESP>true<tracers>true<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>true<nametagInfoInterval>5<aimbotColor>"#0000ff"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>true<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<minimap>true<minimapZoom>5<minimapSize>1<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<fakeMessageID>0<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>14<autoStamp>0<autoHat>0<skybox>1<randomSkyBox>true<randomSkyBoxInterval>5.9<legacyModels>true<filter>0<gunPosition>true<bobModifierEnabled>true<bobModifier>0.25<bobModifierWhenStill>true<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>5<replaceLogo>true<titleAnimation>true<themeType>5<partyLightsEnabled>true<partyLightsIntensity>1.87<worldFlattening>1<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<autoUnban>true<adBlock>true<spoofVIP>true<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoChickenWinner>true<chickenWinnerNotifs>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>true<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
         "OP7 + Server Hopper": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>true<aimbotMinAngle>174<aimbotAntiSnap>0.75<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>true<tracers>true<chams>false<nametags>true<targets>false<predictionESP>false<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<antiAFK>false<spamChat>false<fakeMessageID>12<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre94 On Top! "<fakeMessageBold>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre71 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>true<autoLeave>true<autoLeaveDelay>150<autoGamemode>5<autoRegion>8<eggColor>0<autoStamp>0<autoHat>0<skybox>9<legacyModels>true<filter>2<gunPosition>0<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>1<replaceLogo>true<titleAnimation>true<themeType>5<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>true<spoofVIP>false<noAnnoyances>true<noTrack>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoUnban>true<autoChickenWinner>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<hideAtStartup>false<consoleLogs>false<popups>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
         "OP7 + Server Hopper + Stream Stealth": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>true<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>174<aimbotAntiSnap>0.75<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>false<tracers>false<chams>false<nametags>true<targets>false<predictionESP>false<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<ammoESP>false<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>false<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>false<showLOS>false<showMinAngle>false<highlightLeaderboard>true<showCoordinates>false<radar>false<playerStats>false<playerInfo>false<gameInfo>true<showStreams>false<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<antiAFK>false<spamChat>false<fakeMessageID>1<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre95 On Top! "<fakeMessageBold>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre95 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>true<usernameAutoJoin>"[sfc] onlypuppy7"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>true<autoLeave>true<autoLeaveDelay>150<autoGamemode>5<autoRegion>8<eggColor>0<autoStamp>0<autoHat>0<skybox>9<legacyModels>true<filter>true<gunPosition>true<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>1<replaceLogo>true<titleAnimation>false<themeType>5<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>true<spoofVIP>false<noAnnoyances>true<noTrack>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoUnban>true<autoChickenWinner>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<hideAtStartup>false<consoleLogs>false<popups>false<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>1<debug>false`,
         "Doeshotter's Crackshot Config": `sfChatNotifications>false<sfChatNotificationSound>false<sfChatAutoStart>false<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>2<aimbotRightClick>true<silentAimbot>true<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>false<aimbotMinAngle>7<antiSneak>0<aimbotAntiSnap>0<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.15000000000000002<grenadeMax>false<grenadePower>1<playerESP>true<tracers>false<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>true<nametagInfoInterval>14<aimbotColor>"#ff0000"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#0000ff"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>false<ammoTracers>false<ammoESPRegime>0<ammoESPColor>"#ffff00"<grenadeESP>false<grenadeTracers>false<grenadeESPRegime>0<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>72<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>1<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>false<showCoordinates>false<radar>false<playerStats>false<playerInfo>false<gameInfo>false<showStreams>false<minimap>false<minimapZoom>5<minimapSize>1<chatExtend>false<chatHighlight>false<maxChat>5<disableChatFilter>false<unfilterNames>false<chatFilterBypass>false<tallChat>false<fakeMessageID>1<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre147 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre147 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>false<leaveMessages>false<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<skybox>true<randomSkyBox>false<randomSkyBoxInterval>3<legacyModels>false<filter>true<gunPosition>true<muteGame>false<distanceMult>1<customSFX1>true<customSFX2>true<customSFX3>true<replaceLogo>false<titleAnimation>false<themeType>5<partyLightsEnabled>false<partyLightsIntensity>0.5<loginEmailPass>"ex@gmail.com:passwd"<loginDatabaseSelection>0<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>false<spoofVIP>false<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>true<adminSpoof>false<autoUnban>true<autoChickenWinner>false<customMacro>"log('wow ur cool!');"<autoMacro>true<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
@@ -1551,12 +1551,34 @@ debug mode).`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.miscTab.pages[0], title: "Ad Block", storeAs: "adBlock", tooltip: "Prevents the anti-adblocker code. NOTE: this will always display the VIP badge as a side effect", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "VIP Spoof", storeAs: "spoofVIP", tooltip: "Makes the VIP badge visible locally (other players won't see)", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", tooltip: "Removes ads", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", tooltip: "Removes some user data tracking code", bindLocation: tp.miscTab.pages[1], });
+            //move this stuff to top bc its more important
+            initFolder({ location: tp.miscTab.pages[0], title: "Ban Evasion Options", storeAs: "banFolder", });
+                initModule({ location: tp.banFolder, title: "Unban", storeAs: "unban", tooltip: "Unbans you by signing out. You will lose skins if you're not signed in.", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
+                    if (GM_getValue('StateFarm_Unbanned')) unban();
+                    else if (prompt("By proceeding, you will be signed out. If you don't have an account, your stats will be lost.\nEnter 'ok' to confirm this.\nThis popup will not be shown again for future unbans.") === 'ok') {
+                        GM_setValue('StateFarm_Unbanned', 'true');
+                        unban();
+                    } else {
+                        alert('You did not entire "ok", so the unban was cancelled.');
+                    };
+                },});
+                initModule({ location: tp.banFolder, title: "Auto Unban", storeAs: "autoUnban", tooltip: "Automatically detects bans & unbans in above fashion", bindLocation: tp.miscTab.pages[1],});
+                initModule({ location: tp.banFolder, title: "New Proxy", storeAs: "newProxy", tooltip: "Switches to a new shell shockers link. SF config won't be transferred", bindLocation: tp.miscTab.pages[1], button: "NEW PROXY", clickFunction: function(){
+                    const userConfirmed=confirm("Switching to a proxy URL. By proceeding, you will enter another URL for Shell Shockers but your data doesn't get transferred.");
+                    if (userConfirmed) {
+                        newProxy();
+                    };
+                },});
+                initModule({ location: tp.banFolder, title: "Reload Page", storeAs: "reload", tooltip: "Reloads the page", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function(){
+                    reloadPage();
+                },});
             tp.miscTab.pages[0].addSeparator();
-            //uhhhh... so..... is this still supposed to be stored in chatTab? //obviously not
+            initFolder({ location: tp.miscTab.pages[0], title: "Ad & Privacy Options", storeAs: "adFolder", });
+                initModule({ location: tp.adFolder, title: "Ad Block", storeAs: "adBlock", tooltip: "Prevents the anti-adblocker code. NOTE: this will always display the VIP badge as a side effect", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.adFolder, title: "VIP Spoof", storeAs: "spoofVIP", tooltip: "Makes the VIP badge visible locally (other players won't see)", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.adFolder, title: "NoAnnoyances", storeAs: "noAnnoyances", tooltip: "Removes ads", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.adFolder, title: "NoTrack", storeAs: "noTrack", tooltip: "Removes some user data tracking code", bindLocation: tp.miscTab.pages[1], });
+            tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "Bypasses AFK kicks", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", tooltip: "Respawns quicker than usual", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", tooltip: "Despawns, similar to the Esc key, but you can move while despawning, not that you cannot deal damage while sneaky despawning", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
@@ -1576,35 +1598,16 @@ debug mode).`},
                 };
             },});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "StateFarm Updates", storeAs: "statefarmUpdates", tooltip: "Shows a element at the home screen about statefarm's update history, notifies you when update is available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.miscTab.pages[0], title: "Replace Feeds", storeAs: "replaceFeeds", tooltip: "Replaces the game menu's news and videos feed with content by the StateFarm dev team", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.miscTab.pages[0], title: "Custom Badges", storeAs: "customBadges", tooltip: "Enables custom StateFarm badges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+            initFolder({ location: tp.miscTab.pages[0], title: "StateFarm UI Options", storeAs: "sfcUIFolder", });
+                initModule({ location: tp.sfcUIFolder, title: "StateFarm Updates", storeAs: "statefarmUpdates", tooltip: "Shows a element at the home screen about statefarm's update history, notifies you when update is available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+                initModule({ location: tp.sfcUIFolder, title: "Replace Feeds", storeAs: "replaceFeeds", tooltip: "Replaces the game menu's news and videos feed with content by the StateFarm dev team", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+                initModule({ location: tp.sfcUIFolder, title: "Custom Badges", storeAs: "customBadges", tooltip: "Enables custom StateFarm badges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins", storeAs: "unlockSkins", tooltip: "Unlocks all skins in locally (other players will not see these)", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins (View Only)", storeAs: "unlockSkins", tooltip: "Unlocks all skins in locally (other players will not see these)", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", tooltip: "Unlocks the real bros grenade skin to your account", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function(){
                 extern.giveBasketBrosReward();
             },});
-            initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", tooltip: "Shows admin options such as BOOT and BAN in games. no ACTUAL functionality", bindLocation: tp.miscTab.pages[1], });
-            tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "Unban", storeAs: "unban", tooltip: "Unbans you by signing out. you will lose skins if you're not signed in", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
-                if (GM_getValue('StateFarm_Unbanned')) unban();
-                else if (prompt("By proceeding, you will be signed out. If you don't have an account, your stats will be lost.\nEnter 'ok' to confirm this.\nThis popup will not be shown again for future unbans.") === 'ok') {
-                    GM_setValue('StateFarm_Unbanned', 'true');
-                    unban();
-                } else {
-                    alert('You did not entire "ok", so the unban was cancelled.');
-                };
-            },});
-            initModule({ location: tp.miscTab.pages[0], title: "Auto Unban", storeAs: "autoUnban", tooltip: "Automatically detects bans & unbans in above fashion", bindLocation: tp.miscTab.pages[1],});
-            initModule({ location: tp.miscTab.pages[0], title: "New Proxy", storeAs: "newProxy", tooltip: "Switches to a new shell shockers link. SF config won't be transferred", bindLocation: tp.miscTab.pages[1], button: "NEW PROXY", clickFunction: function(){
-                const userConfirmed=confirm("Switching to a proxy URL. By proceeding, you will enter another URL for Shell Shockers but your data doesn't get transferred.");
-                if (userConfirmed) {
-                    newProxy();
-                };
-            },});
-            initModule({ location: tp.miscTab.pages[0], title: "Reload Page", storeAs: "reload", tooltip: "Reloads the page", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function(){
-                reloadPage();
-            },});
+            initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", tooltip: "Shows admin options such as BOOT and BAN in games. No ACTUAL functionality", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Switch Focus", storeAs: "unfocus", tooltip: "Controls the focus of the game. Allows for tabbing out without despawning", bindLocation: tp.miscTab.pages[1], button: "FOCUS/UNFOCUS", defaultBind: "P", clickFunction: function(){
                 if (document.pointerLockElement !== null) { //currently locked
@@ -1615,31 +1618,32 @@ debug mode).`},
                 };
             },});
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "FastChickenWinner", storeAs: "chickenWinner", tooltip: "Instantly plays the chick'n winner minigame", bindLocation: tp.miscTab.pages[1], button: "Force Play", clickFunction: function(){
-                unsafeWindow.extern.chwTryPlay();
-                const eggElement = document.getElementById("eggOne");
-                eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();
-                let chicknWinnerElementLoaded = false;
-                const checkInterval = setInterval(() => {
-                    const chicknWinnerElement = document.getElementById('chicknWinner');
-                    chicknWinnerElementLoaded = (chicknWinnerElement?.style?.display == ''); //idk, this is kind of shit? but who actually cares that much...
-                    if (chicknWinnerElementLoaded) {
-                        const gotWinnerOkElement = document.getElementById('gotWinnerOk');
-                        if (gotWinnerOkElement) {
-                            gotWinnerOkElement.click();
+            initFolder({ location: tp.miscTab.pages[0], title: "Chicken Winner Options", storeAs: "chwFolder", });
+                initModule({ location: tp.chwFolder, title: "FastChickenWinner", storeAs: "chickenWinner", tooltip: "Instantly plays the chick'n winner minigame", bindLocation: tp.miscTab.pages[1], button: "Force Play", clickFunction: function(){
+                    unsafeWindow.extern.chwTryPlay();
+                    const eggElement = document.getElementById("eggOne");
+                    eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();
+                    let chicknWinnerElementLoaded = false;
+                    const checkInterval = setInterval(() => {
+                        const chicknWinnerElement = document.getElementById('chicknWinner');
+                        chicknWinnerElementLoaded = (chicknWinnerElement?.style?.display == ''); //idk, this is kind of shit? but who actually cares that much...
+                        if (chicknWinnerElementLoaded) {
+                            const gotWinnerOkElement = document.getElementById('gotWinnerOk');
+                            if (gotWinnerOkElement) {
+                                gotWinnerOkElement.click();
+                            };
+                            if (chicknWinnerElement.style.display == 'none') {
+                                log("ermm, found");
+                                clearInterval(checkInterval);
+                                updateAccountRecords();
+                                accountStatus = "chwDone";
+                            };
                         };
-                        if (chicknWinnerElement.style.display == 'none') {
-                            log("ermm, found");
-                            clearInterval(checkInterval);
-                            updateAccountRecords();
-                            accountStatus = "chwDone";
-                        };
-                    };
-                }, 100);
-            },});
-            initModule({ location: tp.miscTab.pages[0], title: "AutoChickenWinner", storeAs: "autoChickenWinner", tooltip: "Automatically plays the chick'n winner minigame when cooldowns are over", bindLocation: tp.miscTab.pages[1],});
+                    }, 100);
+                },});
+                initModule({ location: tp.chwFolder, title: "AutoChickenWinner", storeAs: "autoChickenWinner", tooltip: "Automatically plays the chick'n winner minigame when cooldowns are over", bindLocation: tp.miscTab.pages[1],});
+                initModule({ location: tp.chwFolder, title: "Chw Info Notifications", storeAs: "chickenWinnerNotifs", tooltip: "Alerts you of the tier of what you just earned and other infos.", bindLocation: tp.miscTab.pages[1],});
             tp.miscTab.pages[0].addSeparator();
-            //GM_getValue("StateFarm_GameHistory");
             initModule({ location: tp.miscTab.pages[0], title: "Get Game History", storeAs: "getGameHistory", tooltip: "Displays a list of the last few lobbies you were in", bindLocation: tp.miscTab.pages[1], button: "get", clickFunction: function(){
               let games = GM_getValue("StateFarm_GameHistory");
               //alert(GM_getValue("StateFarm_GameHistory"));
@@ -2036,9 +2040,9 @@ debug mode).`},
             alert("Bollocks! If you're getting this message, injection probably failed. To solve this, perform CTRL+F5 - this performs a hard reload. If this does not work, contact the developers.");
         };
     };
-    const createPrompt = function(text, buttons, duration) {
-        unsafeWindow.BAWK.play("kotc_zonespawn"); log(arguments);
-        duration = duration || 5000;
+    const createPrompt = function(text = "No text set", buttons = [], duration = 5000) {
+        unsafeWindow.BAWK.play("kotc_zonespawn");
+        // log(arguments);
         const promptElement = document.createElement('div');
         promptElement.innerText = text;
         promptElement.setAttribute('style', `
@@ -3667,6 +3671,7 @@ z-index: 999999;
             unsafeWindow.globalSS.GM = GM;
             unsafeWindow.globalSS.crackedShell = crackedShell;
             unsafeWindow.globalSS.createPopup = createPopup;
+            unsafeWindow.globalSS.createPrompt = createPrompt;
             unsafeWindow.globalSS.remove = remove;
             unsafeWindow.globalSS.change = change;
             unsafeWindow.globalSS.unban = unban;
@@ -5304,6 +5309,7 @@ z-index: 999999;
             // };
         });
         createAnonFunction('interceptGa', function () {
+            // log(arguments);
             if (arguments['3'] == 'Reward item') {
                 let itemName = arguments['4'].slice(0, -4);
                 let tier = arguments['4'].slice(-1);
@@ -5324,9 +5330,23 @@ z-index: 999999;
                 let tierCache = GM_getValue("StateFarm_TierCache") || {};
                 tierCache[itemName] = tier;
                 GM_setValue("StateFarm_TierCache", tierCache);
+
+                if (extract("chickenWinnerNotifs")) {
+                    let isSlightlyRare = Number(tier) >= 4;
+                    createPrompt(`Chicken Winner:\nYou won: ${itemName} [T${tier}]\n\n${isSlightlyRare ? "High value item! GG." : "Low value item."}`, [], 10e3);
+                    if (isSlightlyRare) BAWK.play("challenge_notify");
+                };
             };
             if (arguments['3'] == 'Reward amount') {
-                log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw result: eggs: ${arguments['4']}`);
+                let eggs = arguments['4'];
+
+                log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw result: eggs: ${eggs}`);
+
+                if (extract("chickenWinnerNotifs")) {
+                    let isSlightlyRare = eggs >= 1000;
+                    createPrompt(`Chicken Winner:\nYou won: ${eggs} eggs.\n\n${isSlightlyRare ? "High egg amount! GG." : "Low egg amount."}`, [], 10e3);
+                    if (isSlightlyRare) BAWK.play("challenge_notify");
+                };
             };
             if (arguments['3'] == 'Reward') {
                 log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw reward: ${arguments['4']}`);
