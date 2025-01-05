@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre151
+// @version      3.4.1-pre152
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1253,11 +1253,11 @@ But check out the GitHub guide.`},
 `Sorry! No guide yet!`},
         ]);
             initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "Allows you to switch out Shell's default skybox", bindLocation: tp.themingTab.pages[1], dropdown: loadedSkyboxes, changeFunction: (newSkybox) => {
-                    if (!unsafeWindow[skyboxName]) return;
-                    unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
-                }});
-                initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", tooltip: "Switches the skybox to a random one", bindLocation: tp.themingTab.pages[1], });
-                initModule({ location: tp.themingTab.pages[0], title: "Switch Interval", storeAs: "randomSkyBoxInterval", tooltip: "The interval after which the skybox is switched, given that randomSkyBox is enabled. In minutes", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
+                if (!unsafeWindow[skyboxName]) return;
+                unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
+            }});
+            initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", tooltip: "Switches the skybox to a random one", bindLocation: tp.themingTab.pages[1], });
+            initModule({ location: tp.themingTab.pages[0], title: "Switch Interval", storeAs: "randomSkyBoxInterval", tooltip: "The interval after which the skybox is switched, given that randomSkyBox is enabled. In minutes", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Legacy Models", storeAs: "legacyModels", tooltip: "Switches to the old models", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", tooltip: "Adds a color tint to the game", bindLocation: tp.themingTab.pages[1], dropdown: [
@@ -1270,6 +1270,11 @@ But check out the GitHub guide.`},
                 {text: "Left", value: "left"},
                 {text: "Hidden", value: "hidden"},
             ],});
+            tp.themingTab.pages[0].addSeparator();
+            initModule({ location: tp.themingTab.pages[0], title: "Enable Bob Modifier", storeAs: "bobModifierEnabled", tooltip: "Enable/disable setting the bob effect", bindLocation: tp.themingTab.pages[1], });
+            initFolder({ location: tp.themingTab.pages[0], title: "Bob Modifier Settings", storeAs: "bobFolder", });
+                initModule({ location: tp.bobFolder, title: "Bobbing Value", storeAs: "bobModifier", tooltip: "Set to 0 to disable. Mess with other numbers for funny effects.", slider: { min: 0, max: 99, step: 0.01 }, defaultValue: 0, });
+                initModule({ location: tp.bobFolder, title: "Only When Still", storeAs: "bobModifierWhenStill", tooltip: "Disables while you're still.", bindLocation: tp.themingTab.pages[1], });
             tp.themingTab.pages[0].addSeparator();
             initFolder({ location: tp.themingTab.pages[0], title: "Audio Settings", storeAs: "audioFolder", });
                 initModule({ location: tp.audioFolder, title: "Mute Game", storeAs: "muteGame", tooltip: "Mute the game?", bindLocation: tp.themingTab.pages[1], });
@@ -1551,9 +1556,8 @@ debug mode).`},
             initModule({ location: tp.miscTab.pages[0], title: "NoAnnoyances", storeAs: "noAnnoyances", tooltip: "Removes ads", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "NoTrack", storeAs: "noTrack", tooltip: "Removes some user data tracking code", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
-            initModule({ location: tp.miscTab.pages[0], title: "NoBob", storeAs: "noBob", tooltip: "Disables view bobbing when walking", bindLocation: tp.miscTab.pages[1], });
-            //uhhhh... so..... is this still supposed to be stored in chatTab?
-            initModule({ location: tp.chatTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "Bypasses AFK kicks", bindLocation: tp.chatTab.pages[1], });
+            //uhhhh... so..... is this still supposed to be stored in chatTab? //obviously not
+            initModule({ location: tp.miscTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "Bypasses AFK kicks", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", tooltip: "Respawns quicker than usual", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", tooltip: "Despawns, similar to the Esc key, but you can move while despawning, not that you cannot deal damage while sneaky despawning", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
                 if (!(unsafeWindow.extern.gamePaused || sneakyDespawning)) {
@@ -3287,6 +3291,10 @@ z-index: 999999;
             let vector = getDirectionVectorFacingTarget(player);
             return Math.hypot(vector.x, vector.y * yMultiplier, vector.z); //pythagoras' theorem in 3 dimensions. no one owns maths, zert.
         } else log("fuck2", player); return 0;
+    };
+    const lerp = function (start, end, alpha) {
+        let value = (1 - alpha) * start + alpha * end;
+        return value;
     };
     const setPrecision = function (value) { return Math.round(value * 8192) / 8192 }; //required precision
     const calculateYaw = function (pos) {
@@ -5289,7 +5297,11 @@ z-index: 999999;
             };
         });
         createAnonFunction('interceptSignedIn', function (args) {
-            if (extract("debug")) log("signedIn", args);
+            // try {
+            //     if (extract("debug")) log("signedIn", args);
+            // } catch (error) {
+                
+            // };
         });
         createAnonFunction('interceptGa', function () {
             if (arguments['3'] == 'Reward item') {
@@ -5606,18 +5618,22 @@ z-index: 999999;
             };
         });
         createAnonFunction('adBlocker', function (input) {
-            if (input == 10 && sneakyDespawning) {
-                return 1;
-            } else if (extract("adBlock")) {
-                if (typeof (input) == 'boolean') {
-                    return true;
-                } else if (input == 10) {
-                    return 5;
-                } else if (input == "adsBlocked") {
-                    return false;
+            try {
+                if (input == 10 && sneakyDespawning) {
+                    return 1;
+                } else if (extract("adBlock")) {
+                    if (typeof (input) == 'boolean') {
+                        return true;
+                    } else if (input == 10) {
+                        return 5;
+                    } else if (input == "adsBlocked") {
+                        return false;
+                    };
                 };
+                return input;
+            } catch (error) {
+                return true;
             };
-            return input;
         });
         createAnonFunction("quickRespawn", function (input) {
             if (input == 3e3) {
@@ -7718,9 +7734,12 @@ z-index: 999999;
                 };
 
                 //nobob
-                if(extract("noBob")){
-                    ss.MYPLAYER[H.actor].bobbleIntensity = 0;
-                }
+                if (extract("bobModifierEnabled")) {
+                    let modifier = extract("bobModifier") || 0;
+                    if (!(extract("bobModifierWhenStill") && ss.CONTROLKEYS !== 0))
+                        ss.MYPLAYER[H.actor].bobbleIntensity = lerp(ss.MYPLAYER[H.actor].bobbleIntensity, modifier, modifier);
+                    // log(ss.MYPLAYER[H.actor].bobbleIntensity, modifier);
+                };
 
                 let doRender = true;
 
