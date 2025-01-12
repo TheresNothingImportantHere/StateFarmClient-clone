@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre154
+// @version      3.4.1-pre155
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -5724,7 +5724,7 @@ z-index: 999999;
             let clientKeys;
 
             let originalJS = js;
-            if (typeof isCrackedShell !== 'undefined') originalJS = fetchTextContent('/js/shellshock.og.js');
+            if (crackedShell) originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
                 return fetchTextContent(clientKeysURL + hash + ".json?v=" + Date.now());
@@ -6053,14 +6053,14 @@ z-index: 999999;
             addParam("usernameAutoJoin", name, true);
 
             log("PARAMS:", params)
-            if (typeof isCrackedShell === 'undefined') {
+            if (!crackedShell) {
                 unsafeWindow.open("https://" + proxyURL + "/" + params, '_blank', `width=${extract("botWindowWidth")}},height=${extract("botWindowHeight")},left=` + leftOffset + ',top=' + topOffset)
             } else {
                 try {
                     if (canMassBot === undefined) {
-                        let data = await fetch(`https://${getScrambled().replace([0-9], '')}.${location.host}/mod/data`);
-                        data = await data.json();
-                        if (!data.success) {
+                        let data = await fetch(`https://${getScrambled().replace([0-9], '')}.${location.host}/$/ping`);
+                        data = await data.text();
+                        if (data !== 'OK') {
                             alert('You are not on a version of CrackedShell that supports botting.');
                             canMassBot = false;
                             return;
