@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre157
+// @version      3.4.1-pre158
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1834,7 +1834,10 @@ debug mode).`},
                     alert("Reset to defaults.");
                 };
             },});
-            initModule({ location: tp.clientTab.pages[0], title: "Debug", storeAs: "debug", tooltip: "Converts SFC into a development tool.\nExposes globalSS to the window (allowing you to manipulate many game variables directly) and also enables some extra logs.", bindLocation: tp.clientTab.pages[1], });
+            tp.clientTab.pages[0].addSeparator();
+            initFolder({ location: tp.clientTab.pages[0], title: "Developer Options", storeAs: "devFolder",});
+                initModule({ location: tp.devFolder, title: "Debug", storeAs: "debug", tooltip: "Converts SFC into a development tool.\nExposes globalSS to the window (allowing you to manipulate many game variables directly) and also enables some extra logs.", bindLocation: tp.clientTab.pages[1], });
+                initModule({ location: tp.devFolder, title: "Force Import", storeAs: "forceImport", tooltip: "Forces importing of Babylon instead of making fake babylon. Use only for testing or if fake babylon doesn't work.", bindLocation: tp.clientTab.pages[1], });
         tp.mainPanel.addSeparator();
         initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", tooltip: "Go to the client's update page", button: "Link", clickFunction: () => GM_openInTab(downloadURL, { active: true }) });
         initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", tooltip: "A guide with more in-depth information on modules", button: "Link", clickFunction: () => GM_openInTab(featuresGuideURL, { active: true }) });
@@ -6830,68 +6833,87 @@ z-index: 999999;
         const oneTime = function () {
             //xd lmao
             if (ss.MYPLAYER) {
-                log('%cSTATEFARM IS ATTEMPTING TO LOAD L.BABYLON', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-                var script = document.createElement("script");
-                script.src = babylonURL;
-                script.onload = function () {
-                    if (unsafeWindow.BABYLON) {
-                        L.BABYLONimported = unsafeWindow.BABYLON;
-                        delete unsafeWindow.BABYLON;
+                log('%cSTATEFARM IS ATTEMPTING TO CREATE FAKE BABYLON', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
 
-                        log("Imported Babylon.js loaded successfully");
-                        log(L.BABYLONimported.Engine.Version);
+                const found = (babylon) => {
+                    L.BABYLON = babylon;
 
-                        try {
-                            L.BABYLONfake = {
-                                //can use GetBabylon
-                                Color3: ss.GetBabylon("BABYLON.Color3"),
-                                Vector3: ss.GetBabylon("BABYLON.Vector3"),
-                                CubeTexture: ss.GetBabylon("BABYLON.CubeTexture"),
-                                PointLight: ss.GetBabylon("BABYLON.PointLight"),
-                                ArcRotateCamera: ss.GetBabylon("BABYLON.ArcRotateCamera"),
-                                Matrix: ss.GetBabylon("BABYLON.Matrix"),
+                    H.actor = findKeyWithProperty(ss.MYPLAYER, H.mesh);
+                    // Math.capVector3 = Math[H.capVector3];
 
-                                //can use ss
-                                TransformNode: ss.TransformNode,
+                    log("StateFarm: found vars:", H);
 
-                                //else
-                                Viewport: L.BABYLONimported.Viewport,
-                                MeshBuilder: L.BABYLONimported.MeshBuilder,
-                                VertexBuffer: L.BABYLONimported.VertexBuffer,
-                            };
+                    crosshairsPosition = new L.BABYLON.Vector3();
 
-                            L.BABYLONfake.Matrix.RotationYawPitchRoll = L.BABYLONfake.Matrix[H.RotationYawPitchRoll];
+                    // Object.defineProperty(ss.MYPLAYER.scene, 'forceWireframe', {
+                    //     get: () => {
+                    //         return extract("wireframe");
+                    //     }
+                    // });
 
-                            L.BABYLON = L.BABYLONfake;
-                        } catch (error) {
-                            log("fake babylon creation failed");
-                            log(error);
-                            L.BABYLON = L.BABYLONimported;
-                        };
-
-                        log('%cSTATEFARM SUCCESSFULLY LOADED BABYLON!', 'color: green; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-
-                        H.actor = findKeyWithProperty(ss.MYPLAYER, H.mesh);
-                        // Math.capVector3 = Math[H.capVector3];
-
-                        log("StateFarm: found vars:", H);
-
-                        crosshairsPosition = new L.BABYLON.Vector3();
-                        Object.defineProperty(ss.MYPLAYER.scene, 'forceWireframe', {
-                            get: () => {
-                                return extract("wireframe");
-                            }
-                        });
-
-                        if (AUTOMATED) {
-                            automatedBorder.style.borderColor = 'rgba(0, 0, 255, 1)';
-                        };
-
-                    } else {
-                        log('%cSTATEFARM COULD NOT LOAD L.BABYLON', 'color: red; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                    if (AUTOMATED) {
+                        automatedBorder.style.borderColor = 'rgba(0, 0, 255, 1)';
                     };
                 };
-                document.body.appendChild(script);
+
+                const doFake = () => {
+                    L.BABYLONfake = {
+                        //can use GetBabylon
+                        Color3: ss.GetBabylon("BABYLON.Color3"),
+                        Vector3: ss.GetBabylon("BABYLON.Vector3"),
+                        CubeTexture: ss.GetBabylon("BABYLON.CubeTexture"),
+                        PointLight: ss.GetBabylon("BABYLON.PointLight"),
+                        ArcRotateCamera: ss.GetBabylon("BABYLON.ArcRotateCamera"),
+                        Matrix: ss.GetBabylon("BABYLON.Matrix"),
+
+                        //can use ss
+                        TransformNode: ss.TransformNode,
+                        MeshBuilder: ss.MeshBuilder,
+                        Viewport: ss.Viewport,
+                        VertexBuffer: ss.VertexBuffer,
+                    };
+
+                    L.BABYLONfake.Matrix.RotationYawPitchRoll = L.BABYLONfake.Matrix[H.RotationYawPitchRoll];
+                    L.BABYLONfake.MeshBuilder.CreateLines = ss.CreateLines; //initially i meant to just make this an attribute but this also works
+
+                    createPopup("Created BabylonFake", "success");
+                    log('%cSTATEFARM SUCCESSFULLY LOADED FAKE BABYLON!', 'color: green; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                    found(L.BABYLONfake);
+                };
+
+                const doImport = () => {
+                    log('%c(Fallback) STATEFARM IS ATTEMPTING TO LOAD L.BABYLON', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                    var script = document.createElement("script");
+                    script.src = babylonURL;
+                    script.onload = function () {
+                        if (unsafeWindow.BABYLON) {
+                            L.BABYLONimported = unsafeWindow.BABYLON;
+                            delete unsafeWindow.BABYLON;
+
+                            log("Imported Babylon.js successfully");
+                            log(L.BABYLONimported.Engine.Version);
+
+                            createPopup("Imported Babylon", "success");
+                            log('%cSTATEFARM SUCCESSFULLY IMPORTED BABYLON!', 'color: green; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                            found(L.BABYLONimported);
+                        } else {
+                            log('%cSTATEFARM COULD NOT LOAD L.BABYLON', 'color: red; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+                        };
+                    };
+                    document.body.appendChild(script);
+                };
+
+                if (extract("forceImport")) {
+                    doImport();
+                } else {
+                    try {
+                        doFake();
+                    } catch (error) {
+                        log("fake babylon creation failed");
+                        log(error);
+                        doImport();
+                    };
+                };
                 ranOneTime = true;
             };
         };
