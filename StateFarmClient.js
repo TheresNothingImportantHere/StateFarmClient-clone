@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre156
+// @version      3.4.1-pre157
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3563,7 +3563,7 @@ z-index: 999999;
             /*----------------------*/
             //stuff
             object.generatedESP = true;
-            ESPArray.push([object, tracerLines, box, target, object.lookDirLine]);
+            ESPArray.push([object, tracerLines, box, object.lookDirLine]); //, target
         };
         if (object.lookDirLine && extract("lookTracers")){ //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
             const TRACE_LENGTH_MULTIPLIER = 75; //how long is the trace max?
@@ -6835,11 +6835,39 @@ z-index: 999999;
                 script.src = babylonURL;
                 script.onload = function () {
                     if (unsafeWindow.BABYLON) {
-                        L.BABYLON = unsafeWindow.BABYLON;
+                        L.BABYLONimported = unsafeWindow.BABYLON;
                         delete unsafeWindow.BABYLON;
 
-                        log("Babylon.js loaded successfully");
-                        log(L.BABYLON.Engine.Version);
+                        log("Imported Babylon.js loaded successfully");
+                        log(L.BABYLONimported.Engine.Version);
+
+                        try {
+                            L.BABYLONfake = {
+                                //can use GetBabylon
+                                Color3: ss.GetBabylon("BABYLON.Color3"),
+                                Vector3: ss.GetBabylon("BABYLON.Vector3"),
+                                CubeTexture: ss.GetBabylon("BABYLON.CubeTexture"),
+                                PointLight: ss.GetBabylon("BABYLON.PointLight"),
+                                ArcRotateCamera: ss.GetBabylon("BABYLON.ArcRotateCamera"),
+                                Matrix: ss.GetBabylon("BABYLON.Matrix"),
+
+                                //can use ss
+                                TransformNode: ss.TransformNode,
+
+                                //else
+                                Viewport: L.BABYLONimported.Viewport,
+                                MeshBuilder: L.BABYLONimported.MeshBuilder,
+                                VertexBuffer: L.BABYLONimported.VertexBuffer,
+                            };
+
+                            L.BABYLONfake.Matrix.RotationYawPitchRoll = L.BABYLONfake.Matrix[H.RotationYawPitchRoll];
+
+                            L.BABYLON = L.BABYLONfake;
+                        } catch (error) {
+                            log("fake babylon creation failed");
+                            log(error);
+                            L.BABYLON = L.BABYLONimported;
+                        };
 
                         log('%cSTATEFARM SUCCESSFULLY LOADED BABYLON!', 'color: green; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
 
@@ -6984,7 +7012,7 @@ z-index: 999999;
                     player.lookDirLine.visibility = player[H.playing] && extract("lookTracers") && passedLists;
                     player.box.visibility = extract("playerESP") && passedLists;
                     // player.target.visibility = extract("targets") && passedLists;
-                    player.target.visibility = false;
+                    // player.target.visibility = false;
 
                     if (player[H.actor]) {
                         let eggSize = extract("eggSize")
