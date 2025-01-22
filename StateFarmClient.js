@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre155
+// @version      3.4.1-pre156
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3537,6 +3537,7 @@ z-index: 999999;
             box.renderingGroupId = 1;
             box.parent = newParent;
             object.box = box;
+            /*
             //TARGETS
             let target;
             if (type == "playerESP") {
@@ -3549,6 +3550,7 @@ z-index: 999999;
                 target.parent = newParent;
                 object.target = target;
             };
+            */
             /*---fwltv2---*/
             if (type == "playerESP"){
                 //create line. other shit later
@@ -3980,8 +3982,8 @@ z-index: 999999;
             if (extract("minimap")) {
                 if (!miniCamera) {
                     var camPos = new L.BABYLON.Vector3(0, -20, 0);
-                    miniCamera = new L.BABYLON.ArcRotateCamera("minimapCamera", L.BABYLON.Tools.ToRadians(-90), L.BABYLON.Tools.ToRadians(0), 30, camPos, ss.SCENE);
-                    miniCamera.mode = L.BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+                    miniCamera = new L.BABYLON.ArcRotateCamera("minimapCamera", -1.5707963267948966, 0, 30, camPos, ss.SCENE);
+                    miniCamera.mode = 1; //L.BABYLON.Camera.ORTHOGRAPHIC_CAMERA
                     ss.SCENE.activeCameras.push(miniCamera);
                     miniCamera.parent = ss.MYPLAYER[H.actor][H.mesh];
                 };
@@ -5836,7 +5838,7 @@ z-index: 999999;
                 log("PAUSE:", match);
                 H.PAUSE = match ? `function(){${match[1]}}` : "function(){log('no pause womp womp')}";
     
-                const variableNameRegex = /^[a-zA-Z0-9_$\[\]"\\]*$/;
+                const variableNameRegex = /^[a-zA-Z0-9_$\[\]"\\\.,]*$/;
                 for (let name in H) {
                     let deobf = H[name];
                     if (name == "SERVERSYNC" || name == "PAUSE" || variableNameRegex.test(deobf)) { //serversync should only be defined just before...
@@ -7316,7 +7318,7 @@ z-index: 999999;
             if (!(extract('skybox') === 'default' || extract('skybox') === true || ss.SCENE.skyboxTextureThing == extract('skybox'))) {
                 let url = `${atob(extract("skybox"))}/skybox`;
                 unsafeWindow[skyboxName].material.reflectionTexture = new L.BABYLON.CubeTexture(url, ss.SCENE);
-                unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
+                unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = 5; //L.BABYLON.Texture.SKYBOX_MODE
                 ss.SCENE.skyboxTextureThing = extract('skybox');
             };
         };
