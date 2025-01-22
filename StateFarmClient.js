@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre158
+// @version      3.4.1-pre159
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -465,7 +465,7 @@ let attemptedInjection = false;
     let ss = {};
     let H = {}; // obfuscated shit lol
     const tp = {}; // <-- tp = tweakpane
-    let msgElement, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, performanceElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -1067,6 +1067,7 @@ sniping and someone sneaks up on you
             initModule({ location: tp.hudTab.pages[0], title: "HP Display", storeAs: "playerStats", tooltip: "Displays the health of your opponents", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "PlayerInfo", storeAs: "playerInfo", tooltip: "Displays added information about the player you're targeting", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "GameInfo", storeAs: "gameInfo", tooltip: "Displays extra game information", bindLocation: tp.hudTab.pages[1], });
+            initModule({ location: tp.hudTab.pages[0], title: "Performance", storeAs: "performanceInfo", tooltip: "Shows performance information like memory usage", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "ShowStream", storeAs: "showStreams", tooltip: "Detects & displays ongoing twitch streamers", bindLocation: tp.hudTab.pages[1], });
             tp.hudTab.pages[0].addSeparator();
             initModule({ location: tp.hudTab.pages[0], title: "MiniMap", storeAs: "minimap", tooltip: "Displays a top down view of your game", bindLocation: tp.hudTab.pages[1], });
@@ -2472,7 +2473,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
                 url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.ttf")format("truetype"),
                 url("https://db.onlinewebfonts.com/t/0a6ee448d1bd65c56f6cf256a7c6f20a.svg#Bahnschrift")format("svg");
             }
-            .tp-dfwv, .tp-sglv_i, .tp-rotv_t, .tp-fldv_t, .tp-ckbv_l, .tp-txtv_i, .tp-lblv_l, .tp-tbiv_t, .coords, .gameinfo, .playerstats, .playerinfo, .automated {
+            .tp-dfwv, .tp-sglv_i, .tp-rotv_t, .tp-fldv_t, .tp-ckbv_l, .tp-txtv_i, .tp-lblv_l, .tp-tbiv_t, .coords, .gameinfo, .playerstats, .playerinfo, .performanceinfo, .automated {
                 font-family: 'Bahnschrift', sans-serif !important;
                 font-size: 16px;
                 z-index: 9999 !important;
@@ -2674,6 +2675,27 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         `);
         document.body.appendChild(playerinfoElement);
         playerinfoElement.style.display = 'none';
+        //initiate player info div and css and shit
+        performanceElement = document.createElement('div'); // create the element directly
+        performanceElement.classList.add('performanceinfo');
+        performanceElement.setAttribute('style', `
+            position: absolute;
+            top: 35%;
+            left: 90%;
+            height: auto;
+            max-height: 102;
+            text-wrap: nowrap;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            font-weight: bolder;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            z-index: 999999;
+        `);
+        document.body.appendChild(performanceElement);
+        performanceElement.style.display = 'none';
         //initiate first use div and css and shit
         firstUseElement = document.createElement('div'); // create the element directly
         firstUseElement.classList.add('firstuse');
@@ -2709,24 +2731,28 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         minangleCircle.style.pointerEvents = 'none';
         document.body.appendChild(minangleCircle);
 
-        if (load("HUD-Positions") == null) {
-            hudElementPositions.coordElement = { top: coordElement.getBoundingClientRect().top, left: coordElement.getBoundingClientRect().left };
-            hudElementPositions.gameInfoElement = { top: gameInfoElement.getBoundingClientRect().top, left: gameInfoElement.getBoundingClientRect().left };
-            hudElementPositions.playerstatsElement = { top: playerstatsElement.getBoundingClientRect().top, left: playerstatsElement.getBoundingClientRect().left };
-            hudElementPositions.playerinfoElement = { top: playerinfoElement.getBoundingClientRect().top, left: playerinfoElement.getBoundingClientRect().left };
-            save("HUD-Positions", hudElementPositions);
-        } else {
+        try {
             hudElementPositions = load("HUD-Positions");
-
+    
             coordElement.style.top = hudElementPositions.coordElement.top + "px";
             gameInfoElement.style.top = hudElementPositions.gameInfoElement.top + "px";
             playerstatsElement.style.top = hudElementPositions.playerstatsElement.top + "px";
             playerinfoElement.style.top = hudElementPositions.playerinfoElement.top + "px";
-
+            performanceElement.style.top = hudElementPositions.performanceElement.top + "px";
+    
             coordElement.style.left = hudElementPositions.coordElement.left + "px";
             gameInfoElement.style.left = hudElementPositions.gameInfoElement.left + "px";
             playerstatsElement.style.left = hudElementPositions.playerstatsElement.left + "px";
             playerinfoElement.style.left = hudElementPositions.playerinfoElement.left + "px";
+            performanceElement.style.left = hudElementPositions.performanceElement.left + "px";
+        } catch (error) {
+            console.error(error);
+            hudElementPositions.coordElement = { top: coordElement.getBoundingClientRect().top, left: coordElement.getBoundingClientRect().left };
+            hudElementPositions.gameInfoElement = { top: gameInfoElement.getBoundingClientRect().top, left: gameInfoElement.getBoundingClientRect().left };
+            hudElementPositions.playerstatsElement = { top: playerstatsElement.getBoundingClientRect().top, left: playerstatsElement.getBoundingClientRect().left };
+            hudElementPositions.playerinfoElement = { top: playerinfoElement.getBoundingClientRect().top, left: playerinfoElement.getBoundingClientRect().left };
+            hudElementPositions.performanceElement = { top: performanceElement.getBoundingClientRect().top, left: performanceElement.getBoundingClientRect().left };
+            save("HUD-Positions", hudElementPositions);
         };
     };
 
@@ -2781,6 +2807,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
                     hudElementPositions.gameInfoElement = { "top": gameInfoElement.getBoundingClientRect().top, "left": gameInfoElement.getBoundingClientRect().left };
                     hudElementPositions.playerstatsElement = { "top": playerstatsElement.getBoundingClientRect().top, "left": playerstatsElement.getBoundingClientRect().left };
                     hudElementPositions.playerinfoElement = { "top": playerinfoElement.getBoundingClientRect().top, "left": playerinfoElement.getBoundingClientRect().left };
+                    hudElementPositions.performanceElement = { "top": performanceElement.getBoundingClientRect().top, "left": performanceElement.getBoundingClientRect().left };
                     save("HUD-Positions", hudElementPositions);
                 };
 
@@ -3791,12 +3818,14 @@ z-index: 999999;
         playerstatsElement.style.display = "none";
         playerinfoElement.style.display = "none";
         redCircle.style.display = "none";
+        performanceElement.style.display = "none";
         firstUseElement.style.display = "none";
 
         makeHudElementDragable(coordElement);
         makeHudElementDragable(gameInfoElement);
         makeHudElementDragable(playerstatsElement);
         makeHudElementDragable(playerinfoElement);
+        makeHudElementDragable(performanceElement);
 
         if (extract("gameBlacklistCodes") != "" && extract("gameBlacklistCodes") != undefined) {
             let input = extract("gameBlacklistCodes");
@@ -4242,6 +4271,22 @@ z-index: 999999;
                 coordElement.innerText = personalCoordinate;
                 void coordElement.offsetWidth;
                 coordElement.style.display = '';
+            };
+            if (ss.MYPLAYER && ss.MYPLAYER[H.actor] && ss.MYPLAYER[H.actor][H.mesh] && extract("performanceInfo")) {
+                if (performance.memory) {
+                    const memoryUsage = performance.memory;
+                    const jsHeapSizeLimit = (memoryUsage.jsHeapSizeLimit / 1024 / 1024).toFixed(2);
+                    const totalJSHeapSize = (memoryUsage.totalJSHeapSize / 1024 / 1024).toFixed(2);
+                    const usedJSHeapSize = (memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(2);
+
+                    performanceElement.textContent = `
+                        Memory Usage:
+                        ${usedJSHeapSize} MB / ${jsHeapSizeLimit} MB
+                    `.trim();
+                } else {
+                    performanceElement.textContent = "Performance.memory API is not supported in this browser.";
+                };
+                performanceElement.style.display = '';
             };
             // create an info box for the first execution, i have 69697935 iq
             if (firstExecution == true) {
