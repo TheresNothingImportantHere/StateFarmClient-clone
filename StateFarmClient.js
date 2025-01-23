@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre159
+// @version      3.4.1-pre160
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -2747,6 +2747,8 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
             performanceElement.style.left = hudElementPositions.performanceElement.left + "px";
         } catch (error) {
             console.error(error);
+            hudElementPositions = {};
+
             hudElementPositions.coordElement = { top: coordElement.getBoundingClientRect().top, left: coordElement.getBoundingClientRect().left };
             hudElementPositions.gameInfoElement = { top: gameInfoElement.getBoundingClientRect().top, left: gameInfoElement.getBoundingClientRect().left };
             hudElementPositions.playerstatsElement = { top: playerstatsElement.getBoundingClientRect().top, left: playerstatsElement.getBoundingClientRect().left };
