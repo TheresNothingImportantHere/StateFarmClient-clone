@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre160
+// @version      3.4.1-pre161
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -283,7 +283,7 @@ let attemptedInjection = false;
                             `;
                         }
 
-                        if (scriptInfo && scriptInfo.version && scriptInfo.version !== version) {
+                        if (scriptInfo && scriptInfo.version && scriptInfo.version !== version && typeof (GM_info) !== 'undefined') {
                             commitHistoryContent += `
                             <a href="${downloadURL}" target="_blank" style="text-decoration: none;">
                                 <div class="attention-notice" style="background-color: #ffcc00; color: #000; padding: 0.75em; text-align: center; font-weight: bold; margin-bottom: 0.15em; margin-top: 0.25em; border-radius: 5px; border: 2px solid #ffff00;">
