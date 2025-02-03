@@ -220,7 +220,7 @@ let attemptedInjection = false;
             } catch (error) {
                 log("couldnt fetch greasyfork info :(");
             };
-            
+
             let oldVersion = load("version");
             save("version", version);
 
@@ -228,10 +228,10 @@ let attemptedInjection = false;
                 const maxAttempts = 30;
                 const interval = 500;
                 let attempts = 0;
-            
+
                 const checkForElement = function() {
                     const existingContainer = document.querySelector('.secondary-aside-wrap');
-            
+
                     if (existingContainer) {
                         log('Element found:', existingContainer);
                         createAndAppendCommitHistoryBox(existingContainer);
@@ -243,11 +243,11 @@ let attemptedInjection = false;
                         log('Element not found after maximum attempts');
                     }
                 };
-            
+
                 const createAndAppendCommitHistoryBox = function(existingContainer) {
                     let commitHistoryBox = document.createElement('div');
                     commitHistoryBox.className = 'media-tabs-wrapper box_relative border-blue5 roundme_sm bg_blue6 common-box-shadow ss_margintop_sm';
-                
+
                     let commitHistoryContent = `
                     <div class="media-tab-container display-grid align-items-center gap-sm bg_blue3">
                         <h4 class="common-box-shadow text-shadow-black-40 text_white dynamic-text" style="display: flex; align-items: center;">
@@ -266,13 +266,13 @@ let attemptedInjection = false;
                         <div class="tab-content ss_paddingright ss_paddingleft">
                             <div class="news-container f_col v_scroll" style="height: 20em; overflow-y: auto;">
                     `;
-                
+
                     fetch(commitFeedURL).then(response => {
                         if (response.ok) return response.json();
                         else throw new Error('Failed to fetch commit history contents');
                     }).then(commitHistory => {
                         log("retrieved: commit history", commitHistory);
-                
+
                         if (oldVersion !== version) {
                             commitHistoryContent += `
                                 <a href="${githubURL}" target="_blank" style="text-decoration: none;">
@@ -282,7 +282,7 @@ let attemptedInjection = false;
                                 </a>
                             `;
                         }
-                
+
                         if (scriptInfo && scriptInfo.version && scriptInfo.version !== version) {
                             commitHistoryContent += `
                             <a href="${downloadURL}" target="_blank" style="text-decoration: none;">
@@ -292,14 +292,14 @@ let attemptedInjection = false;
                             </a>
                             `;
                         }
-                
+
                         commitHistory.forEach(commit => {
                             const commitDate = new Date(commit.commit.author.date).toLocaleString();
                             const authorProfileURL = `https://github.com/${commit.author.login}`; //replace with actual url if available
                             const messageParts = commit.commit.message.split('\n\n', 2); //split by the first occurrence of '\n\n'
                             const title = messageParts[0]; //title part of the message
                             const description = messageParts[1] || ''; //description part of the message, defaults to empty string if not present
-                
+
                             commitHistoryContent += `
                             <div class="commit-item" style="padding: 0.2em 0.3em; background-color: #95e2fe; border-bottom: 2px solid #0B93BD;">
                                 <div style="display: flex; align-items: flex-start;">
@@ -319,29 +319,29 @@ let attemptedInjection = false;
                             </div>
                             `;
                         });
-                
+
                         commitHistoryContent += `
                             </div>
                         </div>
                     </div>
                     `;
-                
+
                     commitHistoryBox.innerHTML = commitHistoryContent;
                     existingContainer.appendChild(commitHistoryBox);
                     }).catch(error => {
                         log('Error:', error);
                     });
                 };
-                
-            
+
+
                 checkForElement();
                         };
-            
+
             (async () => {
                 try {
                     var response = await fetch(sfxURL);
                     if (!response.ok) throw new Error('Failed to fetch folder contents (custom sfx)');
-            
+
                     var data = await response.json();
                     data.forEach((file) => {
                         retrievedSFX.push({ text: file.name.replace(".zip", ""), value: btoa(file.download_url) });
@@ -349,7 +349,7 @@ let attemptedInjection = false;
                     //1ust i hated your implementation and this is me showing that i reached my breaking point.
                     var response = await fetch(skyboxListURL); //when the nice guy loses his temper
                     if (!response.ok) throw new Error('Failed to fetch folder contents (custom skyboxes)');
-            
+
                     var data = await response.json();
                     data.forEach((folder) => {
                         if (folder.type === "dir") {
@@ -365,7 +365,7 @@ let attemptedInjection = false;
                             });
                         };
                     });
-            
+
                     initMenu(false);
                     tp.mainPanel.hidden = extract("hideAtStartup");
                 } catch (error) {
@@ -373,11 +373,11 @@ let attemptedInjection = false;
                     initMenu(false);
                     tp.mainPanel.hidden = extract("hideAtStartup");
                 };
-            })();            
+            })();
         });
 
     };
-    
+
     //INIT VARS
     const inbuiltPresets = { //Don't delete onlypuppy7's Config
         "onlypuppy7's Config": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>360<antiSneak>1.8<aimbotAntiSnap>0<aimbotAntiSnapRegime>3<maxAimTime>64<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.05<grenadeMax>true<grenadePower>1<playerESP>true<tracers>true<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>true<nametagInfoInterval>5<aimbotColor>"#0000ff"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>true<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<minimap>true<minimapZoom>5<minimapSize>1<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<fakeMessageID>0<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>14<autoStamp>0<autoHat>0<skybox>1<randomSkyBox>true<randomSkyBoxInterval>5.9<legacyModels>true<filter>0<gunPosition>true<bobModifierEnabled>true<bobModifier>0.25<bobModifierWhenStill>true<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>5<replaceLogo>true<titleAnimation>true<themeType>5<partyLightsEnabled>true<partyLightsIntensity>1.87<worldFlattening>1<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<autoUnban>true<adBlock>true<spoofVIP>true<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoChickenWinner>true<chickenWinnerNotifs>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>true<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
@@ -466,7 +466,7 @@ let attemptedInjection = false;
     let H = {}; // obfuscated shit lol
     const tp = {}; // <-- tp = tweakpane
     let msgElement, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, performanceElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
-    let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond
+    let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond, enemyAimNearest
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
     let pathfindingTargetOverride = undefined;
@@ -939,7 +939,7 @@ sniping and someone sneaks up on you
         ]);
             initModule({ location: tp.combatTab.pages[0], title: "Aimbot", storeAs: "aimbot", tooltip: "Locks onto targeted player", bindLocation: tp.combatTab.pages[1], defaultBind: "V", });
             initFolder({ location: tp.combatTab.pages[0], title: "Aimbot Options", storeAs: "aimbotFolder", });
-                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "Decides the priority for which player aimbot should target", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }, { text: "Lowest HP", value: "lowestHp" }, { text: "Most Kills", value: "mostKills" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "Decides the priority for which player aimbot should target", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }, { text: "Lowest HP", value: "lowestHp" }, { text: "Most Kills", value: "mostKills" }, {text: "Aiming At Me", value: "aimingAt" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
                 initModule({ location: tp.aimbotFolder, title: "TargetVisible", storeAs: "aimbotVisibilityMode", tooltip: "A filter, applied after TargetMode helping to pick the aimbot target", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Prioritise Visible", value: "prioritise" }, { text: "Only Visible", value: "onlyvisible" }], defaultValue: "disabled", enableConditions: [["aimbot", true]] });
                 tp.aimbotFolder.addSeparator();
                 initModule({ location: tp.aimbotFolder, title: "ToggleRM", storeAs: "aimbotRightClick", tooltip: "Modifies aimbot to only lock when the right mouse is held", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
@@ -999,7 +999,7 @@ sniping and someone sneaks up on you
                 initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersColor1Rainbow", false]], });
                 //TODO: I hate having it like that so maybe a initmodule helper func for color with creates both color opt and rainbow opt. Same with the getColors() btw ~Sq
                 //also speed customisation and shit, people love customization.
-                //-------- 
+                //--------
                 initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "Static: (Unused)\nProximity: Moderately close colour\nVisibility: Visible.", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
                 //initModule({ location: tp.tracersFolder, title: "C2 rainbow", storeAs: "tracersColor2Rainbow", tooltip: "🌈", defaultValue: true, disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
                 //--------
@@ -1984,7 +1984,7 @@ debug mode).`},
                 label.addEventListener('mouseleave', () => {
                     tooltipElement.style.opacity = '0';
                 });
-            });            
+            });
         }, 500);
 
         menuInitiated = reset == "init" ? "init" : true;
@@ -2103,7 +2103,7 @@ debug mode).`},
         setTimeout(() => {
             promptElement.style.opacity = '1';
         }, 100);
-        setTimeout(() => { 
+        setTimeout(() => {
             promptElement.style.opacity = '0';
             setTimeout(() => {
                 deleteButton();
@@ -2120,7 +2120,7 @@ debug mode).`},
                 reloadPage();
             }, 400);
         };
-    
+
         //create vardataOverlay
         vardataOverlay = document.createElement('div');
         vardataOverlay.style.position = 'fixed';
@@ -2132,7 +2132,7 @@ debug mode).`},
         vardataOverlay.style.zIndex = '9998';
         vardataOverlay.style.opacity = '0';
         vardataOverlay.style.transition = 'opacity 0.4s ease-in-out';
-    
+
         //create vardataPopup
         vardataPopup = document.createElement('div');
         vardataPopup.style.position = 'fixed';
@@ -2153,7 +2153,7 @@ debug mode).`},
         vardataPopup.style.fontSize = '16px';
         vardataPopup.style.zIndex = '9999';
         vardataPopup.style.whiteSpace = 'pre-wrap';
-    
+
         //set vardataPopup content
         const title = "Valid VarData for this hash could not be retrieved.";
         const message = `This could be due to a conflicting script or StateFarm Client is out of date.<br>
@@ -2174,13 +2174,13 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
                                <input type="text" id="vardataInput" style="flex: 1; padding: 5px; width: 250px; border: 1px solid rgba(255, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; border-radius: 5px; margin-right: 10px;">
                                <button id="submitVarData" style="padding: 5px 15px; background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; cursor: pointer; transition: background-color 0.2s;">GO</button>
                            </div>${message2}`;
-    
+
         //create buttons
         const vardataButtonContainer = document.createElement('div');
         vardataButtonContainer.style.display = 'flex';
         vardataButtonContainer.style.justifyContent = 'space-between';
         vardataButtonContainer.style.marginTop = '10px';
-    
+
         vardataButtonsInfo.forEach(({ id, text, action }) => {
             const button = document.createElement('button');
             button.id = id;
@@ -2196,14 +2196,14 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
             button.style.marginRight = '10px';
             button.style.fontSize = '12px';
             button.style.whiteSpace = 'pre-wrap';
-        
+
             button.addEventListener('click', action);
             button.addEventListener('mouseenter', () => button.style.backgroundColor = 'rgba(255, 255, 255, 0.3)');
             button.addEventListener('mouseleave', () => button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)');
-        
+
             vardataButtonContainer.appendChild(button);
         });
-        
+
         vardataPopup.appendChild(vardataButtonContainer);
 
         const setButtonState = function (buttonId, isEnabled) {
@@ -2214,7 +2214,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
                 button.style.pointerEvents = isEnabled ? 'auto' : 'none';
             }
         };
-        
+
         (setTimeout(() => {
             vardataButtonsInfo.forEach(({ id, enabled }) => {
                 setButtonState(id, enabled);
@@ -2228,12 +2228,12 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         vardataCheckboxContainer.style.alignItems = 'center';
         vardataCheckboxContainer.style.marginTop = '15px';
         vardataCheckboxContainer.style.fontSize = '16px';
-    
+
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = 'rememberCheckbox';
         checkbox.style.display = 'none';
-    
+
         const customCheckbox = document.createElement('span');
         customCheckbox.style.width = '20px';
         customCheckbox.style.height = '20px';
@@ -2243,18 +2243,18 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         customCheckbox.style.borderRadius = '5px';
         customCheckbox.style.marginRight = '8px';
         customCheckbox.style.cursor = 'pointer';
-    
+
         customCheckbox.addEventListener('click', () => {
             checkbox.checked = !checkbox.checked;
             change("vardataType", checkbox.checked ? 2 : 1);
             customCheckbox.style.backgroundColor = checkbox.checked ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.1)';
         });
-    
+
         vardataCheckboxContainer.appendChild(customCheckbox);
         vardataCheckboxContainer.appendChild(checkbox);
         vardataCheckboxContainer.appendChild(document.createTextNode('Remember until next hash'));
         vardataPopup.appendChild(vardataCheckboxContainer);
-    
+
         document.body.appendChild(vardataOverlay);
         document.body.appendChild(vardataPopup);
 
@@ -2268,7 +2268,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
             const error = function () {
                 createPopup("Inputted VarData isn't valid.", "error");
             };
-            
+
             try {
                 let converted = JSON.parse(inputValue);
                 if (converted.vars && converted.checksum) {
@@ -2289,7 +2289,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
                 submitButton.click();
             }
         });
-    
+
         //fade anims
         setTimeout(() => {
             vardataOverlay.style.opacity = '1';
@@ -2733,13 +2733,13 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
 
         try {
             hudElementPositions = load("HUD-Positions");
-    
+
             coordElement.style.top = hudElementPositions.coordElement.top + "px";
             gameInfoElement.style.top = hudElementPositions.gameInfoElement.top + "px";
             playerstatsElement.style.top = hudElementPositions.playerstatsElement.top + "px";
             playerinfoElement.style.top = hudElementPositions.playerinfoElement.top + "px";
             performanceElement.style.top = hudElementPositions.performanceElement.top + "px";
-    
+
             coordElement.style.left = hudElementPositions.coordElement.left + "px";
             gameInfoElement.style.left = hudElementPositions.gameInfoElement.left + "px";
             playerstatsElement.style.left = hudElementPositions.playerstatsElement.left + "px";
@@ -3178,7 +3178,7 @@ z-index: 999999;
         return new L.BABYLON.Color3(r, g, b);
     };
     /**
-     * 
+     *
      * @param {String} colorSelectName name of the color module. Will be used for extract. EG. aimbotColor
      * @param {String} isRainbowName name of the rainbow checkbox mod. Will be used for extract.
      */
@@ -3214,7 +3214,7 @@ z-index: 999999;
             if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9)  imgURL = replacementLogoHalloweenURL;
             if (replacementLogoChristmasURL && replacementLogoChristmasURL !== "" && month == 11) imgURL = replacementLogoChristmasURL;
             if (replacementLogoNewYearsURL  && replacementLogoNewYearsURL  !== "" && month == 0)  imgURL = replacementLogoNewYearsURL;
-            
+
             for (let i = 0; i < images.length; i++) {
                 const src = images[i].getAttribute('src');
                 if (src && src.includes('img/logo.svg')) {
@@ -3453,7 +3453,7 @@ z-index: 999999;
                 log("Error in anonymous function:", error);
             }
         };
-    
+
         F[name] = unsafeWindow[funcName];
         functionNames[name] = funcName
     };
@@ -3597,7 +3597,7 @@ z-index: 999999;
             object.generatedESP = true;
             ESPArray.push([object, tracerLines, box, object.lookDirLine]); //, target
         };
-        if (object.lookDirLine && extract("lookTracers")){ //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
+        if (object.lookDirLine && (extract("lookTracers") || extract("aimbotTargetMode") === "aimingAt")){ //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
             const TRACE_LENGTH_MULTIPLIER = 75; //how long is the trace max?
             const playerEye = object[H.actor].eye; // BABYLON.TransformNode (https://doc.babylonjs.com/typedoc/classes/BABYLON.TransformNode). TN of the "eye", as shell calls it. Basically camera pos.
 
@@ -3618,7 +3618,7 @@ z-index: 999999;
                 object.lookDirLine.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [g.x, g.y, g.z, f.x, f.y, f.z]);
                 //set line to correct points, with the max dist scaled dirVec3 as endpoint
             }
-
+            object.team !== ss.MYPLAYER.team ? object.lookLineData = object.lookDirLine.getVerticesData(L.BABYLON.VertexBuffer.PositionKind): null;
             object.lookDirLine.color = new L.BABYLON.Color3(...hexToRgb(extract("lookTracersColor"))); //updaté line colo(u)r
             object.lookDirLine.renderingGroupId = extract("lookTracersRGI1")? 1 : 0; //render in front shell?
             //I dont really like the implementation without parenting, but IDK how the fuck bab's parenting system works and we need to update anyway. :/
@@ -4022,7 +4022,7 @@ z-index: 999999;
                     miniCamera.parent = ss.MYPLAYER[H.actor][H.mesh];
                 };
                 miniCamera._skipRendering = false;
-                
+
                 let cameraScale = extract("minimapZoom");
 
                 miniCamera.orthoLeft = -cameraScale;
@@ -5044,7 +5044,7 @@ z-index: 999999;
         // let targetPosition = usePrediction ? predictPosition(target) : target[H.actor][H.mesh].position;
 
         let directionVector = getDirectionVectorFacingTarget(targetPosition, true);
-        
+
         //NOTE: i dont really know HOW good this is of a fix! at least it will only affect aimbot and not anything else :pensive:
         directionVector.x = -directionVector.x;
         directionVector.y = -directionVector.y;
@@ -5357,7 +5357,7 @@ z-index: 999999;
             // try {
             //     if (extract("debug")) log("signedIn", args);
             // } catch (error) {
-                
+
             // };
         });
         createAnonFunction('interceptGa', function () {
@@ -5508,7 +5508,7 @@ z-index: 999999;
             };
         });
         createAnonFunction('onConnectFail', function (ERRORCODE, ERRORARRAY) {
-            const terminationMessage = findKeyByValue(ERRORARRAY, ERRORCODE); //don't want to fuck with errorString so here's a new var! 
+            const terminationMessage = findKeyByValue(ERRORARRAY, ERRORCODE); //don't want to fuck with errorString so here's a new var!
             if (ERRORCODE !== ERRORARRAY.mainMenu) {
                 errorString = terminationMessage;
                 log("StateFarm has detected a connection error...", errorString, ERRORCODE, ERRORARRAY);
@@ -5575,26 +5575,26 @@ z-index: 999999;
             } else {
                 if (msg !== lastSentMessage) { //not spammed or afked
                     //NOTE: never, NEVER, never under any otherworldly circumstances use Notepad++ for editing nested stuff like this. IT WILL FUCK UP THE FORMATTING
-			//ITS STILL FUCKED UP IN THE GH EDITOR WTF PLEASE END ME 
+			//ITS STILL FUCKED UP IN THE GH EDITOR WTF PLEASE END ME
 			//TODO: FIX THIS FUCKING FORMATTING fuckfuckFUCK
                     if(extract("chatFilterBypass")) msg=msg.replaceAll("fuck", "ꬵսсk"); //special case bc they check f.ck; this basically just gets the f from the nonexacts.
                     if (extract("chatFilterBypass") && ss.isBadWord(msg)) { //apply filter bypass
-                        //#freedomOfSpeech #againstInternetCensorship 
-                        //Bl*e W*zard D*gital will not c*nsor me!!!!! 
+                        //#freedomOfSpeech #againstInternetCensorship
+                        //Bl*e W*zard D*gital will not c*nsor me!!!!!
     			        const exactLookAlikes = {
 	    		            //(almost) exact lookalikes, will make it look better if it is enough
-		    	            'a': 'а', 'c': 'с', 'e': 'е', 
+		    	            'a': 'а', 'c': 'с', 'e': 'е',
 			                'h': 'հ', 'i': 'і', 'j': 'ј',
 			                'n': '𝗇', 'o': 'о', 'p': 'р',
     			            'q': 'q', 'u': 'ս',  'w': 'ԝ',
 	    		            'y': 'у',
     		    	        //uppercase
 	    		            'B': 'В', 'D': 'ꓓ', 'E': 'Е',
-    	    		        'H': 'Η', 'I': 'І', 'J': 'Ј', 
+    	    		        'H': 'Η', 'I': 'І', 'J': 'Ј',
 	    	    	        'U': '𐓎',
 		    	            'V': 'ⴸ', 'W': 'Ԝ', 'X': 'Χ', 'Y': 'Υ',
-			                'Z': 'Ζ', 
-    			        }; 
+			                'Z': 'Ζ',
+    			        };
                         const lookAlikes = {
                             //nvm, found this complete list on reddit: https://www.reddit.com/r/Unicode/comments/gpgmb7/unique_unicode_chars_that_look_the_exact_same_as/
 				//should literally cover 100% of the thing now, still keeping fallback though
@@ -5608,25 +5608,25 @@ z-index: 999999;
 		        	        'l': 'ⅼ', 'm': 'ｍ', 'r': '𝗋', 's': '𐑈',
 			                't': '𝚝', 'v': '∨',
     	    		        'x': 'ⅹ',  'z': '𝗓', 'A': '𐊠',
-	        		        'C': '𐊢', 
+	        		        'C': '𐊢',
     		          	    'F': '𐊇', 'G': 'Ԍ', 'K': 'Κ', 'L': 'Ⅼ', 'M': 'Μ',
 	    	    	        'N': 'Ν', 'O': 'Ο', 'P': 'Ρ', 'Q': '𝖰',
-    	    	    	    'R': '𖼵', 'S': 'Ѕ', 'T': 'Τ', 
+    	    	    	    'R': '𖼵', 'S': 'Ѕ', 'T': 'Τ',
                         };
                         let onlyReplace = msg;
 	    	            //exact
 		                for (let char in exactLookAlikes) {
                             //replace all chars with lookalikes
-		    	            onlyReplace = onlyReplace.replaceAll(char, exactLookAlikes[char]); 
+		    	            onlyReplace = onlyReplace.replaceAll(char, exactLookAlikes[char]);
                         };
     		            //did that work?
 	    	            if(ss.isBadWord(onlyReplace)){
 		    	            log("chatFilterBypass: exacts were not enough, trying full...");
     		    	        for (let char in lookAlikes) {
-	    		                onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]); 
+	    		                onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]);
 		    	            };
     		            };
-                        if(!ss.isBadWord(onlyReplace)){ 
+                        if(!ss.isBadWord(onlyReplace)){
                         //did the lookalike replace do the job? Set it as the new message
 		        	    log("chatFilterBypass: lookalike replace worked!");
                             msg = onlyReplace;
@@ -5637,9 +5637,9 @@ z-index: 999999;
                             const UNICODE_RTL_OVERRIDE = '\u202e'
                             msg = ([UNICODE_RTL_OVERRIDE,].concat(reverseString(msg).split(""))).join("");
                         };
-                    };  
+                    };
                 };
-                
+
                 if (extract("tallChat") && !(msg.includes("᥊"))) {
                     msg = msg + "᥊";
                 };
@@ -5844,7 +5844,7 @@ z-index: 999999;
                     ];
 
                     createVarDataPopup(vardataButtonsInfo);
-    
+
                     return;
                 };
             };
@@ -5887,7 +5887,7 @@ z-index: 999999;
                 match = new RegExp(`,setTimeout\\(\\(\\(\\)=>\\{([=A-z0-9\\(\\),\\{ \\.;!\\|\\?:\\}]+send\\([a-zA-Z$_]+\\))`).exec(js);
                 log("PAUSE:", match);
                 H.PAUSE = match ? `function(){${match[1]}}` : "function(){log('no pause womp womp')}";
-    
+
                 const variableNameRegex = /^[a-zA-Z0-9_$\[\]"\\\.,]*$/;
                 for (let name in H) {
                     let deobf = H[name];
@@ -5900,9 +5900,9 @@ z-index: 999999;
                         crashplease = "balls2";
                     };
                 };
-    
+
                 log('%cSTATEFARM INJECTION STAGE 1: GATHER VARS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-    
+
                 const modifyJS = function (find, replace) {
                     let oldJS = js;
                     try {
@@ -5916,9 +5916,9 @@ z-index: 999999;
                         log("%cReplacement failed! Attempted to replace " + find + " with: " + replace, 'color: red; font-weight: bold; font-size: 0.6em; text-decoration: italic;');
                     };
                 };
-    
+
                 const f = function (varName) { return varName.replace("$", "\\$") };
-    
+
                 log('%cSTATEFARM INJECTION STAGE 2: INJECT VAR RETRIEVAL FUNCTION AND MAIN LOOP', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
                 //hook for main loop function in render loop
                 modifyJS(f(H.SCENE) + '.' + f(H.render), `window["${functionNames.retrieveFunctions}"]({${injectionString}},true)||${f(H.SCENE)}.render`);
@@ -5980,7 +5980,7 @@ z-index: 999999;
                 modifyJS('5:10', functionNames.quickRespawn + '(5):' + functionNames.adBlocker + '(10)');
                 modifyJS(',3e3),console.log', `,window.${functionNames.quickRespawn}(3e3)),console.log`);
                 // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
-    
+
                 //Modifies matchmaker JS to block gamecodes.
                 match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
                 if (match) {
@@ -6000,9 +6000,9 @@ z-index: 999999;
                 modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments, this.${H.player_})},`);
                 //intercept signedIn function
                 modifyJS(`if(this.isAnonymous`, `window.${functionNames.interceptSignedIn}(arguments);if(this.isAnonymous`);
-    
+
                 modifyJS(`="SPACE",`,`="SPACE",window.${functionNames.shouldInputSpace}()&&`)
-    
+
                 modifyJS(/tp-/g, '');
                 modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
 
@@ -6013,7 +6013,7 @@ z-index: 999999;
                 log("COLLIDER", match);
                 modifyJS(match[0], match[0] + "var iterations=0;");
                 modifyJS(">=0);){", ">=0);){iterations++;if (iterations >= 1e3) {console.log('oops lol');return false};")
-    
+
                 //intercept updateParticles for particle speed control
                 //deobf is: updateParticles(manager, delta)
                 match = js.match(/function [a-zA-Z$_]+\([a-zA-Z$_]+,[a-zA-Z$_]+\)\{for\(var [a-zA-Z$_]+=0;[a-zA-Z$_]+<[a-zA-Z$_]+\.sprites/); //this should only give one match.
@@ -6023,10 +6023,10 @@ z-index: 999999;
                   +`${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
                   +splitted[1]
                 )
-    
+
                 log(H);
                 log(js);
-    
+
                 attemptedInjection = true;
                 return js;
             } catch (error) {
@@ -6262,14 +6262,14 @@ z-index: 999999;
 
     // const pathfindingCode = function () { //wrapped in a function just to stop its execution
     //     loggedGameMap = false;
-    
+
     //     // begin pathfinding
-    
+
     //     const BinaryHeap = function(scoreFunction) {
     //         this.content = [];
     //         this.scoreFunction = scoreFunction;
     //     };
-    
+
     //     BinaryHeap.prototype = {
     //         push: function (element) {
     //             // Add the new element to the end of the array.
@@ -6277,11 +6277,11 @@ z-index: 999999;
     //             // Allow it to bubble up.
     //             this.bubbleUp(this.content.length - 1);
     //         },
-    
+
     //         rescoreElement: function (node) {
     //             this.sinkDown(this.content.indexOf(node));
     //         },
-    
+
     //         pop: function () {
     //             // Store the first element so we can return it later.
     //             var result = this.content[0];
@@ -6295,7 +6295,7 @@ z-index: 999999;
     //             }
     //             return result;
     //         },
-    
+
     //         remove: function (node) {
     //             var length = this.content.length;
     //             // To remove a value, we must search through the array to find
@@ -6316,11 +6316,11 @@ z-index: 999999;
     //                 break;
     //             }
     //         },
-    
+
     //         size: function () {
     //             return this.content.length;
     //         },
-    
+
     //         bubbleUp: function (n) {
     //             // Fetch the element that has to be moved.
     //             var element = this.content[n], score = this.scoreFunction(element);
@@ -6332,7 +6332,7 @@ z-index: 999999;
     //                 // If the parent has a lesser score, things are in order and we
     //                 // are done.
     //                 if (score >= this.scoreFunction(parent)) break;
-    
+
     //                 // Otherwise, swap the parent with the current element and
     //                 // continue.
     //                 this.content[parentN] = element;
@@ -6340,17 +6340,17 @@ z-index: 999999;
     //                 n = parentN;
     //             }
     //         },
-    
+
     //         includes: function (n) {
     //             return this.content.includes(n);
     //         },
-    
+
     //         sinkDown: function (n) {
     //             // Look up the target element and its score.
     //             var length = this.content.length,
     //                 element = this.content[n],
     //                 elemScore = this.scoreFunction(element);
-    
+
     //             while (true) {
     //                 // Compute the indices of the child elements.
     //                 var child2N = (n + 1) * 2, child1N = child2N - 1;
@@ -6371,10 +6371,10 @@ z-index: 999999;
     //                         child2Score = this.scoreFunction(child2);
     //                     if (child2Score < (swap == null ? elemScore : child1Score)) swap = child2N;
     //                 }
-    
+
     //                 // No need to swap further, we are done.
     //                 if (swap == null) break;
-    
+
     //                 // Otherwise, swap and continue.
     //                 this.content[n] = this.content[swap];
     //                 this.content[swap] = element;
@@ -6382,15 +6382,15 @@ z-index: 999999;
     //             };
     //         }
     //     };
-    
+
     //     const isNodeAir = function(item) {
     //         return item.mesh === undefined
     //     };
-    
+
     //     const canTravelThroughNode = function(item) {
     //         return isNodeAir(item) || item.mesh.name.includes("none")
     //     };
-    
+
     //     class Position {
     //         constructor(x, y, z) {
     //             this.x = x;
@@ -6398,9 +6398,9 @@ z-index: 999999;
     //             this.z = z;
     //         }
     //     }
-    
+
     //     var GLOBAL_NODE_LIST = [];
-    
+
     //     class MapNode {
     //         constructor(position, linked, map) {
     //             this.position = position;
@@ -6437,46 +6437,46 @@ z-index: 999999;
     //                         var map_data_z = this.position.z + z;
     //                         if (map_data_x < 0 || map_data_y < 0 || map_data_z < 0) {
     //                             continue;
-    
+
     //                         };
     //                         if (map_data_x >= map_data.length || map_data_y >= map_data[0].length || map_data_z >= map_data[0][0].length) {
     //                             continue;
     //                         };
-    
+
     //                         var attemptedNode = map_data[map_data_x][map_data_y][map_data_z];
-    
+
     //                         if (!canTravelThroughNode(attemptedNode)) {
     //                             ;continue;
     //                         }
-    
+
     //                         /* for the tested node:
     //                             continue if:
     //                                 can't travel through it
     //                                 a nonsolid is directly below it
     //                         */
-    
+
     //                         try {
     //                             var node_below_checked_node = map_data[map_data_x][map_data_y - 1][map_data_z];
     //                         } catch (error) {
     //                             log(error)
     //                             continue;
     //                         };
-    
+
     //                         var is_air_directly_below = isNodeAir(node_below_checked_node); // self explanatory
     //                         var is_solid_directly_below = !is_air_directly_below ? node_below_checked_node.mesh.name.includes("full") : false;
     //                         var is_partial_directly_below = !is_air_directly_below && !is_solid_directly_below
-    
+
     //                         var node_directly_below_node_doing_the_checking;
-    
+
     //                         try {
     //                             node_directly_below_node_doing_the_checking = map_data[this.position.x][this.position.y - 1][this.position.z];
     //                         } catch (error) {
     //                             log(error);
     //                             node_directly_below_node_doing_the_checking = {};
     //                         };
-    
+
     //                         var is_solid_directly_below_node_doing_checking = !isNodeAir(node_directly_below_node_doing_the_checking) && node_directly_below_node_doing_the_checking.mesh.name.includes("full");
-    
+
     //                         var is_valid_candidate = (
     //                             is_solid_directly_below ||
     //                             y == -1 && !is_partial_directly_below ||
@@ -6486,12 +6486,12 @@ z-index: 999999;
     //                             // that's hard
     //                             // i just want this to work
     //                         );
-    
+
     //                         if (y == -1 && !is_partial_directly_below) {
     //                             // log('weird case, looking downwards to x/y/z from x/y/z', map_data_x, map_data_y, map_data_z, this.position.x, this.position.y, this.position.z, 'is air directly below?', is_air_directly_below, 'is solid directly below?', is_solid_directly_below, 'is partial directly below?', is_partial_directly_below, 'is valid candidate?', is_valid_candidate)
     //                             //shit lags, lol
     //                         };
-    
+
     //                         // if the node is already in the list, add a link to it. Otherwise create it and then add a link to it.
     //                         // if it's air / equivalent to air we can create it (but not necessarily link to it)
     //                         if (GLOBAL_NODE_LIST.some(item => item.position.x == map_data_x && item.position.y == map_data_y && item.position.z == map_data_z)) { // eslint-disable-line
@@ -6500,20 +6500,20 @@ z-index: 999999;
     //                                 found_link++;
     //                                 this.add_link(GLOBAL_NODE_LIST.find(item => item.position.x == map_data_x && item.position.y == map_data_y && item.position.z == map_data_z)); // eslint-disable-line
     //                                 }
-    
+
     //                             } else {
-    
+
     //                                 found_node++;
-    
+
     //                                 var new_node = new MapNode(new Position(map_data_x, map_data_y, map_data_z), [], map_data);
     //                                 // the new node doesn't exist yet
     //                                 // we create it
     //                                 // if it's possible to move to we add the link
-    
+
     //                                 if (is_valid_candidate) {
     //                                     found_link++;
     //                                     this.add_link(new_node);
-    
+
     //                                 };
     //                             };
     //                     };
@@ -6523,18 +6523,18 @@ z-index: 999999;
     //             //shit lags, lol
     //         }
     //     };
-    
+
     //     const get_node_at = function(position) {
     //         return GLOBAL_NODE_LIST.find(item => item.position.x == position.x && item.position.y == position.y && item.position.z == position.z);
     //     };
-    
+
     //     const get_player_position = function(player) {
     //         var x = Math.floor(player[H.actor][H.mesh].position.x);
     //         var y = Math.floor(player[H.actor][H.mesh].position.y);
     //         var z = Math.floor(player[H.actor][H.mesh].position.z);
     //         return new Position(x, y, z);
     //     }
-    
+
     //     const get_player_linked_nodes = function(player) {
     //         var position = get_player_position(player);
     //         var node = get_node_at(position);
@@ -6544,15 +6544,15 @@ z-index: 999999;
     //             return [];
     //         };
     //     };
-    
+
     //     var map_data_created = false;
-    
+
     //     // kazowie
-    
+
     //     const TaxicabDist3D = function(pos1, pos2) {
     //         return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y) + Math.abs(pos1.z - pos2.z);
     //     };
-    
+
     //     const pathTo = function(node) {
     //         var current = node;
     //         var path = [];
@@ -6564,13 +6564,13 @@ z-index: 999999;
     //         //log("done")
     //         return path;
     //     };
-    
+
     //     const getHeap = function() {
     //         return new BinaryHeap(function (node) {
     //             return node.f;
     //         });
     //     };
-    
+
     //     const cleanList = function(items) {
     //         for (var i = 0; i < items.length; i++) {
     //             var item = items[i];
@@ -6582,7 +6582,7 @@ z-index: 999999;
     //             item.visited = undefined;
     //         };
     //     };
-    
+
     //     const AStar = function(start, goal) {
     //         log("astar called")
     //         cleanList(GLOBAL_NODE_LIST)
@@ -6591,23 +6591,23 @@ z-index: 999999;
     //         // each node has a .linked indicating which nodes can be traveled to from it
     //         // returns a list of nodes to travel through, ordered from start to goal
     //         // if no path is found, returns null
-    
+
     //         var closed_set = [];
-    
-    
+
+
     //         var heuristic = TaxicabDist3D;
     //         var open_heap = getHeap();
-    
+
     //         start.h = heuristic(start.position, goal.position);
     //         start.g = 0;
     //         start.f = start.g + start.h;
-    
+
     //         open_heap.push(start);
-    
-    
+
+
     //         while (open_heap.size() != 0) {
     //             var current = open_heap.pop();
-    
+
     //             if (current === goal) {
     //                 log("done with astar - path found")
     //                 var val = pathTo(current);
@@ -6615,18 +6615,18 @@ z-index: 999999;
     //                 print_node_list(val);
     //                 return val;
     //             }
-    
+
     //             closed_set.push(current);
-    
+
     //             var neighbors = current.linked;
-    
+
     //             for (var i = 0; i < neighbors.length; i++) {
     //                 var neighbor = neighbors[i];
-    
+
     //                 if (closed_set.includes(neighbor)) {
     //                     continue;
     //                 }
-    
+
     //                 var tentative_g_score = current.g + 1;
     //                 var visited = neighbor.visited;
     //                 if (!visited || tentative_g_score < neighbor.g) {
@@ -6643,12 +6643,12 @@ z-index: 999999;
     //                 };
     //             };
     //         };
-    
+
     //         log("done with astar - no path found")
     //         // return null if no path has been found
     //         return null
     //     };
-    
+
     //     const print_node_list = function(list) {
     //         var output = "";
     //         log("printing node list, length:", list.length, "list:", list);
@@ -6657,7 +6657,7 @@ z-index: 999999;
     //         };
     //         log(output);
     //     };
-    
+
     //     const create_red_line_between_nodes = function(ss, node1, node2) {
     //         // const tracerLines = L.BABYLON.MeshBuilder.CreateLines("tracerLines", { points: [newPosition, crosshairsPosition] }, newScene);
     //         let pos1 = [node1.position.x - 0.5, node1.position.y - 0.5, node1.position.z - 0.5];
@@ -6674,13 +6674,13 @@ z-index: 999999;
     //             window.pathLines.push(node_lines);
     //         };
     //     };
-    
+
     //     const create_pathfinding_lines = function(ss, path) {
     //         for (var i = 0; i < path.length - 1; i++) {
     //             create_red_line_between_nodes(ss, path[i], path[i + 1]);
     //         };
     //     };
-    
+
     //     // end pathfinding
 
     //     const createMapData = function () {
@@ -6839,7 +6839,7 @@ z-index: 999999;
     //             }
     //         };
     //     };
-        
+
     //     const clearPath = function () {
     //         activePath = undefined;
     //         activeNodeTarget = undefined;
@@ -7009,7 +7009,7 @@ z-index: 999999;
 
                 // //eye level
                 crosshairsPosition.y += 0.4;
-                const forwardOffset = -5; 
+                const forwardOffset = -5;
                 const yaw = ss.MYPLAYER[H.yaw];
                 const pitch = -ss.MYPLAYER[H.pitch];
                 const forwardX = Math.sin(yaw) * Math.cos(pitch);
@@ -7037,6 +7037,33 @@ z-index: 999999;
                     const blacklisted = (extract("blacklistESPType") == "justexclude" && extract("enableBlacklistTracers") && playerMatchesList(blacklistPlayers, player));
                     const passedLists = whitelisted && (!blacklisted);
                     const tracersType = extract("tracersType");
+
+                   if (player.lookLineData && player.lookLineData.length === 6) {
+                        // player.lookLineData
+                        const x1 = player.lookLineData[0],
+                              y1 = player.lookLineData[1],
+                              z1 = player.lookLineData[2],
+                              x2 = player.lookLineData[3],
+                              y2 = player.lookLineData[4],
+                              z2 = player.lookLineData[5];
+
+                        //  ss.MYPLAYER pos
+                        const rx = ss.MYPLAYER[H.actor][H.mesh].position.x,
+                              ry = ss.MYPLAYER[H.actor][H.mesh].position.y,
+                              rz = ss.MYPLAYER[H.actor][H.mesh].position.z;
+                        // not speed
+                        const dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
+                        // , also not spped
+                        const rpx = rx - x1, rpy = ry - y1, rpz = rz - z1;
+                        // cross = (r - p) x (q - p)
+                        const cx = rpy * dz - rpz * dy, cy = rpz * dx - rpx * dz, cz = rpx * dy - rpy * dx;
+                        const crossLength = Math.sqrt(cx * cx + cy * cy + cz * cz);
+                        // length of the line vector (q - p)
+                        const lineLength = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                        // min distance point to line is crossp magnitude / line length
+                        player.aimdistance = crossLength / lineLength;
+                        //console.log(`Minimum distance from ${player.name}'s look line to my position:`, aimdistance);
+                    };
 
                     //predEsp
                     if (extract("predictionESP")) { //important note here is that we only create/update the predESP if the module is toggled on. saves resources from predictPosition raycast
@@ -7122,7 +7149,7 @@ z-index: 999999;
                             };
                         };
                         onlinePlayersArray.push([player, player.name, player.team]);
-                        
+
                         player[H.actor].setupNameSprite = (()=>{
                             setupNameSpriteNew(player[H.actor])
                         });
@@ -7139,17 +7166,17 @@ z-index: 999999;
                             score: player.score,
                             totalDeaths: player.totalDeaths,
                             bestGameStreak: player.bestGameStreak,
-    
+
                             team: player.team,
-    
+
                             hp: player[H.hp],
                             hardBoiledValue: player.hardBoiledValue,
 
                             shouldReplace: extract("nametagInfo"), //replace with the extract l8r
                         };
-    
+
                         let playerInfoOld = playerInfoCache[player.uniqueId];
-    
+
                         if ((playerInfoOld) && (
                             (playerInfo.shouldReplace != playerInfoOld.shouldReplace) || ((playerInfo.shouldReplace) && (
                                 (playerInfo.score != playerInfoOld.score) ||
@@ -7162,11 +7189,11 @@ z-index: 999999;
                         )) {
                             player[H.actor].setupNameSprite();
                         };
-    
+
                         playerInfoCache[player.uniqueId] = playerInfo;
 
                         if (player[H.actor]?.nameSprite?.color) {
-                            playerInfo.shouldReplace ? 
+                            playerInfo.shouldReplace ?
                                 (player[H.actor].nameSprite.color = ss.teamColors.textColor[0]) :
                                 (player[H.actor].nameSprite.color = ss.teamColors.textColor[player.team]);
                         }
@@ -7657,6 +7684,9 @@ z-index: 999999;
 
                 let enemyMinimumValue = ((targetType == "pointingat") && (extract("silentAimbot"))) ? deg2rad(extract("aimbotMinAngle")) : 10000; //used for selecting target (either pointingat or nearest)
 
+                let enemyMinimumAimDistance = 999999;
+                enemyAimNearest = undefined;
+
                 let didAimbot
                 const candidates = [];
                 amountVisible = 0;
@@ -7684,6 +7714,10 @@ z-index: 999999;
                                     enemyMinimumDistance = player.adjustedDistance;
                                     enemyNearest = player;
                                 };
+                                if (player.aimdistance < enemyMinimumAimDistance) {
+                                    enemyMinimumAimDistance = player.aimdistance;
+                                    enemyAimNearest = player;
+                                };
                                 if (selectNewTarget) {
                                     candidates.push(player);
                                     if ( player.isVisible ) { amountVisible += 1 };
@@ -7697,15 +7731,18 @@ z-index: 999999;
                     const valueToUse = (
                         (targetType == "nearest" && (
                             player.adjustedDistance
-                        )) || 
+                        )) ||
                         (targetType == "pointingat" && (
                             player.angleDiff
-                        )) || 
+                        )) ||
                         (targetType == "lowestHp" && (
                             player[H.hp]
-                        )) || 
+                        )) ||
                         (targetType == "mostKills" && (
                             -player.score
+                        )) ||
+                        (targetType == "aimingAt" && (
+                            player.aimdistance
                         ))
                     );
                     let visibleValue =  ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team));
@@ -7718,11 +7755,14 @@ z-index: 999999;
                     } else { //some are visible
                         visibleValue = visibleValue && player.isVisible; //assuming now that either "prioritise" or "onlyvisible" are enabled, as "onlyvisible"'s use case fulfilled in previous statement
                     };
-                    if (visibleValue) {
+                    if (visibleValue && extract("aimbotTargetMode") !== "aimingAt") {
                         if (valueToUse < enemyMinimumValue) {
                             enemyMinimumValue = valueToUse;
                             currentlyTargeting = player;
                         };
+                    };
+                    if(extract("aimbotTargetMode") === "aimingAt"){
+                      currentlyTargeting = enemyAimNearest;
                     };
                 });
 
@@ -7745,9 +7785,9 @@ z-index: 999999;
                             const aimbot = getAimbot(currentlyTargeting);
 
                             let antiSnap = (1 - (extract("aimbotAntiSnap") || 0));
-            
+
                             //new method: neuublue / https://github.com/AimTuxOfficial/AimTux/blob/master/src/Hacks/aimbot.cpp
-    
+
                             const yawDiff = Math.radDifference(aimbot.yawReal, ss.MYPLAYER[H.yaw]);
                             const pitchDiff = Math.radDifference(aimbot.pitchReal, ss.MYPLAYER[H.pitch]);
 
@@ -7757,7 +7797,7 @@ z-index: 999999;
                                 else if (extract("aimbotAntiSnapRegime") == "timeBased") antiSnap *= currentAimTime / extract("maxAimTime"); // time based
                                 antiSnap = Math.min(1, antiSnap);
                             };
-    
+
                             ss.MYPLAYER[H.yaw] = setPrecision(ss.MYPLAYER[H.yaw] + yawDiff * antiSnap);
                             ss.MYPLAYER[H.pitch] = setPrecision(ss.MYPLAYER[H.pitch] + pitchDiff * antiSnap);
 
