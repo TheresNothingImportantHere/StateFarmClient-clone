@@ -283,7 +283,7 @@ let attemptedInjection = false;
                             `;
                         }
 
-                        if (scriptInfo && scriptInfo.version && scriptInfo.version !== version) {
+                        if (scriptInfo && scriptInfo.version && scriptInfo.version !== version && typeof (GM_info) !== 'undefined') {
                             commitHistoryContent += `
                             <a href="${downloadURL}" target="_blank" style="text-decoration: none;">
                                 <div class="attention-notice" style="background-color: #ffcc00; color: #000; padding: 0.75em; text-align: center; font-weight: bold; margin-bottom: 0.15em; margin-top: 0.25em; border-radius: 5px; border: 2px solid #ffff00;">
