@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Shell Shockers Aimbot & ESP: StateFarm Client V3 - Bloom, Chat, Botting, Unban & More, shellshock.io
+// @name         v1Shell Shockers Aimbot & ESP: StateFarm Client V3 - Bloom, Chat, Botting, Unban & More, shellshock.io
 // @description  Fixed for 0.48.3! Advanced, Open Source, No Ads. Best cheats menu for shellshock.io in 2024. Many modules such as Aimbot, PlayerESP, AmmoESP, Chams, Nametags, Join/Leave messages, Chat Filter Disabling, AntiAFK, FOV Slider, Zooming, Co-ords, Player Stats, Auto Refill and many more whilst having unsurpassed customisation options such as binding to any key, easily editable color scheme and themes - all on the fly!
 // @author       Hydroflame521, onlypuppy7, enbyte, notfood, 1ust, OakSwingZZZ, Seq and de_Neuublue
 // @namespace    http://github.com/Hydroflame522/StateFarmClient/
@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre160
+// @version      3.4.1-pre160.5
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3618,7 +3618,10 @@ z-index: 999999;
                 object.lookDirLine.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [g.x, g.y, g.z, f.x, f.y, f.z]);
                 //set line to correct points, with the max dist scaled dirVec3 as endpoint
             }
-            object.team !== ss.MYPLAYER.team ? object.lookLineData = object.lookDirLine.getVerticesData(L.BABYLON.VertexBuffer.PositionKind): null;
+            if (object && (object !== ss.MYPLAYER) && object[H.playing] && (object[H.hp] > 0) && ((!ss.MYPLAYER.team) || (object.team !== ss.MYPLAYER.team))) {
+                  object.lookLineData = object.lookDirLine.getVerticesData(L.BABYLON.VertexBuffer.PositionKind);//error here only works in teams, fix
+
+            };
             object.lookDirLine.color = new L.BABYLON.Color3(...hexToRgb(extract("lookTracersColor"))); //updaté line colo(u)r
             object.lookDirLine.renderingGroupId = extract("lookTracersRGI1")? 1 : 0; //render in front shell?
             //I dont really like the implementation without parenting, but IDK how the fuck bab's parenting system works and we need to update anyway. :/
