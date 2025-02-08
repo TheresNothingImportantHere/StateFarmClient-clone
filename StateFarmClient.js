@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre163
+// @version      3.4.1-pre164
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -6921,6 +6921,8 @@ z-index: 999999;
                         MeshBuilder: ss.MeshBuilder,
                         Viewport: ss.Viewport,
                         VertexBuffer: ss.VertexBuffer,
+                        VertexData: ss.VertexData,
+                        SceneLoader: ss.SceneLoader,
                     };
 
                     L.BABYLONfake.Matrix.RotationYawPitchRoll = L.BABYLONfake.Matrix[H.RotationYawPitchRoll];
