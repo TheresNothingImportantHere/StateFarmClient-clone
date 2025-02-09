@@ -103,8 +103,8 @@
 // @match        *://*.yolk.quest/*
 // @match        *://*.yolk.today/*
 // @match        *://*.zygote.cafe/*
-// @downloadURL  https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.user.js
-// @updateURL    https://update.greasyfork.org/scripts/482982/StateFarm%20Client%20V3%20-%20Combat%2C%20Bloom%2C%20ESP%2C%20Rendering%2C%20Chat%2C%20Automation%2C%20Botting%2C%20Unbanning%20and%20more.meta.js
+// @downloadURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.user.js
+// @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
 // ==/UserScript==
 
 let attemptedInjection = false;
@@ -6955,7 +6955,8 @@ z-index: 999999;
                     document.body.appendChild(script);
                 };
 
-                if (extract("forceImport")) {
+                // chrome web store reviewers, GM_info is never declared and this will always be false in the web store environment
+                if (extract("forceImport") && typeof GM_info == 'undefined') {
                     doImport();
                 } else {
                     try {
