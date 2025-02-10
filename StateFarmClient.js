@@ -173,7 +173,7 @@ let attemptedInjection = false;
     const bottingGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-botting";
     const violentmonkeyURL = "https://violentmonkey.github.io/get-it/";
 
-    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.15.0/babylon.min.js";
+    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.21.1/babylon.min.js";
 
     const replacementLogoURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement.png";
     const replacementLogoHalloweenURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-halloween.png";
@@ -1598,6 +1598,7 @@ debug mode).`},
                     }, 3e3);
                 };
             },});
+            initModule({ location: tp.miscTab.pages[0], title: "InstantSpectate", storeAs: "instantSpectate", tooltip: "Don't wait around for the spectate button to appear", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
             initFolder({ location: tp.miscTab.pages[0], title: "StateFarm UI Options", storeAs: "sfcUIFolder", });
                 initModule({ location: tp.sfcUIFolder, title: "StateFarm Updates", storeAs: "statefarmUpdates", tooltip: "Shows a element at the home screen about statefarm's update history, notifies you when update is available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
@@ -4042,6 +4043,13 @@ z-index: 999999;
             } else if (miniCamera) {
                 miniCamera._skipRendering = true;
             };
+
+            if (extract("instantSpectate")) {
+                if (document.getElementsByClassName("pause-container centered")[0].style.display == "") {
+                    document.getElementsByClassName("pause-screen-btn-spectate")[0].style.display = '';
+                    document.getElementsByClassName("pause-screen-btn-spectate")[0].disabled = null;
+                };
+            };
         } else {
             if (!document.getElementById("progressBar")) {
                 if (extract("autoJoin") && (extract("autoLogin") == "disabled" || unsafeWindow.vueApp.accountCreated !== null)) {
@@ -5722,6 +5730,12 @@ z-index: 999999;
             };
             return input;
         });
+        createAnonFunction("getInstantSpectateEnterSpectatorModeBlocked", function (enterSpectatorModeBlocked) {
+            return extract("instantSpectate") ? false : enterSpectatorModeBlocked;
+        });
+        createAnonFunction("getInstantSpectateRespawnTime", function (respawnTime) {
+            return extract("instantSpectate") ? -1 : respawnTime;
+        });
         createAnonFunction('gameBlacklisted', function (t) {
             let result = false;
             if (blacklistedGameCodes.length >= 1) {
@@ -5981,8 +5995,12 @@ z-index: 999999;
                 modifyJS(H.USERDATA + '.playerAccount.isUpgraded()', functionNames.adBlocker + '(' + f(H.USERDATA) + '.playerAccount.isUpgraded())');
                 //respawn time stuff
                 modifyJS('5:10', functionNames.quickRespawn + '(5):' + functionNames.adBlocker + '(10)');
-                modifyJS(',3e3),console.log', `,window.${functionNames.quickRespawn}(3e3)),console.log`);
+                modifyJS(',3e3),console.log', `,window["${functionNames.quickRespawn}"](3e3)),console.log`);
                 // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
+
+                //instant spectate
+                modifyJS(`\{${H.enterSpectatorModeBlocked}\|\|`,`\{(window["${functionNames.getInstantSpectateEnterSpectatorModeBlocked}"](${H.enterSpectatorModeBlocked}))\|\|`);
+                modifyJS(`\),${H.respawnTime}<0&&`,`\),(window["${functionNames.getInstantSpectateRespawnTime}"](${H.respawnTime}))&&`);
 
                 //Modifies matchmaker JS to block gamecodes.
                 match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
