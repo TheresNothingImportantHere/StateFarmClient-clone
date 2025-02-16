@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre166
+// @version      3.4.1-pre167
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -3837,7 +3837,7 @@ z-index: 999999;
             let input = extract("gameBlacklistCodes");
             input = input.split(",");
             input.forEach(function (code) {
-                if (code != "" && code.length == 7) {
+                if (code != "" && code.length == 14) {
                     blacklistedGameCodes.push(code);
                 }
             });
@@ -4054,11 +4054,11 @@ z-index: 999999;
             if (!document.getElementById("progressBar")) {
                 if (extract("autoJoin") && (extract("autoLogin") == "disabled" || unsafeWindow.vueApp.accountCreated !== null)) {
                     unsafeWindow.vueApp.externPlayObject(
-                        (extract("joinCode").length === 7) ? 2 : 0,
+                        (extract("joinCode").length === 14) ? 2 : 0,
                         unsafeWindow.vueApp.currentGameType,
                         unsafeWindow.vueApp.playerName,
                         '',
-                        (extract("joinCode").length === 7) ? extract("joinCode") : '',
+                        (extract("joinCode").length === 14) ? extract("joinCode") : '',
                     );
                 };
             };
