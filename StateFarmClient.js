@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.1-pre167
+// @version      3.4.2-pre1
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -380,10 +380,10 @@ let attemptedInjection = false;
 
     //INIT VARS
     const inbuiltPresets = { //Don't delete onlypuppy7's Config
-        "onlypuppy7's Config": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>360<antiSneak>1.8<aimbotAntiSnap>0<aimbotAntiSnapRegime>3<maxAimTime>64<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.05<grenadeMax>true<grenadePower>1<playerESP>true<tracers>true<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>true<nametagInfoInterval>5<aimbotColor>"#0000ff"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>true<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<minimap>true<minimapZoom>5<minimapSize>1<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<fakeMessageID>0<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>14<autoStamp>0<autoHat>0<skybox>1<randomSkyBox>true<randomSkyBoxInterval>5.9<legacyModels>true<filter>0<gunPosition>true<bobModifierEnabled>true<bobModifier>0.25<bobModifierWhenStill>true<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>5<replaceLogo>true<titleAnimation>true<themeType>5<partyLightsEnabled>true<partyLightsIntensity>1.87<worldFlattening>1<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<autoUnban>true<adBlock>true<spoofVIP>true<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoChickenWinner>true<chickenWinnerNotifs>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>true<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
+        "onlypuppy7's Config": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>360<antiSneak>1.8<aimbotAntiSnap>0<aimbotAntiSnapRegime>3<maxAimTime>64<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.05<grenadeMax>true<grenadePower>1<playerESP>true<tracers>true<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>false<nametagInfoInterval>5<aimbotColor>"#0000ff"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>true<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<minimap>false<minimapZoom>5<minimapSize>1<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<fakeMessageID>0<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre154 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>14<autoStamp>0<autoHat>0<skybox>1<randomSkyBox>true<randomSkyBoxInterval>5.9<legacyModels>true<filter>0<gunPosition>true<bobModifierEnabled>true<bobModifier>0.25<bobModifierWhenStill>true<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>5<replaceLogo>true<titleAnimation>true<themeType>5<partyLightsEnabled>true<partyLightsIntensity>1.87<worldFlattening>1<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<autoUnban>true<adBlock>true<spoofVIP>true<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoChickenWinner>true<chickenWinnerNotifs>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>true<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
         "OP7 + Server Hopper": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>false<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>true<aimbotMinAngle>174<aimbotAntiSnap>0.75<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>true<tracers>true<chams>false<nametags>true<targets>false<predictionESP>false<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>true<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<antiAFK>false<spamChat>false<fakeMessageID>12<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre94 On Top! "<fakeMessageBold>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre71 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>true<autoLeave>true<autoLeaveDelay>150<autoGamemode>5<autoRegion>8<eggColor>0<autoStamp>0<autoHat>0<skybox>9<legacyModels>true<filter>2<gunPosition>0<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>1<replaceLogo>true<titleAnimation>true<themeType>5<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>true<spoofVIP>false<noAnnoyances>true<noTrack>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoUnban>true<autoChickenWinner>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<hideAtStartup>false<consoleLogs>false<popups>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
         "OP7 + Server Hopper + Stream Stealth": `sfChatNotifications>true<sfChatNotificationSound>true<sfChatAutoStart>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>true<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>174<aimbotAntiSnap>0.75<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>false<tracers>false<chams>false<nametags>true<targets>false<predictionESP>false<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<ammoESP>false<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>false<grenadeTracers>false<grenadeESPRegime>2<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>120<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>0.35<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>false<showLOS>false<showMinAngle>false<highlightLeaderboard>true<showCoordinates>false<radar>false<playerStats>false<playerInfo>false<gameInfo>true<showStreams>false<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<unfilterNames>true<chatFilterBypass>false<tallChat>false<antiAFK>false<spamChat>false<fakeMessageID>1<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre95 On Top! "<fakeMessageBold>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre95 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>true<usernameAutoJoin>"[sfc] onlypuppy7"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>true<autoLeave>true<autoLeaveDelay>150<autoGamemode>5<autoRegion>8<eggColor>0<autoStamp>0<autoHat>0<skybox>9<legacyModels>true<filter>true<gunPosition>true<muteGame>false<distanceMult>1.5<customSFX1>3<customSFX2>4<customSFX3>1<replaceLogo>true<titleAnimation>false<themeType>5<loginEmailPass>"ssss"<loginDatabaseSelection>1<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>true<spoofVIP>false<noAnnoyances>true<noTrack>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>false<adminSpoof>false<autoUnban>true<autoChickenWinner>true<customMacro>"log('cool');"<autoMacro>false<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<hideAtStartup>false<consoleLogs>false<popups>false<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>1<debug>false`,
-        "Doeshotter's Crackshot Config": `sfChatNotifications>false<sfChatNotificationSound>false<sfChatAutoStart>false<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>2<aimbotRightClick>true<silentAimbot>true<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>false<aimbotMinAngle>7<antiSneak>0<aimbotAntiSnap>0<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.15000000000000002<grenadeMax>false<grenadePower>1<playerESP>true<tracers>false<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>true<nametagInfoInterval>14<aimbotColor>"#ff0000"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#0000ff"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>false<ammoTracers>false<ammoESPRegime>0<ammoESPColor>"#ffff00"<grenadeESP>false<grenadeTracers>false<grenadeESPRegime>0<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>72<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>1<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>false<showCoordinates>false<radar>false<playerStats>false<playerInfo>false<gameInfo>false<showStreams>false<minimap>false<minimapZoom>5<minimapSize>1<chatExtend>false<chatHighlight>false<maxChat>5<disableChatFilter>false<unfilterNames>false<chatFilterBypass>false<tallChat>false<fakeMessageID>1<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre147 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre147 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>false<leaveMessages>false<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<skybox>true<randomSkyBox>false<randomSkyBoxInterval>3<legacyModels>false<filter>true<gunPosition>true<muteGame>false<distanceMult>1<customSFX1>true<customSFX2>true<customSFX3>true<replaceLogo>false<titleAnimation>false<themeType>5<partyLightsEnabled>false<partyLightsIntensity>0.5<loginEmailPass>"ex@gmail.com:passwd"<loginDatabaseSelection>0<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>false<spoofVIP>false<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>true<adminSpoof>false<autoUnban>true<autoChickenWinner>false<customMacro>"log('wow ur cool!');"<autoMacro>true<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
+        "Doeshotter's Crackshot Config": `sfChatNotifications>false<sfChatNotificationSound>false<sfChatAutoStart>false<sfChatInvitations>true<aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>2<aimbotRightClick>true<silentAimbot>true<aimbSemiSilent>false<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>true<oneKill>false<aimbotMinAngle>7<antiSneak>0<aimbotAntiSnap>0<autoRefill>true<smartRefill>true<enableAutomatic>true<enableAutoFire>true<autoFireType>3<autoFireAccuracy>0.15000000000000002<grenadeMax>false<grenadePower>1<playerESP>true<tracers>false<chams>false<trajectories>true<predictionESP>false<nametags>true<nametagInfo>false<nametagInfoInterval>14<aimbotColor>"#ff0000"<aimbotRainbow>false<tracersType>2<tracersColor1Rainbow>true<tracersColor1>"#ff0000"<tracersColor2>"#0000ff"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<predictionESPColor>"#ff0000"<predictionESPColorRainbow>false<ammoESP>false<ammoTracers>false<ammoESPRegime>0<ammoESPColor>"#ffff00"<grenadeESP>false<grenadeTracers>false<grenadeESPRegime>0<grenadeESPColor>"#00ffff"<lookTracers>false<lookTracersRGI1>false<lookTracersColor>"#00ffff"<fov>72<zoom>15<perspective>0<perspectiveAlpha>false<perspectiveY>0.5<perspectiveZ>2<freecam>false<wireframe>false<particleSpeedMultiplier>1<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>false<showCoordinates>false<radar>false<playerStats>false<playerInfo>false<gameInfo>false<showStreams>false<minimap>false<minimapZoom>5<minimapSize>1<chatExtend>false<chatHighlight>false<maxChat>5<disableChatFilter>false<unfilterNames>false<chatFilterBypass>false<tallChat>false<fakeMessageID>1<fakeMessageText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre147 On Top! "<fakeMessageBold>false<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.1-pre147 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>false<leaveMessages>false<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhenNoneVisible>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<skybox>true<randomSkyBox>false<randomSkyBoxInterval>3<legacyModels>false<filter>true<gunPosition>true<muteGame>false<distanceMult>1<customSFX1>true<customSFX2>true<customSFX3>true<replaceLogo>false<titleAnimation>false<themeType>5<partyLightsEnabled>false<partyLightsIntensity>0.5<loginEmailPass>"ex@gmail.com:passwd"<loginDatabaseSelection>0<autoLogin>0<accountGmail>"example (NO @gmail.com)"<accountPass>"password69"<accountRecordsLogging>false<shellPrintKey>""<adBlock>false<spoofVIP>false<noAnnoyances>true<noTrack>true<antiAFK>true<quickRespawn>true<statefarmUpdates>true<replaceFeeds>true<customBadges>true<unlockSkins>true<adminSpoof>false<autoUnban>true<autoChickenWinner>false<customMacro>"log('wow ur cool!');"<autoMacro>true<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<vardataFallback>0<vardataType>0<vardataCustom>"{}"<hideAtStartup>false<consoleLogs>false<popups>true<tooltips>true<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
         // ^^ no idea how to fix blue filter being on, its whatever
         // "onlypuppy7's Silent Config": `aimbot>true<aimbotTargetMode>1<aimbotVisibilityMode>1<aimbotRightClick>true<silentAimbot>true<noWallTrack>false<prediction>true<antiBloom>true<antiSwitch>false<oneKill>false<aimbotMinAngle>360<aimbotAntiSnap>0.77<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>true<tracers>true<chams>false<nametags>true<targets>true<tracersType>0<tracersColor1>"#ff0000"<tracersColor2>"#00ff00"<tracersColor3>"#ffffff"<tracersColor1to2>5<tracersColor2to3>15<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>0<grenadeESPColor>"#00ffff"<fov>120<zoom>15<freecam>false<wireframe>false<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>false<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<chatFilterBypass>false<tallChat>false<antiAFK>true<spamChat>false<spamChatDelay>500<spamChatText>"dsc.gg/s𝖿network: ЅtateFarm Client v3.4.0-pre19 On Top! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>true<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"ЅtateFarmer"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>300<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<muteGame>false<distanceMult>1<customSFX>0<adBlock>true<spoofVIP>false<unlockSkins>false<adminSpoof>false<autoUnban>true<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>2<popups>true<replaceLogo>true<titleAnimation>true<themeType>5<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
         "Hydroflame521's Config": `aimbot>true<aimbotTargetMode>0<aimbotVisibilityMode>0<aimbotRightClick>true<silentAimbot>false<noWallTrack>true<prediction>true<antiBloom>true<antiSwitch>true<oneKill>true<aimbotMinAngle>30<aimbotAntiSnap>0.77<antiSneak>1.8<aimbotColor>"#0000ff"<autoRefill>true<smartRefill>true<enableAutoFire>true<autoFireType>3<grenadeMax>true<playerESP>true<tracers>true<chams>false<nametags>true<targets>true<tracersType>1<tracersColor1>"#b200ff"<tracersColor2>"#ff0000"<tracersColor3>"#00ff4b"<tracersColor1to2>3<tracersColor2to3>20<ammoESP>true<ammoTracers>false<ammoESPRegime>1<ammoESPColor>"#ffff00"<grenadeESP>true<grenadeTracers>false<grenadeESPRegime>0<grenadeESPColor>"#00ffff"<fov>120<zoom>15<freecam>false<wireframe>false<eggSize>1<setDetail>0<enableTextures>true<renderDelay>0<revealBloom>true<showLOS>true<showMinAngle>false<highlightLeaderboard>false<showCoordinates>true<radar>false<playerStats>true<playerInfo>true<gameInfo>true<showStreams>true<chatExtend>true<chatHighlight>false<maxChat>10<disableChatFilter>true<chatFilterBypass>false<tallChat>false<antiAFK>false<spamChat>false<spamChatDelay>1440<spamChatText>"Live now at twitch.tv/ЅtateFarmNetwork! "<mockMode>false<announcer>false<autoEZ>false<cheatAccuse>false<joinMessages>true<leaveMessages>true<publicBroadcast>false<joinLeaveBranding>false<whitelist>"User-1, User-2"<enableWhitelistAimbot>false<enableWhitelistTracers>false<whitelistESPType>0<whitelistColor>"#e80aac"<blacklist>"User-1, User-2"<enableBlacklistAimbot>false<enableBlacklistTracers>false<blacklistESPType>0<blacklistColor>"#00ff00"<bunnyhop>false<autoWalk>false<autoStrafe>false<autoJump>false<autoJumpDelay>1<autoWeapon>0<autoGrenade>false<autoJoin>false<joinCode>"CODE"<useCustomName>false<usernameAutoJoin>"CaptainShell74"<autoRespawn>false<autoTeam>0<gameBlacklist>false<gameBlacklistCodes>""<leaveEmpty>false<autoLeave>false<autoLeaveDelay>240<autoGamemode>0<autoRegion>0<eggColor>0<autoStamp>0<autoHat>0<muteGame>false<distanceMult>0.59<customSFX>true<adBlock>true<spoofVIP>false<unlockSkins>false<adminSpoof>false<autoUnban>true<silentRoll>false<enableSeizureX>false<amountSeizureX>2<enableSeizureY>false<amountSeizureY>0.04772456526919999<popups>true<replaceLogo>false<titleAnimation>false<themeType>7<enablePanic>false<panicURL>"https://classroom.google.com/"<selectedPreset>0<debug>false`,
@@ -765,7 +765,11 @@ let attemptedInjection = false;
             showConditions: (module.showConditions || false),
             hideConditions: (module.hideConditions || false),
             enableConditions: (module.enableConditions || false),
-            disableConditions: (module.disableConditions || false), //why have disable when there is already enable? enable acts like an AND operator, whereas having conditions for the opposite allows for an OR operation. it is messy, but hey it works lmao?
+            //why have disable when there is already enable?
+            //enable acts like an AND operator,
+            //whereas having conditions for the opposite allows for an OR operation.
+            //it is messy, but hey it works lmao?
+            disableConditions: (module.disableConditions || false), 
         };
 
         if (!(module.slider && module.slider.step)) { module.slider = {} };
@@ -777,29 +781,39 @@ let attemptedInjection = false;
             step: module.slider.step,
             title: module.button,
         };
+
+        const tpStoreAs = module.storeAs + "Button";
+
         if (module.button) {
-            tp[(module.storeAs + "Button")] = module.location.addButton({
+            tp[tpStoreAs] = module.location.addButton({
                 label: module.title,
                 title: module.button,
             }).on("click", (value) => {
-                if (module.clickFunction !== undefined) { module.clickFunction(value) };
+                try {
+                    if (module.clickFunction !== undefined) { module.clickFunction(value) };
+                } catch (error) {
+                    log("OooOoOoops, error in click function", module.storeAs, error);
+                };
                 if (module.botParam !== undefined) { updateBotParams(module.botParam) };
+                log("click", module.storeAs, value);
+                onOptionChanged(module.storeAs, value);
             });
         } else if (module.monitor) {
             monitorObjects[module.storeAs] = "Text Goes Here";
-            tp[(module.storeAs + "Button")] = module.location.addMonitor(monitorObjects, module.storeAs, {
+            tp[tpStoreAs] = module.location.addMonitor(monitorObjects, module.storeAs, {
                 label: '',
                 expanded: true,
                 multiline: true,
                 lineCount: module.monitor,
             });
-            setInterval(() => {
-                tp[(module.storeAs + "Button")].refresh();
-            }, 1000);
         } else {
-            tp[module.storeAs + "Button"] = module.location.addInput(value, module.storeAs, config
+            tp[tpStoreAs] = module.location.addInput(value, module.storeAs, config
             ).on("change", (value) => {
-                if (module.changeFunction !== undefined) { module.changeFunction(value) };
+                try {
+                    if (module.changeFunction !== undefined) { module.changeFunction(value) };
+                } catch (error) {
+                    log("OooOoOoops, error in change function", module.storeAs, error);
+                };
                 setTimeout(() => {
                     if (startUpComplete) {
                         if ((module.botParam !== undefined)) {
@@ -809,6 +823,8 @@ let attemptedInjection = false;
                     updateHiddenAndDisabled();
                     saveConfig();
                 }, 150);
+                log("change", module.storeAs, value);
+                onOptionChanged(module, value);
             });
         };
         allModules.push(module.storeAs);
@@ -987,8 +1003,8 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "Creates an ESP box at the predicted position of the player", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "NametagESP", storeAs: "nametags", tooltip: "Enlarges nametags and makes them appear through walls", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "NametagInfo", storeAs: "nametagInfo", tooltip: "Adds extra info to nametags such as HP and score stats", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Info Update Interval", storeAs: "nametagInfoInterval", tooltip: "If the info updater lags you, increase this value to make it update less often.", slider: { min: 1, max: 180, step: 1 }, defaultValue: 20, showConditions: [["nametagInfo", true]], });
+            initModule({ location: tp.renderTab.pages[0], title: "NametagInfo", storeAs: "nametagInfo", tooltip: "Adds extra info to nametags such as HP and score stats (Warning: Lags)", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Info Update Interval", storeAs: "nametagInfoInterval", tooltip: "If the info updater lags you, increase this value to make it update less often.", slider: { min: 1, max: 180, step: 1 }, defaultValue: 180, showConditions: [["nametagInfo", true]], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
                 initModule({ location: tp.tracersFolder, title: "TargetedColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", showConditions: [["aimbotRainbow", false]] });
@@ -1255,7 +1271,7 @@ But check out the GitHub guide.`},
         ]);
             initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "Allows you to switch out Shell's default skybox", bindLocation: tp.themingTab.pages[1], dropdown: loadedSkyboxes, changeFunction: (newSkybox) => {
                 if (!unsafeWindow[skyboxName]) return;
-                unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = L.BABYLON.Texture.SKYBOX_MODE;
+                unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = 5; //L.BABYLON.Texture.SKYBOX_MODE;
             }});
             initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", tooltip: "Switches the skybox to a random one", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Switch Interval", storeAs: "randomSkyBoxInterval", tooltip: "The interval after which the skybox is switched, given that randomSkyBox is enabled. In minutes", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
@@ -1904,7 +1920,7 @@ debug mode).`},
         tp.botTabs.pages[1].addSeparator();
         initModule({ location: tp.botTabs.pages[1], title: "Join Game", storeAs: "botAutoJoin", tooltip: "Forces bots to join a game", botParam: true, });
         initModule({ location: tp.botTabs.pages[1], title: "Game Code", storeAs: "botJoinCode", tooltip: "The code of the game the bots will join. If not specified, they'll find a random game", defaultValue: "CODE", botParam: true, });
-        initModule({ location: tp.botTabs.pages[1], title: "Get Code", storeAs: "getCodeBots", tooltip: "Get your current gameÄs ID", button: "Retrieve", clickFunction: function () { change("botJoinCode", GAMECODE) }, botParam: true, });
+        initModule({ location: tp.botTabs.pages[1], title: "Get Code", storeAs: "getCodeBots", tooltip: "Get your current game as ID", button: "Retrieve", clickFunction: function () { change("botJoinCode", GAMECODE) }, botParam: true, });
         tp.botTabs.pages[1].addSeparator();
         initModule({ location: tp.botTabs.pages[1], title: "GameType", storeAs: "autoGamemodeBots", tooltip: "The game type the bots join - ffa, kotc, etc. can be random or disabled", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "FFA", value: "ffa" }, { text: "Teams", value: "teams" }, { text: "Captula", value: "captula" }, { text: "KotC", value: "kotc" }, { text: "Randomised", value: "random" }], defaultValue: "disabled", botParam: true, });
         initModule({ location: tp.botTabs.pages[1], title: "AutoRegion", storeAs: "autoRegionBots", tooltip: "The region the bots join - use, usc, etc. can be random or disabled", dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Chile", value: "santiago" }, { text: "Germany", value: "germany" }, { text: "Singapore", value: "singapore" }, { text: "Sydney", value: "sydney" }, { text: "US Central", value: "uscentral" }, { text: "US East", value: "useast" }, { text: "US West", value: "uswest" }, { text: "Randomised", value: "random" }], defaultValue: "disabled", botParam: true, });
@@ -3690,6 +3706,8 @@ z-index: 999999;
         };
     };
     const everySecond = function () {
+        let oldMonitorObjects = JSON.parse(JSON.stringify(monitorObjects));
+
         if (extract("debug")) {
             unsafeWindow.globalSS = {};
             unsafeWindow.globalSS.ss = ss;
@@ -3724,6 +3742,9 @@ z-index: 999999;
             unsafeWindow.globalSS.crosshairsPosition = crosshairsPosition;
             unsafeWindow.globalSS.predictGrenade = predictGrenade;
             unsafeWindow.globalSS.miniCamera = miniCamera;
+            unsafeWindow.globalSS.configMain = configMain;
+            unsafeWindow.globalSS.configBots = configBots;
+            unsafeWindow.globalSS.predictBloom = predictBloom;
             // unsafeWindow.globalSS.pathfindingInfo = {
             //     activePath: activePath,
             //     pathfindingTargetOverride: pathfindingTargetOverride,
@@ -4225,9 +4246,18 @@ z-index: 999999;
 
         //block ads or something kek
         localStorage.timesPlayed = 0;
+
+        for (let storeAs of Object.keys(monitorObjects)) {
+            let object = monitorObjects[storeAs];
+            if (monitorObjects[object] !== oldMonitorObjects[object]) {
+                log(object, monitorObjects[object]);
+                tp[storeAs+"Button"].refresh();
+            };
+        };
     };
     const everyDecisecond = function () {
-        updateConfig(); deciSecondsPassed++;
+        // updateConfig();
+        deciSecondsPassed++;
 
         if (extract("titleAnimation")) {
             if (deciSecondsPassed % 3 == 0) {
@@ -4475,6 +4505,17 @@ z-index: 999999;
                     sendChatMessage("Invalid setpathdespawn message");
                 };
                 */
+        };
+    };
+
+    const onOptionChanged = function(module, value) {
+        if ((!configMain) || (!configBots)) {
+            updateConfig();
+        };
+        if (configBots[module.storeAs] !== undefined) {
+            configBots[module.storeAs] = value.value;
+        } else {
+            configMain[module.storeAs] = value.value;
         };
     };
 
@@ -4984,33 +5025,58 @@ z-index: 999999;
 
     // [sfc] PREDICTION CODE
 
-    const predictBloom = function (yaw, pitch) { //outputs the difference in yaw/pitch from the bloom
+    const predictBloom = function (yaw, pitch, amountToGenerate = ss.MYPLAYER.weapon.constructor.standardMeshName !== "dozenGauge" ? 1 : 20) { //outputs the difference in yaw/pitch from the bloom
         let seed = ss.MYPLAYER[H.randomGen].seed;
-        let numbers = [];
         const accuracy = ss.MYPLAYER.weapon.accuracy;
-        for (var i = 0; i < 3; i++) { //generate from seed the values used to scatter shot
-            seed = (seed * 9301 + 49297) % 233280;
-            numbers.push(((seed / 233280) - 0.5) * accuracy);
-        };
         const range = ss.MYPLAYER.weapon.constructor.range;
-        const playerRotationMatrix = L.BABYLON.Matrix.RotationYawPitchRoll(yaw, pitch, 0);
-        const rangeMatrix = L.BABYLON.Matrix.Translation(0, 0, range);
-        const playerAndRangeMatrix = rangeMatrix.multiply(playerRotationMatrix);
-        const bloomMatrix = L.BABYLON.Matrix.RotationYawPitchRoll(numbers[0], numbers[1], numbers[2]);
-        const finalBulletMatrix = playerAndRangeMatrix.multiply(bloomMatrix);
-        const finalBulletTranslation = finalBulletMatrix.getTranslation();
-        const bulletYaw = calculateYaw(finalBulletTranslation);
-        const bulletPitch = calculatePitch(finalBulletTranslation);
-        const bulletYawDiff = radianAngleDiff(yaw, bulletYaw)
-        const bulletPitchDiff = radianAngleDiff(pitch, bulletPitch);
 
-        //log("current accuracy: ",accuracy)
-        //log("input yaw: ",yaw)
-        //log("input pitch: ",pitch)
-        //log("calculated bullet yaw: ",bulletYaw)
-        //log("calculated bullet pitch: ",bulletPitch)
-        //log("therefore yaw diff: ",bulletYawDiff)
-        //log("therefore pitch diff: ",bulletPitchDiff)
+        const generateSeed = () => {
+            let numbers = [];
+
+            for (var i = 0; i < 3; i++) { //generate from seed the values used to scatter shot
+                seed = (seed * 9301 + 49297) % 233280;
+                numbers.push(((seed / 233280) - 0.5) * accuracy);
+            };
+
+            const playerRotationMatrix = L.BABYLON.Matrix.RotationYawPitchRoll(yaw, pitch, 0);
+            const rangeMatrix = L.BABYLON.Matrix.Translation(0, 0, range);
+            const playerAndRangeMatrix = rangeMatrix.multiply(playerRotationMatrix);
+            const bloomMatrix = L.BABYLON.Matrix.RotationYawPitchRoll(numbers[0], numbers[1], numbers[2]);
+            const finalBulletMatrix = playerAndRangeMatrix.multiply(bloomMatrix);
+            const finalBulletTranslation = finalBulletMatrix.getTranslation();
+            const bulletYaw = calculateYaw(finalBulletTranslation);
+            const bulletPitch = calculatePitch(finalBulletTranslation);
+            const bulletYawDiff = radianAngleDiff(yaw, bulletYaw)
+            const bulletPitchDiff = radianAngleDiff(pitch, bulletPitch);
+
+            //log("current accuracy: ",accuracy)
+            //log("input yaw: ",yaw)
+            //log("input pitch: ",pitch)
+            //log("calculated bullet yaw: ",bulletYaw)
+            //log("calculated bullet pitch: ",bulletPitch)
+            //log("therefore yaw diff: ",bulletYawDiff)
+            //log("therefore pitch diff: ",bulletPitchDiff)
+
+            return [bulletYawDiff, bulletPitchDiff];
+        };
+
+        const values = [];
+
+        // log("generating bloom for ", amountToGenerate, " shots");
+
+        for (var i = 0; i < amountToGenerate; i++) {
+            values.push(generateSeed());
+        };
+
+        //create average:
+        let bulletYawDiff = 0;
+        let bulletPitchDiff = 0;
+        for (var i = 0; i < amountToGenerate; i++) {
+            bulletYawDiff += values[i][0];
+            bulletPitchDiff += values[i][1];
+        };
+        bulletYawDiff /= amountToGenerate;
+        bulletPitchDiff /= amountToGenerate;
 
         return [bulletYawDiff, bulletPitchDiff];
     };
@@ -5080,7 +5146,7 @@ z-index: 999999;
             pitchReal: calculatePitch(directionVector),
         };
 
-        if (extract("antiBloom") && ss.MYPLAYER.weapon.constructor.standardMeshName !== "dozenGauge") {
+        if (extract("antiBloom")) {
             direction = applyBloom(direction, 1);
         };
 
@@ -6974,7 +7040,7 @@ z-index: 999999;
                 };
 
                 // chrome web store reviewers, GM_info is never declared and this will always be false in the web store environment
-                if (extract("forceImport") && typeof GM_info == 'undefined') {
+                if (extract("forceImport") && typeof GM_info !== 'undefined') {
                     doImport();
                 } else {
                     try {
