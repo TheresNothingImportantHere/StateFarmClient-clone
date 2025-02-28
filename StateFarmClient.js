@@ -35,7 +35,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.2-pre3
+// @version      3.4.2-pre4
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -173,7 +173,7 @@ let attemptedInjection = false;
     const bottingGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-botting";
     const violentmonkeyURL = "https://violentmonkey.github.io/get-it/";
 
-    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@7.21.1/babylon.min.js";
+    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@{0}/babylon.min.js";
 
     const replacementLogoURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement.png";
     const replacementLogoHalloweenURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-halloween.png";
@@ -269,13 +269,13 @@ let attemptedInjection = false;
 
                     let disablePlayButton = vueApp.disablePlayButton;
                     vueApp.disablePlayButton = (isDisabled) => {
-                      console.log('called disablePlayButton, so we are handling the statefarm updates box')
+                        log('called disablePlayButton, so we are handling the statefarm updates box')
 
-                      if (isDisabled) commitHistoryBox.style.display = 'none';
-                      else commitHistoryBox.style.display = '';
+                        if (isDisabled) commitHistoryBox.style.display = 'none';
+                        else commitHistoryBox.style.display = '';
 
-                      return disablePlayButton(isDisabled);
-                    }
+                        return disablePlayButton(isDisabled);
+                    };
 
                     fetch(commitFeedURL).then(response => {
                         if (response.ok) return response.json();
@@ -6040,7 +6040,7 @@ z-index: 999999;
                 match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
                 if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
                 //reset join/leave msgs
-                modifyJS(',console.log("joinGame()', ',window.' + functionNames.setNewGame + '(),console.log("value changed, also joinGame()');
+                modifyJS(',console.log("joinGame()', ',window.' + functionNames.setNewGame + '(),console.log("joinGame()');
                 //bypass chat filter
                 modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
                 //hook for control interception
@@ -7031,7 +7031,7 @@ z-index: 999999;
                 const doImport = () => {
                     log('%c(Fallback) STATEFARM IS ATTEMPTING TO LOAD L.BABYLON', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
                     var script = document.createElement("script");
-                    script.src = babylonURL;
+                    script.src = babylonURL.format(H?.BabylonVersion || "7.21.1");
                     script.onload = function () {
                         if (unsafeWindow.BABYLON) {
                             L.BABYLONimported = unsafeWindow.BABYLON;
