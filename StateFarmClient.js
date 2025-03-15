@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.2-pre6
+// @version      3.4.2-pre7
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -111,6 +111,8 @@
 // @match        *://*.yolk.quest/*
 // @match        *://*.yolk.today/*
 // @match        *://*.zygote.cafe/*
+// @match        *://getstate.farm/*
+// @match        *://localhost:5173/*
 // @downloadURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.user.js
 // @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
 // ==/UserScript==
@@ -119,6 +121,11 @@ let attemptedInjection = false;
 // log("StateFarm: running (before function)");
 
 (function () {
+    if (location.hostname == 'getstate.farm' || location.hostname == 'localhost') {
+        unsafeWindow.userscript = typeof GM_info !== 'undefined' ? GM_info : false;
+        return;
+    }
+
     if (typeof isCrackedShell !== 'undefined') alert('CrackedShell v1 is no longer supported. Upgrade to v2.');
 
     let crackedShell = typeof $WEBSOCKET !== 'undefined';
