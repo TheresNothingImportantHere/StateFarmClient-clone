@@ -7,7 +7,7 @@
 
 [![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)](https://greasyfork.org/en/scripts/482982-statefarm-client-v3-combat-bloom-esp-rendering-chat-automation-botting-unbanning-and-more)
 [![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)](https://github.com/Hydroflame522/StateFarmClient/raw/main/StateFarmClient.js)
-[![Discord Members](https://shields.io/discord/988104240000028706?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)](https://dsc.gg/sfnetwork)
+[![Discord Members](https://shields.io/discord/977271202924097586?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)](https://discord.gg/TX4VnAs6gj)
 
 </div>
 <br><br>
@@ -17,7 +17,7 @@ StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), includ
 > StateFarm Client V3 is based off [LibertyMutual Client](https://github.com/onlypuppy7/LibertyMutualShellShockers) <br>
 > This is a simpler template client, intended to be a base for StateFarm but anyone is welcome to use it in their own projects. <br>
 
-<h3 align='center'>Join our <a href='https://dsc.gg/sfnetwork'>Discord Server</a> for the latest news!</h3>
+<h3 align='center'>Join our <a href='https://discord.gg/TX4VnAs6gj'>Discord Server</a> for the latest news!</h3>
 <br>
 
 The information below is accurate as of StateFarm version **3.4.1-pre147**. 
