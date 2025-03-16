@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.2-pre8
+// @version      3.4.2-pre7
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -121,15 +121,8 @@ let attemptedInjection = false;
 // log("StateFarm: running (before function)");
 
 (function () {
-    if ((location.hostname == 'getstate.farm' || location.hostname == 'localhost') && typeof unsafeWindow !== 'undefined') {
+    if (location.hostname == 'getstate.farm' || location.hostname == 'localhost') {
         unsafeWindow.userscript = typeof GM_info !== 'undefined' ? GM_info : false;
-
-        if (typeof GM_listValues !== 'undefined' && typeof GM_getValue !== 'undefined') {
-            const keyArr = GM_listValues();
-            const allValues = {};
-            keyArr.forEach((key) => allValues[key] = GM_getValue(key));
-            unsafeWindow.gm = allValues;
-        }
         return;
     }
 
@@ -149,7 +142,7 @@ let attemptedInjection = false;
             if (typeof value === 'object') localStorage.setItem(name, JSON.stringify(value));
             else localStorage.setItem(name, value);
         };
-        GM_listValues = () => Object.keys(localStorage);
+        GM_listValues = () => localStorage;
         GM_deleteValue = (...a) => localStorage.removeItem(...a);
         GM_openInTab = (link) => window.open(link, '_blank');
         GM_setClipboard = (text, _, callback) => navigator.clipboard.writeText(text).then(() => callback());
