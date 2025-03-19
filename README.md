@@ -17,7 +17,7 @@ StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), includ
 > StateFarm Client V3 is based off [LibertyMutual Client](https://github.com/onlypuppy7/LibertyMutualShellShockers) <br>
 > This is a simpler template client, intended to be a base for StateFarm but anyone is welcome to use it in their own projects. <br>
 
-<h3 align='center'>Join our <a href='https://discord.gg/TX4VnAs6gj'>Discord Server</a> for the latest news!</h3>
+<h3 align='center'>Join our <a href='https://dsc.gg/sfnetwork'>Discord Server</a> for the latest news!</h3>
 <br>
 
 The information below is accurate as of StateFarm version **3.4.1-pre147**. 
