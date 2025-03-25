@@ -12,7 +12,7 @@
 </div>
 <br><br>
 
-StateFarm is the **BEST** hack client for Shell Shockers (shellshock.io), including **Aimbot**, **ESP**, **Bloom Hacks**, **Botting**, **Custom Binding**, **Highly Customisable Modules**, **Chat Mods** and so much more!<br>
+StateFarm is the **BEST** utility mod for Shell Shockers (shellshock.io), including **Aimbot**, **ESP**, **Bloom Mods**, **Botting**, **Custom Binding**, **Highly Customisable Modules**, **Chat Mods** and so much more!<br>
 
 > StateFarm Client V3 is based off [LibertyMutual Client](https://github.com/onlypuppy7/LibertyMutualShellShockers) <br>
 > This is a simpler template client, intended to be a base for StateFarm but anyone is welcome to use it in their own projects. <br>
@@ -102,7 +102,7 @@ Aimbot is one of the key features of StateFarm, it is the most powerful combat m
 	- If using a mouse, click the **V** key to enable & disable aimbot.
   
 ### ESP
-**ESP** or also known as `wall hacks`, are cheats that allow you to see players positions through walls.<br>
+**ESP** or also known as `wall mods`, are cheats that allow you to see players positions through walls.<br>
 To configure ESP, open the `Render` tab.
 
 - To see eggs through walls with **boxes**, enable `PlayerESP`.
@@ -417,7 +417,7 @@ Various account management tools
 - **Hide at Startup** - hides the StateFarm menu by default.
 - **No Console Logs** - blocks the client from sending messages to the browser console.
 - **Popups** - disables/enables popups and notifications
-- **Panic** - allows you to quickly exit to a set URL. great for hacking in class
+- **Panic** - allows you to quickly exit to a set URL. great for modding in class
 - **Presets**
   - **Preset List** - pick a preset from the list including the dev teams configs & apply it to get a custom configuration 
   - **Save** - saves your current settings as a preset.
@@ -448,7 +448,7 @@ Various account management tools
 |       Issue        |  Solution                                                |
 |----------------|---------------------------------------------|
 |Stuck on loading screen|Press CTRL+F5 (or FN+F5) until "Script Injected" is shown.|
-|Skin hacks not working|This feature is only clientsided and will not show your skins to other players.|
+|Skin mods not working|This feature is only clientsided and will not show your skins to other players.|
 
 > If you have any issues, contact us in our [Discord server](https://dsc.gg/sfnetwork).
 
