@@ -10,9 +10,9 @@
 [![Discord Members](https://shields.io/discord/977271202924097586?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)](https://discord.gg/TX4VnAs6gj)
 
 </div>
-<br><br>
 
 ## This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the user's responsibility. By downloading, intalling, or using the mod, you agree to our [Terms and Disclaimers](https://docs.google.com/document/d/18A226mG4kVyd-BoNSxXxoXOuhwtm9M3CFwTaFf0-sZU/edit?usp=sharing).
+<br>
 
 StateFarm is the **BEST** utility mod for Shell Shockers (shellshock.io), including **Aimbot**, **ESP**, **Bloom Mods**, **Botting**, **Custom Binding**, **Highly Customisable Modules**, **Chat Mods** and so much more!<br>
 
