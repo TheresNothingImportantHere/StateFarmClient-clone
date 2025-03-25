@@ -12,6 +12,8 @@
 </div>
 <br><br>
 
+# This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the user's responsibility.
+
 StateFarm is the **BEST** utility mod for Shell Shockers (shellshock.io), including **Aimbot**, **ESP**, **Bloom Mods**, **Botting**, **Custom Binding**, **Highly Customisable Modules**, **Chat Mods** and so much more!<br>
 
 > StateFarm Client V3 is based off [LibertyMutual Client](https://github.com/onlypuppy7/LibertyMutualShellShockers) <br>
