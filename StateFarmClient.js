@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre1
+// @version      3.4.2-pre7
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -113,7 +113,6 @@
 // @match        *://*.zygote.cafe/*
 // @match        *://getstate.farm/*
 // @match        *://localhost:5173/*
-// @antifeature  ads, technically
 // @downloadURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.user.js
 // @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
 // ==/UserScript==
@@ -201,7 +200,6 @@ let attemptedInjection = false;
     const badgeListURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/ingamebadges/";
     const iconURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/StateFarmClientLogo384px.png";
     const itsOverURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/assets/its%20over/ItsOver4Smaller.png";
-    const eggShowURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/assets/show/EggShowSmaller.png";
     const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
     const skyboxListURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/skyboxes/";
 
@@ -490,7 +488,7 @@ let attemptedInjection = false;
     let ss = {};
     let H = {}; // obfuscated shit lol
     const tp = {}; // <-- tp = tweakpane
-    let msgElement, allowAccess, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, performanceElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
+    let msgElement, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, performanceElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond, enemyAimNearest
     let cachedCommand = "", cachedCommandTime = Date.now();
     let activePath, findNewPath, activeNodeTarget;
@@ -601,190 +599,11 @@ let attemptedInjection = false;
     let skyboxName = getScrambled();
     let mapData = getScrambled();
 
-    //verification system
-    //you can disable this by setting the variable to false, so please dont worry future ppl using this
-    //in truth its just to get ppl to join the discord server
-
-    const verification = {
-        enabled: true,
-        verified: true,
-        currentlyTrial: false,
-        discordInvite: discordURL,
-        trialPeriod: 5, //in minutes
-        trialMessage: "Hello! StateFarm Client requires you to verify in the\nDiscord server to use the full version. You have a trial\nperiod of {0} minutes before you will need to verify.\nIt's all free, so don't worry. No subscriptions!",
-        trialMessage2: "You have {0} minute(s) left of your SFC trial period.",
-        trialOverMessage: "The trial period has ended. Please verify to continue to use StateFarm Client.",
-        mustJoinMessage: "You must verify in the Discord server to continue to use\nthis script.\n\nPlease click the verify button below.",
-        verificationMessage: "You have been verified! Enjoy the full version of StateFarm Client.",
-
-        timeUsedStorageKey: "StateFarmVerification_TimeUsed",
-        verifiedStorageKey: "StateFarmVerification_Verified",
-
-        getTimeUsed: function () {
-            if (!verification.timeUsed) verification.timeUsed = GM_getValue(verification.timeUsedStorageKey, 0);
-            return verification.timeUsed;
-        },
-        timeUsed: 0,
-        checkVerification: function () {
-            verification.currentlyTrial = (verification.getTimeUsed() < verification.trialPeriod);
-            verification.verified = (!verification.enabled) || (verification.currentlyTrial) || (GM_getValue(verification.verifiedStorageKey, false));
-            return verification.verified;
-        },
-        started: false,
-        beginVerificationCheck: function () {
-            if (verification.started) return;
-            verification.started = true;
-
-            // log("the 'wtf is going on with' logs");
-            // log(verification.checkVerification());
-            // log(verification.currentlyTrial);
-            
-            if (verification.checkVerification()) { //allowed to use
-                if (verification.currentlyTrial) {
-                    createPrompt(verification.trialMessage2.format(verification.trialPeriod - verification.timeUsed), [], 15e3);
-                    verification.interval = setInterval(function () {
-                        verification.timeUsed++;
-                        GM_setValue(verification.timeUsedStorageKey, verification.timeUsed);
-                        log("Time used:", verification.timeUsed);
-                        if (!verification.checkVerification()) {
-                            change("leaveGame");
-                            clearInterval(verification.interval);
-                            createPrompt(verification.trialOverMessage, [], 15e3);
-                            verification.setDisableClient();
-                        };
-                    }, 60000);
-                };
-            } else { //not allowed to use
-                verification.openVerificationPopup();
-            };
-        },
-        setDisableClient: function () {
-            initMenu();
-            verification.openVerificationPopup();
-        },
-        popupShown: false,
-        openVerificationPopup: function () {
-            if (verification.popupShown) return;
-            verification.popupShown = true;
-            createVarDataOverlay();
-            tp.mainPanel.hidden = true;
-
-            //create verificationPopup
-            let verificationPopup = document.createElement('div');
-            verificationPopup.style.position = 'fixed';
-            verificationPopup.style.left = '50%';
-            verificationPopup.style.top = '50%';
-            verificationPopup.style.width = '40em';
-            verificationPopup.style.transform = 'translate(-50%, -50%)';
-            verificationPopup.style.color = '#fff';
-            verificationPopup.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-            verificationPopup.style.padding = '15px';
-            verificationPopup.style.borderRadius = '5px';
-            verificationPopup.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
-            verificationPopup.style.border = '2px solid rgba(255, 255, 255, 0.5)';
-            verificationPopup.style.pointerEvents = 'auto';
-            verificationPopup.style.opacity = '0';
-            verificationPopup.style.transition = 'opacity 0.4s ease-in-out';
-            verificationPopup.style.fontFamily = 'Bahnschrift, sans-serif';
-            verificationPopup.style.fontSize = '16px';
-            verificationPopup.style.zIndex = '9999';
-            verificationPopup.style.whiteSpace = 'pre-wrap';
-    
-            //set verificationPopup content
-            const title = "Please verify in the StateFarm Discord server";
-            const message = `You only need to do this once, and it's free.<br>
-    <strong>Why am I seeing this?</strong>
-    Due to some recent issues, we have implemented this system to ensure our users are using the genuine StateFarm script.<br>
-    <strong>How do I verify?</strong>
-    Verifying is easy.
-    You can verify by using the command "sf.verify" in the StateFarm Discord bot channel.
-    <a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the StateFarm Network Discord server</a> to get your verification code!`;
-            const image = `<img src='${eggShowURL}' style='width: 20%; height: 20%; margin-right: 15px; vertical-align: middle;'>`;
-            verificationPopup.innerHTML = `${image}<strong>${title}</strong><br><br>${message}<br>
-                               <label for="verificationInput">Enter Verification Code:</label>
-                               <div style="display: flex; align-items: center;">
-                                   <input type="text" id="verificationInput" style="flex: 1; padding: 5px; width: 250px; border: 1px solid rgba(255, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; border-radius: 5px; margin-right: 10px;">
-                                   <button id="submitVerificationCode" style="padding: 5px 15px; background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; cursor: pointer; transition: background-color 0.2s;">GO</button>
-                               </div>`;
-
-            document.body.appendChild(verificationPopup);
-
-            //add inputs stuff
-            const input = document.getElementById('verificationInput');
-            const submitButton = document.getElementById('submitVerificationCode');
-    
-            submitButton.addEventListener('click', () => {
-                const inputValue = input.value;
-    
-                const error = function () {
-                    createPopup("Inputted verification code isn't valid.", "error");
-                };
-    
-                try {
-                    if (verification.checkCodeValidity(inputValue)) {
-                        verification.setVerified();
-                        //add success message
-                        alert(verification.verificationMessage);
-                        unsafeWindow.location.reload();
-                    } else {
-                        error();
-                    };
-                } catch (e) {
-                    error();
-                };
-            });
-    
-            input.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    submitButton.click();
-                };
-            });
-
-            // log(verificationPopup);
-
-            //fade anims
-            setTimeout(() => {
-                verificationPopup.style.opacity = '1';
-            }, 10);
-        },
-
-        codeExpirationTime: 30 * 60, //in seconds
-        checkCodeValidity: function (code) {
-            //if you found this function, well done.
-            //you can now use the full version of the script without verifying.
-            //now just let us know in the discord server that you found this and we'll give you a special role.
-            function fromBase62(str) {
-                const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-                let num = 0;
-            
-                for (let i = 0; i < str.length; i++) {
-                    num = num * 62 + chars.indexOf(str[i]);
-                }
-            
-                return num;
-            };
-
-            let codeNum = (fromBase62(code) % 100000000000) * 1e3;
-
-            let isValid = (Date.now() - codeNum) <= (verification.codeExpirationTime * 1e3);
-
-            return isValid;
-        },
-        setVerified: function () {
-            GM_setValue(verification.verifiedStorageKey, true);
-        },
-    };
-
     //menu interaction functions
     //menu extraction
     const extract = function (variable, shouldUpdate) {
-        try {
-            if (shouldUpdate) { updateConfig() };
-            return configMain[variable] || configBots[variable];
-        } catch (error) {
-            // variable !== "consoleLogs" && log("Error extracting variable:", variable, error);
-            return undefined;
-        };
+        if (shouldUpdate) { updateConfig() };
+        return configMain[variable] || configBots[variable];
     };
     const extractDropdownList = function (variable) {
         return tp[variable + "Button"].controller_.binding.value.constraint_.constraints[0].options;
@@ -1052,40 +871,12 @@ let attemptedInjection = false;
         resetModules = reset === true;
         menuInitiated = false;
 
-        const alreadyOpen = tp?.mainPanel !== undefined && !tp.mainPanel.hidden;
-
-        log("alreadyOpen", alreadyOpen);
-
         if (tp.mainPanel) { tp.mainPanel.dispose() };
         if (tp.botPanel) { tp.botPanel.dispose() };
 
         tp.mainPanel = new Tweakpane.Pane(); // eslint-disable-line
         tp.mainPanel.hidden = true;
-        if (alreadyOpen) tp.mainPanel.hidden = false;
-
-        //VERIFICATION STUFF
-        verification.checkVerification();
-
-        allowAccess = true;
-
-        if (verification.currentlyTrial || !verification.verified) {
-            initModule({ location: tp.mainPanel, title: "Verification", storeAs: "verificationText", monitor: 5, });
-            if (verification.currentlyTrial) {
-                monitorObjects["verificationText"] = verification.trialMessage.format(verification.trialPeriod);
-            } else {
-                monitorObjects["verificationText"] = verification.mustJoinMessage;
-                allowAccess = false;
-            };
-
-            initModule({ location: tp.mainPanel, title: "Verify", storeAs: "verificationButton", tooltip: "Go to the Discord to verify", button: "Go", clickFunction: verification.openVerificationPopup });
-
-            tp.mainPanel.addSeparator();
-
-            tp.mainPanel.title = menuTitle + " (✘)";
-        } else {
-            tp.mainPanel.title = menuTitle + " (✔)";
-        };
-            
+        tp.mainPanel.title = menuTitle;
         //SFC CHAT
         initFolder({ location: tp.mainPanel, title: "StateFarm Chat", storeAs: "sfChatFolder", });
         initTabs({ location: tp.sfChatFolder, storeAs: "sfChatTab" }, [
@@ -1123,7 +914,6 @@ let attemptedInjection = false;
             tp.sfChatTab.pages[0].addSeparator();
             initModule({ location: tp.sfChatTab.pages[0], title: "Prompt Invitations", storeAs: "sfChatInvitations", tooltip: "Show invite prompts when someone sends a game code in the chatroom", bindLocation: tp.sfChatTab.pages[1], defaultValue: true, });
         //COMBAT MODULES
-        if (allowAccess) {
         initFolder({ location: tp.mainPanel, title: "Combat", storeAs: "combatFolder", });
         initTabs({ location: tp.combatFolder, storeAs: "combatTab" }, [
             {
@@ -1483,7 +1273,6 @@ sniping and someone sneaks up on you
             initModule({ location: tp.automationTab.pages[0], title: "Egg Color", storeAs: "eggColor", tooltip: "Picks the egg color automatically", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "White", value: "white" }, { text: "Light Blue", value: "lightblue" }, { text: "Light Eggshell", value: "lighteggshell" }, { text: "Eggshell", value: "eggshell" }, { text: "Dark Eggshell", value: "darkeggshell" }, { text: "Darker Eggshell", value: "darkereggshell" }, { text: "Darkest Eggshell", value: "darkesteggshell" }, { text: "Red (VIP)", value: "red" }, { text: "Purple (VIP)", value: "purple" }, { text: "Pink (VIP)", value: "pink" }, { text: "Yellow (VIP)", value: "yellow" }, { text: "Blue (VIP)", value: "blue" }, { text: "Green (VIP)", value: "green" }, { text: "Lime (VIP)", value: "lime" }, /*{text: "Randomised", value: "random"}*/], defaultValue: "disabled" });
             initModule({ location: tp.automationTab.pages[0], title: "Auto Stamp", storeAs: "autoStamp", tooltip: "Picks the egg stamp automatically", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Target Stamp", value: "target" }, { text: "No Sign Stamp", value: "nosign" }, { text: "Question Mark Stamp?", value: "question" }, { text: "Peace Stamp", value: "peace" }, { text: "Thumbs Up Stamp", value: "thumbsup" }, { text: "Pablo Smile Stamp", value: "pablosmile" }], defaultValue: "disabled" });
             initModule({ location: tp.automationTab.pages[0], title: "Auto Hat", storeAs: "autoHat", tooltip: "Picks the egg hat automatically", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Ball Cap", value: "ballcap" }, { text: "Boat Fedora", value: "boatfedora" }, { text: "Top Hat", value: "tophat" }, { text: "Derby Hat", value: "derbyhat" }, { text: "Mountie Hat", value: "mountiehat" }, { text: "Pablo Hat", value: "pablohat" }], defaultValue: "disabled" });
-        };
         //BOTTING MODULES
         initFolder({ location: tp.mainPanel, title: "Botting", storeAs: "bottingFolder", });
         initTabs({ location: tp.bottingFolder, storeAs: "bottingTab" }, [
@@ -1497,7 +1286,6 @@ But check out the GitHub guide.`},
             }});
             tp.bottingTab.pages[0].addSeparator();
             initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", tooltip: "Click for infos on how to get started and free candy", button: "Link", clickFunction: function () { GM_openInTab(bottingGuideURL, { active: true }) }, });
-        if (allowAccess) {
         //THEMING MODULES
         initFolder({ location: tp.mainPanel, title: "Theming", storeAs: "themingFolder", });
         initTabs({ location: tp.themingFolder, storeAs: "themingTab" }, [
@@ -1557,7 +1345,7 @@ But check out the GitHub guide.`},
             initModule({ location: tp.themingTab.pages[0], title: "Party Lights Intensity", storeAs: "partyLightsIntensity", tooltip: "Intensity of the party 🥳", slider: { min: 0.01, max: 20, step: 0.01 }, defaultValue: 0.5, });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "World Flattening", storeAs: "worldFlattening", tooltip: "Make the world F-L-A-T", slider: { min: 0.05, max: 10, step: 0.05 }, defaultValue: 1, });
-        //ACCOUNT MODULES
+            //ACCOUNT MODULES
         initFolder({ location: tp.mainPanel, title: "Accounts", storeAs: "accountsFolder", });
         initTabs({ location: tp.accountsFolder, storeAs: "accountsTab" }, [
             {
@@ -1953,7 +1741,6 @@ debug mode).`},
                 initModule({ location: tp.seizureFolder, title: "X Amount", storeAs: "amountSeizureX", tooltip: "Amount to roll", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
                 initModule({ location: tp.seizureFolder, title: "SeizureY", storeAs: "enableSeizureY", tooltip: "Rotates the player by the specified amount around the x-axis (pitch)", bindLocation: tp.miscTab.pages[1], });
                 initModule({ location: tp.seizureFolder, title: "Y Amount", storeAs: "amountSeizureY", tooltip: "Amount to roll", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
-        };
         //CLIENT MODULES
         initFolder({ location: tp.mainPanel, title: "Client & About", storeAs: "clientFolder", });
         initTabs({ location: tp.clientFolder, storeAs: "clientTab" }, [
@@ -2188,27 +1975,23 @@ debug mode).`},
         initModule({ location: tp.botTabs.pages[3], storeAs: "botOnline", tooltip: "Sex", monitor: 17.5, botParam: true, });
 
         if (!AUTOMATED) {
-            try {
-                if (!load("StateFarmConfigMainPanel") || reset===true) {
-                    saveConfig();
-                } else {
-                    log("##############################################")
-                    tp.mainPanel.importPreset(load("StateFarmConfigMainPanel"));
-                    tp.botPanel.importPreset(load("StateFarmConfigBotPanel"));
-                    try {
-                        let specialItems = load("StateFarmConfigSpecialItems"); //this is for the fucking shit that doesnt apply for NO reason!!
-                        if (specialItems) {
-                            specialItems.forEach(item => {
-                                change(item[0], item[1]);
-                                log(item[0], item[1]);
-                            });
-                        };
-                    } catch (error) {
-    
-                    }
-                };
-            } catch (error) {
-                log("error in initmenu !AUTOMATED part thing, idk", error);
+            if (!load("StateFarmConfigMainPanel") || reset===true) {
+                saveConfig();
+            } else {
+                log("##############################################")
+                tp.mainPanel.importPreset(load("StateFarmConfigMainPanel"));
+                tp.botPanel.importPreset(load("StateFarmConfigBotPanel"));
+                try {
+                    let specialItems = load("StateFarmConfigSpecialItems"); //this is for the fucking shit that doesnt apply for NO reason!!
+                    if (specialItems) {
+                        specialItems.forEach(item => {
+                            change(item[0], item[1]);
+                            log(item[0], item[1]);
+                        });
+                    };
+                } catch (error) {
+
+                }
             };
         };
 
@@ -2246,17 +2029,14 @@ debug mode).`},
         }, 500);
 
         menuInitiated = reset == "init" ? "init" : true;
+        const defaultSpamText = ("dsc.gg/s𝖿network: " + menuTitle + " On Top! ");
 
-        if (allowAccess) {
-            const defaultSpamText = ("dsc.gg/s𝖿network: " + menuTitle + " On Top! ");
-    
-            if (extract("spamChatText").includes("On Top!")) { change("spamChatText", defaultSpamText) };
-            if (extract("spamChatTextBot").includes("On Top!")) { change("spamChatTextBot", defaultSpamText) };
-            if (extract("fakeMessageText").includes("On Top!")) { change("fakeMessageText", defaultSpamText) };
-    
-            makeDraggable(tp.mainPanel.containerElem_);
-            makeDraggable(tp.botPanel.containerElem_);
-        };
+        if (extract("spamChatText").includes("On Top!")) { change("spamChatText", defaultSpamText) };
+        if (extract("spamChatTextBot").includes("On Top!")) { change("spamChatTextBot", defaultSpamText) };
+        if (extract("fakeMessageText").includes("On Top!")) { change("fakeMessageText", defaultSpamText) };
+
+        makeDraggable(tp.mainPanel.containerElem_);
+        makeDraggable(tp.botPanel.containerElem_);
     };
     const onContentLoaded = function () {
         log("StateFarm: initMenu()");
@@ -2336,11 +2116,7 @@ debug mode).`},
         buttonContainer.setAttribute('style', 'margin-top: 10px; pointer-events: auto; text-align: center;');
 
         const deleteButton = function(){
-            try {
-                document.body.removeChild(promptElement);
-            } catch (error) {
-                log("Error deleting prompt element:", error);
-            };
+            document.body.removeChild(promptElement);
         };
 
         buttons = [...buttons,
@@ -2375,26 +2151,6 @@ debug mode).`},
             }, 800);
          }, duration);
     };
-    const createVarDataOverlay = function () {
-        //create vardataOverlay
-        vardataOverlay = document.createElement('div');
-        vardataOverlay.style.position = 'fixed';
-        vardataOverlay.style.top = '0';
-        vardataOverlay.style.left = '0';
-        vardataOverlay.style.width = '100%';
-        vardataOverlay.style.height = '100%';
-        vardataOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-        vardataOverlay.style.zIndex = '9998';
-        vardataOverlay.style.opacity = '0';
-        vardataOverlay.style.transition = 'opacity 0.4s ease-in-out';
-
-        document.body.appendChild(vardataOverlay);
-
-        //fade anims
-        setTimeout(() => {
-            vardataOverlay.style.opacity = '1';
-        }, 10);
-    };
     const createVarDataPopup = function (vardataButtonsInfo) {
         closeVardataPopup = () => {
             vardataPopup.style.opacity = '0';
@@ -2406,7 +2162,17 @@ debug mode).`},
             }, 400);
         };
 
-        createVarDataOverlay();
+        //create vardataOverlay
+        vardataOverlay = document.createElement('div');
+        vardataOverlay.style.position = 'fixed';
+        vardataOverlay.style.top = '0';
+        vardataOverlay.style.left = '0';
+        vardataOverlay.style.width = '100%';
+        vardataOverlay.style.height = '100%';
+        vardataOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+        vardataOverlay.style.zIndex = '9998';
+        vardataOverlay.style.opacity = '0';
+        vardataOverlay.style.transition = 'opacity 0.4s ease-in-out';
 
         //create vardataPopup
         vardataPopup = document.createElement('div');
@@ -2422,8 +2188,8 @@ debug mode).`},
         vardataPopup.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
         vardataPopup.style.border = '2px solid rgba(255, 255, 255, 0.5)';
         vardataPopup.style.pointerEvents = 'auto';
-        vardataPopup.style.opacity = '0';
-        vardataPopup.style.transition = 'opacity 0.4s ease-in-out';
+        vardataPopup.style.opacity = '0'; // Start invisible for fade-in effect
+        vardataPopup.style.transition = 'opacity 0.4s ease-in-out'; // Fade-in transition
         vardataPopup.style.fontFamily = 'Bahnschrift, sans-serif';
         vardataPopup.style.fontSize = '16px';
         vardataPopup.style.zIndex = '9999';
@@ -2530,6 +2296,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
         vardataCheckboxContainer.appendChild(document.createTextNode('Remember until next hash'));
         vardataPopup.appendChild(vardataCheckboxContainer);
 
+        document.body.appendChild(vardataOverlay);
         document.body.appendChild(vardataPopup);
 
         //add inputs stuff
@@ -2566,6 +2333,7 @@ You can generate VarData by using the command "sf.vardata" in the StateFarm Netw
 
         //fade anims
         setTimeout(() => {
+            vardataOverlay.style.opacity = '1';
             vardataPopup.style.opacity = '1';
         }, 10);
     };
@@ -4001,8 +3769,6 @@ z-index: 999999;
             unsafeWindow.globalSS.configMain = configMain;
             unsafeWindow.globalSS.configBots = configBots;
             unsafeWindow.globalSS.predictBloom = predictBloom;
-            unsafeWindow.globalSS.verification = verification;
-            unsafeWindow.globalSS.createVarDataPopup = createVarDataPopup;
             // unsafeWindow.globalSS.pathfindingInfo = {
             //     activePath: activePath,
             //     pathfindingTargetOverride: pathfindingTargetOverride,
@@ -4016,11 +3782,6 @@ z-index: 999999;
             startStateFarmChat(true);
         };
         startUpComplete = (!document.getElementById("progressBar"));
-
-        if (startUpComplete) {
-            verification.beginVerificationCheck();
-        };
-
         let botsDict = GM_getValue("StateFarm_BotStatus");
         sfChatUsernameSet();
         if (!botsDict) botsDict = {};
@@ -4891,21 +4652,19 @@ z-index: 999999;
             .catch(() => { });
     };
     const saveConfig = function () {
-        if (verification.checkVerification()) {
-            if (menuInitiated !== "init") {
-                if (retrievedSFX && retrievedSFX.length > 1) {
-                    save("StateFarmConfigSpecialItems", [
-                        ["customSFX1", extractAsDropdownInt("customSFX1") || 0],
-                        ["customSFX2", extractAsDropdownInt("customSFX2") || 0],
-                        ["customSFX3", extractAsDropdownInt("customSFX3") || 0],
-                        ["skybox",     extractAsDropdownInt("skybox")     || 0],
-                        ["filter",     extractAsDropdownInt("filter")     || 0],
-                    ]);
-                };
+        if (menuInitiated !== "init") {
+            if (retrievedSFX && retrievedSFX.length > 1) {
+                save("StateFarmConfigSpecialItems", [
+                    ["customSFX1", extractAsDropdownInt("customSFX1") || 0],
+                    ["customSFX2", extractAsDropdownInt("customSFX2") || 0],
+                    ["customSFX3", extractAsDropdownInt("customSFX3") || 0],
+                    ["skybox",     extractAsDropdownInt("skybox")     || 0],
+                    ["filter",     extractAsDropdownInt("filter")     || 0],
+                ]);
             };
-            save("StateFarmConfigMainPanel", tp.mainPanel.exportPreset());
-            save("StateFarmConfigBotPanel", tp.botPanel.exportPreset());
         };
+        save("StateFarmConfigMainPanel", tp.mainPanel.exportPreset());
+        save("StateFarmConfigBotPanel", tp.botPanel.exportPreset());
     };
     const save = function (key, value) {
         if (AUTOMATED) { return undefined };
@@ -7890,8 +7649,6 @@ z-index: 999999;
 
         createAnonFunction("STATEFARM", function () {
             ss.PLAYERS.forEach((PLAYER) => (PLAYER.hasOwnProperty("ws")) ? (ss.MYPLAYER = PLAYER) : null);
-
-            if (!verification.checkVerification()) return true;
 
             if (!ranOneTime) {
                 oneTime();
