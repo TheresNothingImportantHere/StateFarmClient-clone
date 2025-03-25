@@ -12,7 +12,7 @@
 </div>
 <br><br>
 
-# This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the user's responsibility.
+# This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the USER's responsibility.
 
 StateFarm is the **BEST** utility mod for Shell Shockers (shellshock.io), including **Aimbot**, **ESP**, **Bloom Mods**, **Botting**, **Custom Binding**, **Highly Customisable Modules**, **Chat Mods** and so much more!<br>
 
@@ -95,7 +95,7 @@ Before you can install the client, there are a few things you must set up to be 
 ## Key features of StateFarm Client:
 
 ### Aimbot
-Aimbot is one of the key features of StateFarm, it is the most powerful combat module.<br>
+Aimbot is one of the key features of StateFarm, it is the most powerful combat mod.<br>
 - To configure the aimbot, open the `Combat` tab. 
 - For more aimbot settings, open the `Aimbot Options` tab.
 
@@ -104,7 +104,7 @@ Aimbot is one of the key features of StateFarm, it is the most powerful combat m
 	- If using a mouse, click the **V** key to enable & disable aimbot.
   
 ### ESP
-**ESP** or also known as `wall mods`, are cheats that allow you to see players positions through walls.<br>
+**ESP** or also known as `wall mods`, are mods that allow you to see players positions through walls.<br>
 To configure ESP, open the `Render` tab.
 
 - To see eggs through walls with **boxes**, enable `PlayerESP`.
@@ -118,10 +118,10 @@ To configure ESP, open the `Render` tab.
 # [](#features) Features:
 ### Binding Modules:
 With the exception of the color pickers and some links, each option should all be bindable to a key of your choice.<br>
-1. Visit the upmost tab of the cheat you wish to bind.
+1. Visit the upmost tab of the mod you wish to bind.
 2. Click on the `Binds` button.
-3. Find the cheat name, and choose `Set Bind` to the right.
-   - Some cheats already have binds. To change these, click on the preset key
+3. Find the mod name, and choose `Set Bind` to the right.
+   - Some mods already have binds. To change these, click on the preset key
 4. Press the key to bind! It's that simple.
 > If you want to remove a bind, press your 'Delete' key while you're editing the bind.
 
@@ -142,8 +142,8 @@ There are a number of badges available, and they do stack. Anyone can get the ba
 The badges can be turned off by unchecking "CustomBadges" in the misc tab.
 
 ## [](#statefarm-chat) StateFarm Chat:
-StateFarm chat is a universal chatroom to chat with other client users or discord members. <br> 
-<!-- The chat is universal to all SFNetwork clients, so it also includes [**KrunkFarm**](https://github.com/onlypuppy7/KrunkFarmClient) users.--> <!-- uncomment once KrukFarm finished.-->
+StateFarm chat is a universal chatroom to chat with other mod users or discord members. <br> 
+<!-- The chat is universal to all SFNetwork mods, so it also includes [**KrunkFarm**](https://github.com/onlypuppy7/KrunkFarmClient) users.--> <!-- uncomment once KrukFarm finished.-->
 - **Username** - your username in the chatroom.
 - **Show/Hide** - toggle chat panel visibility.
 - **Notifications** - shows an in-game notification for every new chat message.
@@ -163,7 +163,7 @@ StateFarm chat is a universal chatroom to chat with other client users or discor
     - **Prioritise Visible** - visible players are the PRIORITY, only targets players behind walls if none are visible.
     - **Only Visible** - only targets visible players. if none are visible, nobody is targeted.
   - **ToggleRM** - modifies aimbot to only lock when the right mouse button is held.
-  - **SilentAim** - shoots without moving the camera. ONLY visual, VERY blatant cheating. [more information](https://youtu.be/R1NkSsi2LrI?t=20)
+  - **SilentAim** - shoots without moving the camera. ONLY visual. [more information](https://youtu.be/R1NkSsi2LrI?t=20)
   - **SemiSilent** - SilentAimbot behavior, but will move the camera after a shot has been fired.
   - **NoWallTrack** - aimbot ignores the player if they're behind obstacles.
   - **Prediction** - predicts where the player will be when the bullet reaches them and adjusts the aimbot accordingly.
@@ -258,7 +258,7 @@ only.
   - **Mock** - rudely mocks people talking in chat.
   - **Announcer** - announces when you change GUI config.
   - **AutoEZ** - gloats on people when you kill them.
-  - **CheatAccuse** - accuses your killer of cheating.
+  - **CheatAccuse** - accuses your enemies of aimbotting.
 - **Join/Leave Messages**
   - **Join Msgs** - notifies you when players join.
   - **Leave Msgs** - notifies you when players leave.
@@ -408,7 +408,7 @@ Various account management tools
 - **FastChickenWinner** - instantly plays the chick'n winner minigame.
 - **AutoChickenWinner** - automatically plays the chick'n winner minigame when cooldowns are over.
 - **Custom Macro** - allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.
-- **DoAtStartup** - executes the entered macro at client startup.
+- **DoAtStartup** - executes the entered macro at mod startup.
 - **RandomPath** - forces a new random path (pathfinding currently disabled).
 - **SilentRoll** - Rolls around without showing it client sided (will cause you to look up if you move your mouse)
 - **SeizureX** - rotates the player by the specified amount around the y-axis (yaw).
@@ -417,7 +417,7 @@ Various account management tools
 ## [](#client-&-about) Client & About:
 - **HideGUI** - hides the big StateFarm menu. default key to do this is `H`.
 - **Hide at Startup** - hides the StateFarm menu by default.
-- **No Console Logs** - blocks the client from sending messages to the browser console.
+- **No Console Logs** - blocks the mod from sending messages to the browser console.
 - **Popups** - disables/enables popups and notifications
 - **Panic** - allows you to quickly exit to a set URL. great for modding in class
 - **Presets**
@@ -471,8 +471,6 @@ Various account management tools
 Statefarm Client is licensed under the **GNU General Public License v3.0** (GPL-3.0). This means you are free to use, modify, and distribute the UserScript, provided that you comply with the terms of the GPL-3.0. For more details, please refer to the full license text available [here]( https://github.com/Hydroflame522/StateFarmClient/blob/main/LICENSE.md).
 
 
-**Disclaimer**: The StateFarm Client team will **not** take any responsibility  for negative consequences caused by the user misusing the client. It is the user's responsibility to ensure it is used properly.
+**Disclaimer**: The StateFarm Client Development Team will **not** take any responsibility for negative repercussions caused by the user misusing the client. It is the user's responsibility to ensure it is used properly.
 
-StateFarm Client is a powerful tool, but like any powerful tool, it can have unintended consequences. So use it with caution.
-
-Remember, be safe & wise on the internet.
+Remember, be safe and wise on the internet.
