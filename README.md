@@ -12,7 +12,7 @@
 </div>
 <br><br>
 
-# This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the USER's responsibility.
+## This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the user's responsibility. By downloading, intalling, or using the mod, you agree to our [Terms and Disclaimers](https://docs.google.com/document/d/18A226mG4kVyd-BoNSxXxoXOuhwtm9M3CFwTaFf0-sZU/edit?usp=sharing).
 
 StateFarm is the **BEST** utility mod for Shell Shockers (shellshock.io), including **Aimbot**, **ESP**, **Bloom Mods**, **Botting**, **Custom Binding**, **Highly Customisable Modules**, **Chat Mods** and so much more!<br>
 
