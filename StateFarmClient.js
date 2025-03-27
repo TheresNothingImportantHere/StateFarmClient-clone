@@ -687,6 +687,8 @@ let attemptedInjection = false;
             createVarDataOverlay();
             tp.mainPanel.hidden = true;
 
+            unsafeWindow.BAWK.play("ks_double_eggs_end");
+
             //create verificationPopup
             let verificationPopup = document.createElement('div');
             verificationPopup.style.position = 'fixed';
@@ -742,8 +744,10 @@ let attemptedInjection = false;
                     if (verification.checkCodeValidity(inputValue)) {
                         verification.setVerified();
                         //add success message, timeouts give the storage time to process
-                        setTimeout(() => alert(verification.verificationMessage), 500);
-                        setTimeout(() => unsafeWindow.location.reload(), 1000);
+                        createPopup(verification.verificationMessage, "success");
+                        unsafeWindow.BAWK.play("shellstreak_start");
+                        setTimeout(reloadPage, 1500);
+                        // setTimeout(() => alert(verification.verificationMessage), 500);
                     } else {
                         error();
                     };
@@ -8391,7 +8395,7 @@ z-index: 999999;
     };
 
     setTimeout(() => {
-        if (!attemptedInjection) {
+        if (unsafeWindow.location.pathname == "/" && !attemptedInjection) {
             log("Injection didn't work for whatever reason, let's try again.");
             reloadPage();
         };
