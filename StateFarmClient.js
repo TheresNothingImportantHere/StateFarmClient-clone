@@ -732,7 +732,7 @@ let attemptedInjection = false;
                     if (verification.checkCodeValidity(inputValue)) {
                         verification.setVerified();
                         //add success message, timeouts give the storage time to process
-                        setTimeout(() => alert(verification.verificationMessage), 100);
+                        setTimeout(() => alert(verification.verificationMessage), 500);
                         setTimeout(() => unsafeWindow.location.reload(), 1000);
                     } else {
                         error();
