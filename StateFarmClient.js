@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre2
+// @version      3.4.3-pre3
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -122,8 +122,16 @@ let attemptedInjection = false;
 // log("StateFarm: running (before function)");
 
 (function () {
-    if (location.hostname == 'getstate.farm' || location.hostname == 'localhost') {
+    if ((location.hostname == 'getstate.farm' || location.hostname == 'localhost') && typeof unsafeWindow !== 'undefined') {
         unsafeWindow.userscript = typeof GM_info !== 'undefined' ? GM_info : false;
+
+        if (typeof GM_listValues !== 'undefined' && typeof GM_getValue !== 'undefined') {
+            const keyArr = GM_listValues();
+            const allValues = {};
+	    keyArr = keyArr.filter((key) => key !== 'StateFarm_LoginDB' && key !== 'StateFarm_AccountRecords' && !key.endsWith('MostRecentEmail'));
+            keyArr.forEach((key) => allValues[key] = GM_getValue(key));
+            unsafeWindow.gm = allValues;
+        }
         return;
     }
 
@@ -143,7 +151,7 @@ let attemptedInjection = false;
             if (typeof value === 'object') localStorage.setItem(name, JSON.stringify(value));
             else localStorage.setItem(name, value);
         };
-        GM_listValues = () => localStorage;
+        GM_listValues = () => Object.keys(localStorage);
         GM_deleteValue = (...a) => localStorage.removeItem(...a);
         GM_openInTab = (link) => window.open(link, '_blank');
         GM_setClipboard = (text, _, callback) => navigator.clipboard.writeText(text).then(() => callback());
@@ -723,9 +731,9 @@ let attemptedInjection = false;
                 try {
                     if (verification.checkCodeValidity(inputValue)) {
                         verification.setVerified();
-                        //add success message
-                        alert(verification.verificationMessage);
-                        unsafeWindow.location.reload();
+                        //add success message, timeouts give the storage time to process
+                        setTimeout(() => alert(verification.verificationMessage), 100);
+                        setTimeout(() => unsafeWindow.location.reload(), 1000);
                     } else {
                         error();
                     };
@@ -3980,7 +3988,6 @@ z-index: 999999;
             unsafeWindow.globalSS.GM_listValues = GM_listValues;
             unsafeWindow.globalSS.GM_getValue = GM_getValue;
             unsafeWindow.globalSS.GM_setValue = GM_setValue;
-            unsafeWindow.globalSS.GM = GM;
             unsafeWindow.globalSS.crackedShell = crackedShell;
             unsafeWindow.globalSS.createPopup = createPopup;
             unsafeWindow.globalSS.createPrompt = createPrompt;
@@ -3988,6 +3995,7 @@ z-index: 999999;
             unsafeWindow.globalSS.change = change;
             unsafeWindow.globalSS.unban = unban;
             if (typeof GM_info !== 'undefined') unsafeWindow.globalSS.GM_info = GM_info;
+            if (typeof GM !== 'undefined') unsafeWindow.globalSS.GM = GM;
             unsafeWindow.globalSS.getScrambled = getScrambled;
             unsafeWindow.globalSS.soundsSFC = soundsSFC;
             unsafeWindow.globalSS.accountStatus = accountStatus;
