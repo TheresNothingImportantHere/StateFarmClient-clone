@@ -2,8 +2,8 @@
 // @name         Shell Shockers Aimbot & ESP: StateFarm Client V3 - Bloom, Chat, Botting, Unban & More, shellshock.io
 // @description  Shell Shockers Aimbot & ESP of the highest level. Best shellshock.io menu in 2025 with NO ADS! Many cheats such as Aimbot, PlayerESP, AmmoESP, Chams, Nametags, Join/Leave alerts, Chat Filter Bypass, AntiAFK, FOV Slider, Zooming, Player Stats, Auto Reload, Auto Unban and many more whilst having unsurpassed customisation options such as binding to any key, easily editable color scheme and themes - all on the fly!
 // @author       Hydroflame521, onlypuppy7, enbyte, notfood, 1ust, OakSwingZZZ, Seq and de_Neuublue
-// @namespace    http://github.com/Hydroflame522/StateFarmClient/
-// @supportURL   http://github.com/Hydroflame522/StateFarmClient/issues/
+// @namespace    https://github.com/Hydroflame522/StateFarmClient/
+// @supportURL   https://github.com/Hydroflame522/StateFarmClient/issues/
 // @license      GPL-3.0
 // @run-at       document-start
 
@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre3
+// @version      3.4.3-pre4
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -189,34 +189,44 @@ let attemptedInjection = false;
 
     //INIT WEBSITE LINKS: store them here so they are easy to maintain and update!
     const discordURL = "https://dsc.gg/sfnetwork";
-    const githubURL = "https://github.com/Hydroflame522/StateFarmClient";
-    const downloadURL = "https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Cheats%20For%20Bloom%2C%20Chat%2C%20Botting%2C%20Unbanning%20%20More.user.js";
-    const updateURL = "https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Cheats%20For%20Bloom%2C%20Chat%2C%20Botting%2C%20Unbanning%20%20More.meta.js";
-    const scriptInfoURL = "https://greasyfork.org/scripts/482982.json";
-    const featuresGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-features";
-    const bottingGuideURL = "https://github.com/Hydroflame522/StateFarmClient/tree/main?tab=readme-ov-file#-botting";
-    const violentmonkeyURL = "https://violentmonkey.github.io/get-it/";
+    const discordName = "Farmer's Workers' Union";
+    const greasyforkID = "482982";
+    const githubID = "Hydroflame522/StateFarmClient";
+    const youtubeURL = "https://www.youtube.com/@StateFarmClientV3";
 
-    const babylonURL = "https://cdn.jsdelivr.net/npm/babylonjs@{0}/babylon.min.js";
+    const greasyforkURL = `https://greasyfork.org/en/scripts/${greasyforkID}`;
+    const downloadURL = `https://update.greasyfork.org/scripts/${greasyforkID}/user.js`;
+    const updateURL = `https://update.greasyfork.org/scripts/${greasyforkID}/meta.js`;
+    const scriptInfoURL = `https://greasyfork.org/scripts/${greasyforkID}.json`;
 
-    const replacementLogoURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement.png";
-    const replacementLogoHalloweenURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-halloween.png";
-    const replacementLogoChristmasURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-christmas.png";
-    const replacementLogoNewYearsURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/shell-logo-replacement-new-years.png";
+    //all of this github stuff assumes youve cloned the repo
+    const githubURL = `https://github.com/${githubID}`;
+    const featuresGuideURL = `https://github.com/${githubID}/tree/main?tab=readme-ov-file#-features`;
+    const bottingGuideURL = `https://github.com/${githubID}/tree/main?tab=readme-ov-file#-botting`;
 
-    const replacementFeedURL = "https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/ingamefeeds/";
-    const commitFeedURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/commits?path=StateFarmClient.js";
-    const badgeListURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/ingamebadges/";
-    const iconURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/icons/StateFarmClientLogo384px.png";
-    const itsOverURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/assets/its%20over/ItsOver4Smaller.png";
-    const eggShowURL = "https://cdn.jsdelivr.net/gh/Hydroflame522/StateFarmClient@main/assets/show/EggShowSmaller.png";
-    const sfxURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/soundpacks/sfx";
-    const skyboxListURL = "https://api.github.com/repos/Hydroflame522/StateFarmClient/contents/skyboxes/";
+    const replacementLogoURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement.png`;
+    const replacementLogoHalloweenURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement-halloween.png`;
+    const replacementLogoChristmasURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement-christmas.png`;
+    const replacementLogoNewYearsURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement-new-years.png`;
 
+    const replacementFeedURL = `https://raw.githubusercontent.com/${githubID}/main/ingamefeeds/`;
+    const commitFeedURL = `https://api.github.com/repos/${githubID}/commits?path=StateFarmClient.js`;
+    const badgeListURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/ingamebadges/`;
+    const iconURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/StateFarmClientLogo384px.png`;
+    const itsOverURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/its%20over/ItsOver4Smaller.png`;
+    const eggShowURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/show/EggShowSmaller.png`;
+    const sfxURL = `https://api.github.com/repos/${githubID}/contents/soundpacks/sfx`;
+    const skyboxListURL = `https://api.github.com/repos/${githubID}/contents/skyboxes/`;
+
+    //misc: statefarm external services
     const shellPrintURL = 'https://shellprint.villainsrule.xyz/v3/account?key=';
-    const jsArchiveURL = "https://cdn.jsdelivr.net/gh/onlypuppy7/ShellShockJSArchives@main/js_archive/";
-    const clientKeysURL = "https://raw.githubusercontent.com/StateFarmNetwork/client-keys/main/statefarm_";
-    const sfChatURL = "https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html";
+    const jsArchiveURL = `https://cdn.jsdelivr.net/gh/onlypuppy7/ShellShockJSArchives@main/js_archive/`;
+    const clientKeysURL = `https://raw.githubusercontent.com/StateFarmNetwork/client-keys/main/statefarm_`;
+    const sfChatURL = `https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html`;
+
+    //misc: non sfc external things
+    const babylonURL = `https://cdn.jsdelivr.net/npm/babylonjs@{0}/babylon.min.js`;
+    const violentmonkeyURL = `https://violentmonkey.github.io/get-it/`;
 
     //startup sequence
     const startUp = function () {
@@ -316,7 +326,7 @@ let attemptedInjection = false;
                                     </div>
                                 </a>
                             `;
-                        }
+                        };
 
                         if (scriptInfo && scriptInfo.version && scriptInfo.version !== version && typeof (GM_info) !== 'undefined') {
                             commitHistoryContent += `
@@ -326,7 +336,7 @@ let attemptedInjection = false;
                                 </div>
                             </a>
                             `;
-                        }
+                        };
 
                         commitHistory.forEach(commit => {
                             const commitDate = new Date(commit.commit.author.date).toLocaleString();
@@ -706,7 +716,7 @@ let attemptedInjection = false;
     <strong>How do I verify?</strong>
     Verifying is easy.
     You can verify by using the command "sf.verify" in the StateFarm Discord bot channel.
-    <a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the StateFarm Network Discord server</a> to get your verification code!`;
+    <a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the ${discordName} Discord server</a> to get your verification code!`;
             const image = `<img src='${eggShowURL}' style='width: 20%; height: 20%; margin-right: 15px; vertical-align: middle;'>`;
             verificationPopup.innerHTML = `${image}<strong>${title}</strong><br><br>${message}<br>
                                <label for="verificationInput">Enter Verification Code:</label>
@@ -2447,8 +2457,8 @@ StateFarm Client was unable to retrieve matching VarData from GitHub. Here are s
 <strong>What is VarData?</strong>
 Shell Shockers uses obfuscation to protect its code. This makes the names of all the variables scrambled every update. VarData is an automatically generated JSON file that restores some information to make mods possible. It is maintained by the StateFarm dev team and hosted on GitHub.<br>
 <strong>How do I generate VarData?</strong>
-You can generate VarData by using the command "sf.vardata" in the StateFarm Network Discord bot channel.
-<a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the StateFarm Network Discord server</a> to generate VarData!`;
+You can generate VarData by using the command "sf.vardata" in the ${discordName} Discord bot channel.
+<a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the ${discordName} Discord server</a> to generate VarData!`;
         const message2 = `<br>Alternatively, if you know what you're doing you can enable one of these options:`;
         const image = `<img src='${itsOverURL}' style='width: 20%; height: 20%; margin-right: 15px; vertical-align: middle;'>`;
         vardataPopup.innerHTML = `${image}<strong>${title}</strong><br><small style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Hash: ${hash}</small><br><br>${message}<br>
@@ -4697,13 +4707,13 @@ z-index: 999999;
 
             <div class="overlay">
                 <div class="overlay-content">
-                    <h100>Welcome to StateFarmClient V3</h100>
+                    <h100>Welcome to StateFarm Client V3</h100>
                     <br>
                     <br>
-                    <a href="https://discord.gg/EMy9swEwB6">Discord&emsp;</a>
-                    <a href="https://github.com/Hydroflame522/StateFarmClient">Github&emsp;</a>
-                    <a href="https://greasyfork.org/en/scripts/482982">Greasyfork&emsp;</a>
-                    <a href="https://www.youtube.com/channel/UCGWtU3Dp3unyefuaBpwGMDw">Youtube</a>
+                    <a href="${discordURL}">Discord&emsp;</a>
+                    <a href="${githubURL}">Github&emsp;</a>
+                    <a href="${greasyforkURL}">Greasyfork&emsp;</a>
+                    <a href="${youtubeURL}">YouTube</a>
                     <br>
                     <br>
                     <p>Press 'Escape' to close</p>
