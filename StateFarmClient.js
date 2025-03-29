@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre6
+// @version      3.4.3-pre7
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -111,7 +111,7 @@
 // @match        *://*.yolk.quest/*
 // @match        *://*.yolk.today/*
 // @match        *://*.zygote.cafe/*
-// @match        *://getstate.farm/*
+// @match        *://*.getstate.farm/*
 // @match        *://localhost:5173/*
 // @antifeature  membership
 // @downloadURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.user.js
@@ -122,15 +122,23 @@ let attemptedInjection = false;
 // log("StateFarm: running (before function)");
 
 (function () {
-    if ((location.hostname == 'getstate.farm' || location.hostname == 'localhost') && typeof unsafeWindow !== 'undefined') {
+    if ((location.hostname.includes('getstate.farm') || location.hostname == 'localhost') && typeof unsafeWindow !== 'undefined') {
         unsafeWindow.userscript = typeof GM_info !== 'undefined' ? GM_info : false;
 
+        const bannedKeys = ['LoginDB', 'AccountRecords', 'MostRecentEmail'];
+
         if (typeof GM_listValues !== 'undefined' && typeof GM_getValue !== 'undefined') {
-            const keyArr = GM_listValues();
+            let keyArr = GM_listValues();
             const allValues = {};
-	    keyArr = keyArr.filter((key) => key !== 'StateFarm_LoginDB' && key !== 'StateFarm_AccountRecords' && !key.endsWith('MostRecentEmail'));
+            keyArr = keyArr.filter((key) => !bannedKeys.includes(key));
             keyArr.forEach((key) => allValues[key] = GM_getValue(key));
             unsafeWindow.gm = allValues;
+        }
+
+        if (typeof GM_setValue !== 'undefined') unsafeWindow.onmessage = (m) => {
+            if (m.data.source !== 'getstate.farm') return;
+
+            if (m.data.type == 'GM.setValue') GM_setValue(m.data.key, m.data.value);
         }
         return;
     }
@@ -656,7 +664,7 @@ let attemptedInjection = false;
             // log("the 'wtf is going on with' logs");
             // log(verification.checkVerification());
             // log(verification.currentlyTrial);
-            
+
             if (verification.checkVerification()) { //allowed to use
                 if (verification.currentlyTrial) {
                     createPrompt(verification.trialMessage2.format(verification.trialPeriod - verification.timeUsed), [], 15e3);
@@ -709,7 +717,7 @@ let attemptedInjection = false;
             verificationPopup.style.fontSize = '16px';
             verificationPopup.style.zIndex = '9999';
             verificationPopup.style.whiteSpace = 'pre-wrap';
-    
+
             //set verificationPopup content
             const title = "Please verify in the StateFarm Discord server";
             const message = `You only need to do this once, and it's free.<br>
@@ -732,14 +740,14 @@ let attemptedInjection = false;
             //add inputs stuff
             const input = document.getElementById('verificationInput');
             const submitButton = document.getElementById('submitVerificationCode');
-    
+
             submitButton.addEventListener('click', () => {
                 const inputValue = input.value;
-    
+
                 const error = function () {
                     createPopup("Inputted verification code isn't valid.", "error");
                 };
-    
+
                 try {
                     if (verification.checkCodeValidity(inputValue)) {
                         verification.setVerified();
@@ -755,7 +763,7 @@ let attemptedInjection = false;
                     error();
                 };
             });
-    
+
             input.addEventListener('keypress', (event) => {
                 if (event.key === 'Enter') {
                     submitButton.click();
@@ -778,11 +786,11 @@ let attemptedInjection = false;
             function fromBase62(str) {
                 const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
                 let num = 0;
-            
+
                 for (let i = 0; i < str.length; i++) {
                     num = num * 62 + chars.indexOf(str[i]);
                 }
-            
+
                 return num;
             };
 
@@ -1107,7 +1115,7 @@ let attemptedInjection = false;
         } else {
             tp.mainPanel.title = menuTitle + " (✔)";
         };
-            
+
         //SFC CHAT
         initFolder({ location: tp.mainPanel, title: "StateFarm Chat", storeAs: "sfChatFolder", });
         initTabs({ location: tp.sfChatFolder, storeAs: "sfChatTab" }, [
@@ -2222,7 +2230,7 @@ debug mode).`},
                             });
                         };
                     } catch (error) {
-    
+
                     }
                 };
             } catch (error) {
@@ -2267,11 +2275,11 @@ debug mode).`},
 
         if (allowAccess) {
             const defaultSpamText = ("dsc.gg/s𝖿network: " + menuTitle + " On Top! ");
-    
+
             if (extract("spamChatText").includes("On Top!")) { change("spamChatText", defaultSpamText) };
             if (extract("spamChatTextBot").includes("On Top!")) { change("spamChatTextBot", defaultSpamText) };
             if (extract("fakeMessageText").includes("On Top!")) { change("fakeMessageText", defaultSpamText) };
-    
+
             makeDraggable(tp.mainPanel.containerElem_);
             makeDraggable(tp.botPanel.containerElem_);
         };
