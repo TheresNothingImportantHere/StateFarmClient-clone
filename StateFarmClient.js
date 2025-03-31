@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre7
+// @version      3.4.3-pre8
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -652,8 +652,10 @@ let attemptedInjection = false;
         },
         timeUsed: 0,
         checkVerification: function () {
-            verification.currentlyTrial = (verification.getTimeUsed() < verification.trialPeriod);
-            verification.verified = (!verification.enabled) || (verification.currentlyTrial) || (GM_getValue(verification.verifiedStorageKey, false));
+            const isVerifiedStorage = GM_getValue(verification.verifiedStorageKey, false);
+            verification.currentlyTrial = (verification.getTimeUsed() < verification.trialPeriod) && !isVerifiedStorage;
+            verification.verified = (!verification.enabled) || verification.currentlyTrial || isVerifiedStorage;
+            // console.warn("isVerifiedStorage", isVerifiedStorage, verification.verified);
             return verification.verified;
         },
         started: false,
