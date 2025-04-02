@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre10
+// @version      3.4.3-pre11
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -8142,8 +8142,8 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                 };
 
                 try {
-                    let minAccuracy = ss.MYPLAYER[H.weapon].accuracyMin + ss.MYPLAYER[H.weapon].accuracyLoss;
-                    accuracyPercentage = (ss.MYPLAYER[H.weapon].accuracy - minAccuracy) / (ss.MYPLAYER[H.weapon].accuracyMax - minAccuracy);
+                    let minAccuracy = ss.MYPLAYER[H.weapon][H.accuracyMin] + ss.MYPLAYER[H.weapon][H.accuracyLoss];
+                    accuracyPercentage = (ss.MYPLAYER[H.weapon].accuracy - minAccuracy) / (ss.MYPLAYER[H.weapon][H.accuracyMax] - minAccuracy);
                     accuracyPercentage = Math.max(0, accuracyPercentage);
                 } catch (error) {
                     accuracyPercentage = 1;
