@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre9
+// @version      3.4.3-pre10
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -535,6 +535,7 @@ let attemptedInjection = false;
     // blank variables
     let ss = {};
     let H = {}; // obfuscated shit lol
+    let C = {}; // commcodes
     const tp = {}; // <-- tp = tweakpane
     let msgElement, allowAccess, tooltipElement, vardataOverlay, vardataPopup, closeVardataPopup, botBlacklist, botWhitelist, hash, onlineClientKeys, initialisedCustomSFX, accuracyPercentage, automatedBorder, clientID, partyLight, didStateFarm, menuInitiated, GAMECODE, noPointerPause, sneakyDespawning, resetModules, amountOnline, errorString, playersInGame, loggedGameMap, startUpComplete, isBanned, attemptedAutoUnban, coordElement, performanceElement, gameInfoElement, playerinfoElement, playerstatsElement, firstUseElement, minangleCircle, redCircle, crosshairsPosition, currentlyTargeting, ammo, ranOneTime, lastWeaponBox, lastChatItemLength, configMain, configBots, playerLogger;
     let whitelistPlayers, scrambledMsgEl, accountStatus, updateMenu, badgeList, scriptInfo, annoyancesRemoved, oldGa, newGame, previousDetail, previousLegacyModels, previousTitleAnimation, blacklistPlayers, playerLookingAt, forceControlKeys, forceControlKeysCache, playerNearest, enemyLookingAt, enemyNearest, AUTOMATED, ranEverySecond, enemyAimNearest
@@ -4005,7 +4006,7 @@ z-index: 999999;
         if (extract("antiAFK") && unsafeWindow.extern.inGame && (document.getElementById("spectate").style.display == "none") && ss && ss.MYPLAYER && ss.MYPLAYER.ws && (!ss.MYPLAYER[H.playing])) {
             if (extract("debug")) log("lets'r try'r to keep alive'r");
             let out = ss.commOut.getBuffer();
-            out.packInt8(ss.SERVERCODES.keepAlive);
+            out.packInt8(C.keepAlive);
             out.send(ss.MYPLAYER.ws);
         };
     };
@@ -4018,6 +4019,7 @@ z-index: 999999;
             unsafeWindow.globalSS.H = H;
             unsafeWindow.globalSS.F = F;
             unsafeWindow.globalSS.L = L;
+            unsafeWindow.globalSS.C = C;
             unsafeWindow.globalSS.tp = tp;
             unsafeWindow.globalSS.initMenu = initMenu;
             unsafeWindow.globalSS.extractAsDropdownInt = extractAsDropdownInt;
@@ -5284,7 +5286,7 @@ z-index: 999999;
         };
 
         var arr = new Uint8Array(2 * str.length + 2);
-        arr[0] = ss.SERVERCODES.chat;
+        arr[0] = C.chat;
         arr[1] = str.length;
 
         for (var i = 0; i < str.length; i++) {
@@ -5316,10 +5318,9 @@ z-index: 999999;
         return packet;
     };
     const modifyPacket = function (data) {
-        if (!ss || !ss.SERVERCODES || ss.SERVERCODES === 'value_undefined' || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
+        if (!C || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
             return data;
         };
-
 
         if (data.byteLength == 0) {
             return data;
@@ -5331,7 +5332,7 @@ z-index: 999999;
         //     log(arr)
         // };
 
-        if (arr[0] == ss.SERVERCODES.throwGrenade) { // comm code 27 = client to server grenade throw
+        if (arr[0] == C.throwGrenade) { // comm code 27 = client to server grenade throw
             if (extract("grenadeMax")) {
                 arr[1] = 255 * (0 || extract("grenadePower"));
                 log("StateFarm: modified a grenade packet to be at full power");
@@ -5339,7 +5340,7 @@ z-index: 999999;
             } else {
                 log("StateFarm: didn't modify grenade packet")
             };
-        } else if (arr[0] == ss.SERVERCODES.chat) {
+        } else if (arr[0] == C.chat) {
             log('%c Chat packet sent, chat handler!!!');
             return chatPacketHandler(data);
         } else {
@@ -6347,6 +6348,9 @@ z-index: 999999;
             log(hash, onlineClientKeys, clientKeys);
 
             H = clientKeys.vars;
+            C = clientKeys.commCodes?.codes;
+
+            if (!C) log('WARNING: YOU SHOULD REALLY ADD COMMCODES TO YOUR VARDATA')
 
             let injectionString = "";
 
