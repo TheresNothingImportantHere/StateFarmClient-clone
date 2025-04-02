@@ -250,7 +250,6 @@ let attemptedInjection = false;
     const factoryURL = 'https://factory.getstate.farm/api/account?key=';
     const jsArchiveURL = `https://cdn.jsdelivr.net/gh/onlypuppy7/ShellShockJSArchives@main/js_archive/`;
     const clientKeysURL = `https://js.getstate.farm/vardata/`;
-    const currentJSURL = `https://js.getstate.farm/js/`
     const sfChatURL = `https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html`;
 
     //misc: non sfc external things
@@ -6423,11 +6422,9 @@ z-index: 999999;
                 //bypass chat filter
                 modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
                 //hook for control interception
-              /*
                 match = new RegExp(`\\.prototype\\.${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
                 log("player update function:", match);
                 modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
-                */
                 //admin spoof lol
                 modifyJS('isGameOwner(){return ', 'isGameOwner(){return window.' + functionNames.getAdminSpoof + '()?true:')
                 modifyJS('adminRoles(){return ', 'adminRoles(){return window.' + functionNames.getAdminSpoof + '()?255:')
