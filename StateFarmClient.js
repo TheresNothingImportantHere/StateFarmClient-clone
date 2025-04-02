@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre8
+// @version      3.4.3-pre9
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -117,6 +117,26 @@
 // @downloadURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.user.js
 // @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
 // ==/UserScript==
+
+/*
+// dont TOUCH our console bwd
+(function() {
+  const consoleMethods = ["log", "warn", "info", "error", "exception", "table", "trace"];
+  const _innerConsole = console;
+
+  consoleMethods.forEach(method => {
+    if (unsafeWindow.console[method]) {
+      Object.defineProperty(unsafeWindow.console, method, {
+        configurable: false,
+        get: (...args) => {
+          return _innerConsole[method].bind(_innerConsole);
+        },
+        set: () => {}
+      });
+    }
+  });
+})();
+*/
 
 let attemptedInjection = false;
 // log("StateFarm: running (before function)");
@@ -229,7 +249,8 @@ let attemptedInjection = false;
     //misc: statefarm external services
     const factoryURL = 'https://factory.getstate.farm/api/account?key=';
     const jsArchiveURL = `https://cdn.jsdelivr.net/gh/onlypuppy7/ShellShockJSArchives@main/js_archive/`;
-    const clientKeysURL = `https://raw.githubusercontent.com/StateFarmNetwork/client-keys/main/statefarm_`;
+    const clientKeysURL = `https://js.getstate.farm/vardata/`;
+    const currentJSURL = `https://js.getstate.farm/js/`
     const sfChatURL = `https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html`;
 
     //misc: non sfc external things
@@ -625,7 +646,6 @@ let attemptedInjection = false;
 
     const getScrambled = () => Array.from({ length: 10 }, () => String.fromCharCode(97 + Math.floor(Math.random() * 26))).join('');
     let skyboxName = getScrambled();
-    let mapData = getScrambled();
 
     //verification system
     //you can disable this by setting the variable to false, so please dont worry future ppl using this
@@ -1887,7 +1907,7 @@ debug mode).`},
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins (View Only)", storeAs: "unlockSkins", tooltip: "Unlocks all skins in locally (other players will not see these)", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", tooltip: "Unlocks the real bros grenade skin to your account", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function(){
-                extern.giveBasketBrosReward();
+                unsafeWindow.extern.giveBasketBrosReward();
             },});
             initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", tooltip: "Shows admin options such as BOOT and BAN in games. No ACTUAL functionality", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
@@ -2256,7 +2276,8 @@ debug mode).`},
             };
             //tooltip events
             unsafeWindow.document.querySelectorAll('.tp-lblv_l').forEach(label => {
-                if (extract("debug") && !tooltips[label.innerText]) log("Warning: no tooltip assigned for module:", label.innerText);
+                // if (extract("debug") && !tooltips[label.innerText]) log("Warning: no tooltip assigned for module:", label.innerText);
+                // shut up - 1ust
 
                 label.addEventListener('mouseenter', () => {
                     if (extract("tooltips")) {
@@ -3420,19 +3441,19 @@ z-index: 999999;
         let xPosition = (player[H.x] / 100) * windowWidth; xPosition += (windowWidth + xPosition) / 2;
         let yPosition = (player[H.z] / 100) * windowHeight; yPosition += (windowHeight + yPosition) / 2;
         if (!player[H.playing] || !player) {
-            if (playerDotsMap.has(player.uniqueId)) {
-                const playerDotToRemove = playerDotsMap.get(player.uniqueId);
+            if (playerDotsMap.has(player[H.uniqueId])) {
+                const playerDotToRemove = playerDotsMap.get(player[H.uniqueId]);
                 mapEl.removeChild(playerDotToRemove); // Remove the dot from the DOM
-                playerDotsMap.delete(player.uniqueId); // Remove the dot from the map
+                playerDotsMap.delete(player[H.uniqueId]); // Remove the dot from the map
             };
         } else if (player === myPlayer) {
             myPlayerDot.style.left = `${xPosition}px`;
             myPlayerDot.style.top = `${yPosition}px`;
             myPlayerDot.textContent = myPlayer.name;
             myPlayerDot.style.transform = 'translate(-50%, -50%) rotate(' + yawToDeg(player[H.yaw]) + 'deg)';
-        } else if (playerDotsMap.has(player.uniqueId)) {
+        } else if (playerDotsMap.has(player[H.uniqueId])) {
             // If it exists, update its position
-            const existingPlayerDot = playerDotsMap.get(player.uniqueId);
+            const existingPlayerDot = playerDotsMap.get(player[H.uniqueId]);
             existingPlayerDot.style.left = `${xPosition}px`;
             existingPlayerDot.style.top = `${yPosition}px`;
             //existingPlayerDot.style.transform = 'translate(-50%, -50%) rotate(' + yawToDeg(player[H.yaw]) + 'deg)'; // could uncomment but then names unreadable,
@@ -3449,7 +3470,7 @@ z-index: 999999;
             mapEl.appendChild(newPlayerDot);
 
             // Store in the Map
-            playerDotsMap.set(player.uniqueId, newPlayerDot);
+            playerDotsMap.set(player[H.uniqueId], newPlayerDot);
         };
     };
     function yawToDeg(yaw) {
@@ -3721,7 +3742,7 @@ z-index: 999999;
     };
     const playerMatchesList = function (array, player) {
         let nameMatched = isPartialMatch(array, player.name);
-        let idMatched = isPartialMatch(array, player.uniqueId);
+        let idMatched = isPartialMatch(array, player[H.uniqueId]);
         return nameMatched || idMatched;
     };
     const randomInt = function (min, max) {
@@ -3810,7 +3831,7 @@ z-index: 999999;
             //tracers
             const tracerLines = L.BABYLON.MeshBuilder.CreateLines("tracerLines", { points: [newPosition, crosshairsPosition] }, newScene);
             tracerLines.color = new L.BABYLON.Color3(1, 1, 1);
-            tracerLines.renderingGroupId = 1;
+            tracerLines[H.renderingGroupId] = 1;
             object.tracerLines = tracerLines;
             //ESP
             //FUCK WIREFRAME BOXES! LIBERTYMUTUAL dictates we making our own MANUALLY bitch! to hell with those diagonal lines
@@ -3867,7 +3888,7 @@ z-index: 999999;
             const box = L.BABYLON.MeshBuilder.CreateLineSystem(getScrambled(), { lines }, newScene);
             box.color = new L.BABYLON.Color3(1, 1, 1);
             box.position.y = boxOffset[type];
-            box.renderingGroupId = 1;
+            box[H.renderingGroupId] = 1;
             box.parent = newParent;
             object.box = box;
             /*
@@ -3879,7 +3900,7 @@ z-index: 999999;
                 target.material.diffuseColor = new L.BABYLON.Color3(1, 0, 0);
                 target.material.alpha = 0.5;
                 target.position.y = 0.3;
-                target.renderingGroupId = 1;
+                target[H.renderingGroupId] = 1;
                 target.parent = newParent;
                 object.target = target;
             };
@@ -3888,7 +3909,7 @@ z-index: 999999;
             if (type == "playerESP"){
                 //create line. other shit later
                 const l = L.BABYLON.MeshBuilder.CreateLines(getScrambled(),{points: [new L.BABYLON.Vector3(0, 0, 0),new L.BABYLON.Vector3(0, 0, 0)]}, newScene); //empty lines. will be edited l8er
-                //l.renderingGroupId = 1;
+                //l[H.renderingGroupId] = 1;
 
                 object.lookDirLine = l;
                 //line will be updated every call, not just creation. I hate this but fuck you
@@ -3924,7 +3945,7 @@ z-index: 999999;
 
             };
             object.lookDirLine.color = new L.BABYLON.Color3(...hexToRgb(extract("lookTracersColor"))); //updaté line colo(u)r
-            object.lookDirLine.renderingGroupId = extract("lookTracersRGI1")? 1 : 0; //render in front shell?
+            object.lookDirLine[H.renderingGroupId] = extract("lookTracersRGI1")? 1 : 0; //render in front shell?
             //I dont really like the implementation without parenting, but IDK how the fuck bab's parenting system works and we need to update anyway. :/
         }
         object.tracerLines.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [crosshairsPosition.x, crosshairsPosition.y, crosshairsPosition.z, newPosition.x, newPosition.y, newPosition.z]);
@@ -3981,8 +4002,8 @@ z-index: 999999;
 
     const every15Seconds = function () {
         //i forgot myself what this is for
-        // if (extract("debug")) log("goodness", extract("antiAFK"), extern.inGame, (document.getElementById("spectate").style.display == "none"), ss, ss.MYPLAYER, ss.MYPLAYER.ws, (!ss.MYPLAYER[H.playing]));
-        if (extract("antiAFK") && extern.inGame && (document.getElementById("spectate").style.display == "none") && ss && ss.MYPLAYER && ss.MYPLAYER.ws && (!ss.MYPLAYER[H.playing])) {
+        // if (extract("debug")) log("goodness", extract("antiAFK"), unsafeWindow.extern.inGame, (document.getElementById("spectate").style.display == "none"), ss, ss.MYPLAYER, ss.MYPLAYER.ws, (!ss.MYPLAYER[H.playing]));
+        if (extract("antiAFK") && unsafeWindow.extern.inGame && (document.getElementById("spectate").style.display == "none") && ss && ss.MYPLAYER && ss.MYPLAYER.ws && (!ss.MYPLAYER[H.playing])) {
             if (extract("debug")) log("lets'r try'r to keep alive'r");
             let out = ss.commOut.getBuffer();
             out.packInt8(ss.SERVERCODES.keepAlive);
@@ -4060,7 +4081,7 @@ z-index: 999999;
                         (botsDict[clientID].noConfig > Date.now()) ? botsDict[clientID].noConfig : Date.now()
                     ) : 0),
                     username: ((ss && ss.MYPLAYER && ss.MYPLAYER.name) || (unsafeWindow.vueApp.playerName)),
-                    uniqueId: ((ss && ss.MYPLAYER && ss.MYPLAYER.uniqueId) || "value_undefined"),
+                    uniqueId: ((ss && ss.MYPLAYER && ss.MYPLAYER[H.uniqueId]) || "value_undefined"),
                     startTime: startTime,
                     timecode: Date.now(),
                     status: ((isBanned && "banned") ||
@@ -4083,10 +4104,10 @@ z-index: 999999;
             let oldWhitelist = botWhitelist;
             botWhitelist = "";
             if (extract("botNoKillMe")) {
-                botBlacklist += botBlacklist + ((ss && ss.MYPLAYER && ss.MYPLAYER.uniqueId) || "value_undefined") + ",";
+                botBlacklist += botBlacklist + ((ss && ss.MYPLAYER && ss.MYPLAYER[H.uniqueId]) || "value_undefined") + ",";
             };
             if (extract("botFollowMe")) {
-                botWhitelist += botWhitelist + ((ss && ss.MYPLAYER && ss.MYPLAYER.uniqueId) || "value_undefined") + ",";
+                botWhitelist += botWhitelist + ((ss && ss.MYPLAYER && ss.MYPLAYER[H.uniqueId]) || "value_undefined") + ",";
             };
             monitorObjects.botOnline = "";
             amountOnline = 0;
@@ -5040,7 +5061,7 @@ z-index: 999999;
         let playerArray = [];
         ss.PLAYERS.forEach(player => {
             if (player && (target !== ss.MYPLAYER) && player[H.playing] && (player[H.hp] > 0) && ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team))) {
-                const uniqueId = player.uniqueId;
+                const uniqueId = player[H.uniqueId];
                 const name = player.name;
                 const hp = player[H.hp]
                 playerArray.push({ player, uniqueId, name, hp });
@@ -5296,7 +5317,7 @@ z-index: 999999;
         return packet;
     };
     const modifyPacket = function (data) {
-        if (!ss || !ss.SERVERCODES || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
+        if (!ss || !ss.SERVERCODES || ss.SERVERCODES === 'value_undefined' || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
             return data;
         };
 
@@ -5361,10 +5382,10 @@ z-index: 999999;
 
     // [sfc] PREDICTION CODE
 
-    const predictBloom = function (yaw, pitch, amountToGenerate = ss.MYPLAYER.weapon.constructor.standardMeshName !== "dozenGauge" ? 1 : 20) { //outputs the difference in yaw/pitch from the bloom
+    const predictBloom = function (yaw, pitch, amountToGenerate = ss.MYPLAYER[H.weapon].constructor.standardMeshName !== "dozenGauge" ? 1 : 20) { //outputs the difference in yaw/pitch from the bloom
         let seed = ss.MYPLAYER[H.randomGen].seed;
-        const accuracy = ss.MYPLAYER.weapon.accuracy;
-        const range = ss.MYPLAYER.weapon.constructor.range;
+        const accuracy = ss.MYPLAYER[H.weapon].accuracy;
+        const range = ss.MYPLAYER[H.weapon].constructor.range;
 
         const generateSeed = () => {
             let numbers = [];
@@ -5426,8 +5447,8 @@ z-index: 999999;
     var velocityVector, newPos, cappedVector, rayVector; //assuming that reusing doesnt leak memory
     const predictPosition = function (player) { //outputs the prediction for where a player will be in the time it takes for a bullet to reach them
         velocityVector = velocityVector || new L.BABYLON.Vector3(0, 0, 0);
-        velocityVector.x = player.dx; velocityVector.y = player.dy; velocityVector.z = player.dz;
-        const bulletSpeed = ss.MYPLAYER.weapon.constructor.velocity;
+        velocityVector.x = player.dx; velocityVector.y = player.dy; velocityVector.z = player[H.dz];
+        const bulletSpeed = ss.MYPLAYER[H.weapon].constructor.velocity;
         const timeDiff = distancePlayers(player, 1) / bulletSpeed + 1;
         newPos = newPos || new L.BABYLON.Vector3(0, 0, 0)
         newPos.x = player[H.x], newPos.y = player[H.y], newPos.z = player[H.z],
@@ -5464,7 +5485,7 @@ z-index: 999999;
         directionVector.z = -directionVector.z;
 
         let rotationMatrix = L.BABYLON.Matrix.RotationYawPitchRoll(calculateYaw(directionVector), calculatePitch(directionVector), 0);
-        let directionMatrix = L.BABYLON.Matrix.Translation(0, 0, ss.MYPLAYER.weapon.constructor.range).multiply(rotationMatrix);
+        let directionMatrix = L.BABYLON.Matrix.Translation(0, 0, ss.MYPLAYER[H.weapon].constructor.range).multiply(rotationMatrix);
         directionVector = directionMatrix.getTranslation();
         let position = L.BABYLON.Matrix.Translation(0, .1, 0).multiply(rotationMatrix).add(L.BABYLON.Matrix.Translation(myPlayerPosition.x, myPlayerPosition.y + 0.3, myPlayerPosition.z)).getTranslation();
 
@@ -5694,7 +5715,7 @@ z-index: 999999;
 
                 //ammo (middle bottom)
                 actor.drawTextOnNameTexture(
-                    `${player.weapon.ammo.rounds} / ${player.weapon.ammo.store}`,                  // text
+                    `${player[H.weapon].ammo[H.rounds]} / ${player[H.weapon].ammo.store}`,                  // text
                     -20, 75,                              // x/y
                     25,                                 // size
                     "yellow",                       // colour
@@ -6156,20 +6177,19 @@ z-index: 999999;
         return extract("particleSpeedMultiplier");
       });
 
+      const originalFunction = Function;
 
-        const originalXHROpen = XMLHttpRequest.prototype.open; //wtf??? libertymutual collab??????
-        const originalXHRGetResponse = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'response');
-        let shellshockjs;
-        XMLHttpRequest.prototype.open = function (...args) { //outgoing
-            const url = args[1];
-            try {
-                if (extract("debug")) log("====XMLHTTPREQUEST====", url, args);
-            } catch (error) { }; //phooey.
-            if (url) {
-                let refresh = `?${Date.now()}`;
+      unsafeWindow.Function = function (...args) {
+          console.log(args.join(""));
+          if (args.join('').includes('(()=>{var ')) {
+            unsafeWindow.Function = originalFunction;
 
-                if (url.includes("js/shellshock.js")) shellshockjs = this;
-
+            // this is the right script
+            return originalFunction(applyStateFarm(...args));
+          }
+          return originalFunction(...args);
+      };
+      /*
                 let replaceFeeds = false;
                 try {
                     replaceFeeds = extract("replaceFeeds");
@@ -6179,16 +6199,7 @@ z-index: 999999;
                     else if (url.includes("data/shellNews.json")) args[1] = replacementFeedURL+"shellNews.json"+refresh;
                 };
             };
-            originalXHROpen.apply(this, args);
-        };
-        Object.defineProperty(XMLHttpRequest.prototype, 'response', { //incoming
-            get: function () {
-                if (this === shellshockjs) {
-                    return applyStateFarm(originalXHRGetResponse.get.call(this));
-                };
-                return originalXHRGetResponse.get.call(this);
-            }
-        });
+            */
         function sha256(str) {
             const utf8 = new TextEncoder().encode(str);
             const k = Uint32Array.of(
@@ -6237,7 +6248,7 @@ z-index: 999999;
             let match;
             let clientKeys;
 
-            let originalJS = js;
+            let originalJS = fetchTextContent('/js/shellshock.js');
             if (crackedShell) originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
@@ -6342,9 +6353,9 @@ z-index: 999999;
 
             try {
                 //SERVERSYNC
-                match = new RegExp(`!${H.CULL}&&(.+?\\}\\})`).exec(js);
+                match = new RegExp(`function serverSync\\(\\)\\{(.*?)\\)\\}`).exec(js)
                 log("SERVERSYNC:", match);
-                H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) : "function(){log('no serversync womp womp')}";
+                H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) + ')' : "function(){log('no serversync womp womp')}";
                 //PAUSE
                 match = new RegExp(`,setTimeout\\(\\(\\(\\)=>\\{([=A-z0-9\\(\\),\\{ \\.;!\\|\\?:\\}]+send\\([a-zA-Z$_]+\\))`).exec(js);
                 log("PAUSE:", match);
@@ -6388,14 +6399,14 @@ z-index: 999999;
                 log('%cSuccess! Variable retrieval and main loop hooked.', 'color: green; font-weight: bold;');
                 log('%cSTATEFARM INJECTION STAGE 3: INJECT CULL INHIBITION', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
                 //stop removal of objects
-                modifyJS(`${f(H.CULL)})r`, `${functionNames.shouldNotCull}())r`);
+                modifyJS(`if(${f(H.CULL)})return`, `if(${functionNames.shouldNotCull}())return`);
                 log('%cSuccess! Cull inhibition hooked ' + f(H.CULL), 'color: green; font-weight: bold;');
                 log('%cSTATEFARM INJECTION STAGE 4: INJECT OTHER FUNCTIONS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
                 //hook for modifications just before firing
                 modifyJS('fire(){var', 'fire(){window.' + functionNames.beforeFiring + '(this.player);var');
                 //hook for fov mods
-                modifyJS(/\.fov\s*=\s*1\.25/g, '.fov = window.' + functionNames.fixCamera + '()');
-                modifyJS(/\.fov\s*\+\s*\(1\.25/g, '.fov + (window.' + functionNames.fixCamera + '()');
+                modifyJS(`${H.fov}=1.25`, 'fov=window.' + functionNames.fixCamera + '()');
+                modifyJS(`${H.fov}+(1.25`, 'fov+(window.' + functionNames.fixCamera + '()');
                 //chat mods: disable chat culling
                 const chatCull = /return\}[a-zA-Z$_]+\.length>4/.exec(js)[0];
                 modifyJS(chatCull, chatCull.originalReplace('4', `window.${functionNames.getChatLimit}()`));
@@ -6408,13 +6419,15 @@ z-index: 999999;
                 match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
                 if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
                 //reset join/leave msgs
-                modifyJS(',console.log("joinGame()', ',window.' + functionNames.setNewGame + '(),console.log("joinGame()');
+                modifyJS('gameJoined_ received"),', 'gameJoined_ received"),window.' + functionNames.setNewGame + '(),');
                 //bypass chat filter
                 modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
                 //hook for control interception
-                match = new RegExp(`\\.prototype\\.${f(H._update)}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
+              /*
+                match = new RegExp(`\\.prototype\\.${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
                 log("player update function:", match);
                 modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
+                */
                 //admin spoof lol
                 modifyJS('isGameOwner(){return ', 'isGameOwner(){return window.' + functionNames.getAdminSpoof + '()?true:')
                 modifyJS('adminRoles(){return ', 'adminRoles(){return window.' + functionNames.getAdminSpoof + '()?255:')
@@ -6459,9 +6472,8 @@ z-index: 999999;
                 modifyJS('"IFRAME"==document.activeElement.tagName', `("IFRAME"==document.activeElement.tagName&&document.activeElement.id!=='sfChat-iframe')`);
                 // skybox (yay)
                 modifyJS(`infiniteDistance=!0;`, `infiniteDistance=!0;window["${skyboxName}"]=${H.skybox};`);
-                modifyJS(`.name)}vueApp`, `.name)}window["${mapData}"]=${H.mapData};vueApp`);
                 //intercept player names before they are censored
-                modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
+modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
                 //intercept player names before they are censored
                 modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments, this.${H.player_})},`);
                 //intercept signedIn function
@@ -7131,12 +7143,12 @@ z-index: 999999;
     //         if (window.pathLines === undefined) {
     //             let node_lines = L.BABYLON.MeshBuilder.CreateLines(new Date().getTime().toString(), { points: [ss.MYPLAYER[H.actor][H.mesh].position, pos2] }, ss.MYPLAYER[H.actor].scene);
     //             node_lines.color = new L.BABYLON.Color3(1, 0, 0);
-    //             node_lines.renderingGroupId = 1;
+    //             node_lines[H.renderingGroupId] = 1;
     //             window.pathLines = [node_lines];
     //         } else {
     //             let node_lines = L.BABYLON.MeshBuilder.CreateLines(new Date().getTime().toString(), { points: [ss.MYPLAYER[H.actor][H.mesh].position, pos2] }, ss.MYPLAYER[H.actor].scene);
     //             node_lines.color = new L.BABYLON.Color3(1, 0, 0);
-    //             node_lines.renderingGroupId = 1;
+    //             node_lines[H.renderingGroupId] = 1;
     //             window.pathLines.push(node_lines);
     //         };
     //     };
@@ -7358,11 +7370,13 @@ z-index: 999999;
 
                     crosshairsPosition = new L.BABYLON.Vector3();
 
-                    // Object.defineProperty(ss.MYPLAYER.scene, 'forceWireframe', {
-                    //     get: () => {
-                    //         return extract("wireframe");
-                    //     }
-                    // });
+                    Object.defineProperty(ss.MYPLAYER.scene, 'forceWireframe', {
+                         configurable: false,
+                         get: () => {
+                             return extract("wireframe");
+                         },
+                         set: () => {}
+                    });
 
                     if (AUTOMATED) {
                         automatedBorder.style.borderColor = 'rgba(0, 0, 255, 1)';
@@ -7488,7 +7502,7 @@ z-index: 999999;
                 crosshairsPosition.y += forwardY * forwardOffset;
                 crosshairsPosition.z += forwardZ * forwardOffset;
 
-                ammo = ss.MYPLAYER.weapon.ammo;
+                ammo = ss.MYPLAYER[H.weapon].ammo;
 
                 whitelistPlayers = (extract("whitelist") || "").split(',');
                 blacklistPlayers = (extract("blacklist") || "").split(',');
@@ -7586,7 +7600,7 @@ z-index: 999999;
                         player[H.actor][H.bodyMesh].scaling._z = eggSize;
                     };
 
-                    player[H.actor][H.bodyMesh].renderingGroupId = extract("chams") ? 1 : 0;
+                    player[H.actor][H.bodyMesh][H.renderingGroupId] = extract("chams") ? 1 : 0;
 
                     player.exists = objExists;
                 };
@@ -7596,8 +7610,8 @@ z-index: 999999;
                     if (extract("unfilterNames")) { player.name = (cachedRealData[player.uniqueId]?.name || player.name);
                     } else player.name = (player?.normalName || player.name);
                     if (extract("nametags") && player[H.actor] && player[H.actor].nameSprite) { //taken from shellshock.js, so var names are weird
-                        player[H.actor].nameSprite._manager.renderingGroupId = 1;
-                        player[H.actor].nameSprite.renderingGroupId = 1;
+                        player[H.actor].nameSprite._manager[H.renderingGroupId] = 1;
+                        player[H.actor].nameSprite[H.renderingGroupId] = 1;
                         var h = Math.length3(player[H.x] - ss.MYPLAYER[H.x], player[H.y] - ss.MYPLAYER[H.y], player[H.z] - ss.MYPLAYER[H.z]),
                             d = Math.pow(h, 1.25) * 2;
                         player[H.actor].nameSprite.width = d / 10 + .6;
@@ -7644,7 +7658,7 @@ z-index: 999999;
                             shouldReplace: extract("nametagInfo"), //replace with the extract l8r
                         };
 
-                        let playerInfoOld = playerInfoCache[player.uniqueId];
+                        let playerInfoOld = playerInfoCache[player[H.uniqueId]];
 
                         if ((playerInfoOld) && (
                             (playerInfo.shouldReplace != playerInfoOld.shouldReplace) || ((playerInfo.shouldReplace) && (
@@ -7659,7 +7673,7 @@ z-index: 999999;
                             player[H.actor].setupNameSprite();
                         };
 
-                        playerInfoCache[player.uniqueId] = playerInfo;
+                        playerInfoCache[player[H.uniqueId]] = playerInfo;
 
                         if (player[H.actor]?.nameSprite?.color) {
                             playerInfo.shouldReplace ?
@@ -7689,8 +7703,8 @@ z-index: 999999;
             //update ammoESP boxes, tracer lines, colors
             if (extract("ammoESP") || extract("ammoTracers") || extract("grenadeESP") || extract("grenadeTracers")) {
                 ss.OBJECTSVAR.getShadowMap()[H.renderList].forEach(item => {
-                    if (item.isEnabled && item.isEnabled() && item.sourceMesh && item.sourceMesh.name && (item.sourceMesh.name == "grenadeItem" || item.sourceMesh.name == "ammo")) { //this is what we want
-                        const itemType = item.sourceMesh.name;
+                    if (item.isEnabled && item.isEnabled() && item[H.sourceMesh] && item[H.sourceMesh].name && (item[H.sourceMesh].name == "grenadeItem" || item[H.sourceMesh].name == "ammo")) { //this is what we want
+                        const itemType = item[H.sourceMesh].name;
                         let color = itemType == "ammo" && extract("ammoESPColor") || extract("grenadeESPColor");
                         color = hexToRgb(color);
 
@@ -7711,11 +7725,11 @@ z-index: 999999;
                             };
                         } else { //grenades
                             const regime = extract("grenadeESPRegime");
-                            if (regime == "whendepleted" && ss.MYPLAYER.grenadeCount == 0) {
+                            if (regime == "whendepleted" && ss.MYPLAYER[H.grenadeCount] == 0) {
                                 willBeVisible = true;
-                            } else if (regime == "whenlow" && ss.MYPLAYER.grenadeCount <= 1) {
+                            } else if (regime == "whenlow" && ss.MYPLAYER[H.grenadeCount] <= 1) {
                                 willBeVisible = true;
-                            } else if (regime == "belowmax" && ss.MYPLAYER.grenadeCount < ss.MYPLAYER.grenadeCapacity) {
+                            } else if (regime == "belowmax" && ss.MYPLAYER[H.grenadeCount] < ss.MYPLAYER[H.grenadeCapacity]) {
                                 willBeVisible = true;
                             } else if (regime == "alwayson") {
                                 willBeVisible = true;
@@ -7734,14 +7748,14 @@ z-index: 999999;
                 trajectory.dispose();
                 trajectory = null;
             };
-            if (extract("trajectories") && ss.MYPLAYER.grenadeCount >= 1 && ss.MYPLAYER[H.playing]) {
+            if (extract("trajectories") && ss.MYPLAYER[H.grenadeCount] >= 1 && ss.MYPLAYER[H.playing]) {
                 if (!trajectoryNade) {
                     const clone = ss.cloneMesh('grenadeItem', ss.SCENE, null);
                     if (clone) {
                         clone.setEnabled(true);
                         trajectoryNade = clone;
                         trajectoryNade.renderOverlay = true;
-                        trajectoryNade.renderingGroupId = 1;
+                        trajectoryNade[H.renderingGroupId] = 1;
                     };
                 };
 
@@ -7757,7 +7771,7 @@ z-index: 999999;
                 const lines = [result.positions];
                 trajectory = L.BABYLON.MeshBuilder.CreateLineSystem("trajectory", { lines: lines }, ss.SCENE);
                 trajectory.color = new L.BABYLON.Color3(1, 0, 0);
-                trajectory.renderingGroupId = 1;
+                trajectory[H.renderingGroupId] = 1;
 
                 trajectoryNade.position = result.finalPos;
             } else if (trajectoryNade) {
@@ -7941,10 +7955,10 @@ z-index: 999999;
                     ss.PLAYERS.forEach(player => { updateRadar(player, ss.MYPLAYER) });
                 } else {
                     ss.PLAYERS.forEach(player => {
-                        if (playerDotsMap.has(player.uniqueId)) {
-                            const playerDotToRemove = playerDotsMap.get(player.uniqueId);
+                        if (playerDotsMap.has(player[H.uniqueId])) {
+                            const playerDotToRemove = playerDotsMap.get(player[H.uniqueId]);
                             mapEl.removeChild(playerDotToRemove);
-                            playerDotsMap.delete(player.uniqueId);
+                            playerDotsMap.delete(player[H.uniqueId]);
                         }
                     });
                     myPlayerDot.style.display = 'none';
@@ -7976,8 +7990,8 @@ z-index: 999999;
                     };
 
                     //rendering
-                    ss.MYPLAYER[H.actor].gunContainer._children[0].renderingGroupId = extract("perspective") !== "firstPerson" ? 0 : 2;
-                    ss.MYPLAYER[H.actor].gunContainer._children[2].renderingGroupId = extract("perspective") !== "firstPerson" ? 0 : 2;
+                    ss.MYPLAYER[H.actor][H.gunContainer]._children[0][H.renderingGroupId] = extract("perspective") !== "firstPerson" ? 0 : 2;
+                    ss.MYPLAYER[H.actor][H.gunContainer]._children[2][H.renderingGroupId] = extract("perspective") !== "firstPerson" ? 0 : 2;
                     if (!ss.MYPLAYER.stampApplied) ss.MYPLAYER[H.actor].applyStamp(ss.MYPLAYER.stampItem); ss.MYPLAYER.stampApplied = true;
                     if (!ss.MYPLAYER[H.actor].hat) {
                         ss.MYPLAYER[H.actor].wearHat(ss.MYPLAYER.hatItem);
@@ -8003,9 +8017,9 @@ z-index: 999999;
                 if (ss.MYPLAYER && ss.MYPLAYER[H.actor] && ss.MYPLAYER[H.actor][H.mesh]) {
                     ss.MYPLAYER[H.actor][H.mesh].scaling._y = extract("worldFlattening"); //this used to be left side gun but for some reason it just affects the world IDK
 
-                    ss.MYPLAYER[H.actor].gunContainer.scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
-                    ss.MYPLAYER[H.actor].gunContainer.scaling._y = extract("gunPosition") == "hidden" ? 0 : 1;
-                    ss.MYPLAYER[H.actor].gunContainer.scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
+                    ss.MYPLAYER[H.actor][H.gunContainer].scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
+                    ss.MYPLAYER[H.actor][H.gunContainer].scaling._y = extract("gunPosition") == "hidden" ? 0 : 1;
+                    ss.MYPLAYER[H.actor][H.gunContainer].scaling._x = extract("gunPosition") == "hidden" ? 0 : 1;
                 };
 
                 if (extract("spamChat")) {
@@ -8028,8 +8042,8 @@ z-index: 999999;
                     document.getElementById("chatOut").style.userSelect = "text"
                 };
                 if (extract("autoRefill")) {
-                    //log(ss.MYPLAYER.weapon);
-                    if (ammo.rounds == 0) {
+                    //log(ss.MYPLAYER[H.weapon]);
+                    if (ammo[H.rounds] == 0) {
                         ss.MYPLAYER.reload();
                     } else if (extract("smartRefill")) {
                         let smartRefillMinAmmo = {
@@ -8042,12 +8056,12 @@ z-index: 999999;
                             aug: 3,
                             cluck9mm: 1
                         };
-                        if (ammo.rounds <= smartRefillMinAmmo[ss.MYPLAYER.weapon.constructor.standardMeshName]) {
+                        if (ammo[H.rounds] <= smartRefillMinAmmo[ss.MYPLAYER[H.weapon].constructor.standardMeshName]) {
                             ss.MYPLAYER.reload();
                         };
                     };
                 };
-                if (extract("autoGrenade") && isVisible && (ss.MYPLAYER.grenadeCount > 0)) {
+                if (extract("autoGrenade") && isVisible && (ss.MYPLAYER[H.grenadeCount] > 0)) {
                     ss.MYPLAYER.throwGrenade();
                 };
                 if ((extract("autoWeapon") !== "disabled") && (!ss.MYPLAYER[H.playing])) {
@@ -8127,8 +8141,8 @@ z-index: 999999;
                 };
 
                 try {
-                    let minAccuracy = ss.MYPLAYER.weapon.accuracyMin + ss.MYPLAYER.weapon.accuracyLoss;
-                    accuracyPercentage = (ss.MYPLAYER.weapon.accuracy - minAccuracy) / (ss.MYPLAYER.weapon.accuracyMax - minAccuracy);
+                    let minAccuracy = ss.MYPLAYER[H.weapon].accuracyMin + ss.MYPLAYER[H.weapon].accuracyLoss;
+                    accuracyPercentage = (ss.MYPLAYER[H.weapon].accuracy - minAccuracy) / (ss.MYPLAYER[H.weapon].accuracyMax - minAccuracy);
                     accuracyPercentage = Math.max(0, accuracyPercentage);
                 } catch (error) {
                     accuracyPercentage = 1;
@@ -8291,8 +8305,8 @@ z-index: 999999;
                         };
                         if (enemyMinimumDistance < extract("antiSneak")) {
                             currentlyTargeting = enemyNearest;
-                            if (ammo.rounds === 0) { //basically after MAGDUMP, switch to pistol, if that is empty reload and keep shootin'
-                                if (ss.MYPLAYER.weaponIdx === 0) { ss.MYPLAYER.swapWeapon(1); }
+                            if (ammo[H.rounds] === 0) { //basically after MAGDUMP, switch to pistol, if that is empty reload and keep shootin'
+                                if (ss.MYPLAYER[H.weaponIdx] === 0) { ss.MYPLAYER.swapWeapon(1); }
                                 else { ss.MYPLAYER.reload(); }
                             };
                             ss.MYPLAYER.pullTrigger();
@@ -8340,7 +8354,7 @@ z-index: 999999;
                         doAutoFire = true;
                     };
                     if (doAutoFire) {
-                        if ((ammo.rounds > 0) || (ammo.store > 0)) { //i fucking hate tweakpane. "errrm actually when a slider is 0 it becomes undefined" go fuck yourself.
+                        if ((ammo[H.rounds] > 0) || (ammo.store > 0)) { //i fucking hate tweakpane. "errrm actually when a slider is 0 it becomes undefined" go fuck yourself.
                             ((accuracyPercentage >= (extract("autoFireAccuracy") || 0))) && ss.MYPLAYER.pullTrigger();
                         } else {
                             ss.MYPLAYER.melee();
@@ -8349,13 +8363,13 @@ z-index: 999999;
                 };
                 //method by de_Neuublue
                 if (extract("enableAutomatic")) {
-                    if (ss.MYPLAYER.weapon.constructor.originallySemi == null) {
-                        ss.MYPLAYER.weapon.constructor.originallySemi = !ss.MYPLAYER.weapon.constructor.automatic;
+                    if (ss.MYPLAYER[H.weapon].constructor.originallySemi == null) {
+                        ss.MYPLAYER[H.weapon].constructor.originallySemi = !ss.MYPLAYER[H.weapon].constructor.automatic;
                     };
-                    ss.MYPLAYER.weapon.constructor.automatic = true;
-                } else if (ss.MYPLAYER.weapon.constructor.originallySemi) {
-                    ss.MYPLAYER.weapon.constructor.originallySemi = null;
-                    ss.MYPLAYER.weapon.constructor.automatic = false;
+                    ss.MYPLAYER[H.weapon].constructor.automatic = true;
+                } else if (ss.MYPLAYER[H.weapon].constructor.originallySemi) {
+                    ss.MYPLAYER[H.weapon].constructor.originallySemi = null;
+                    ss.MYPLAYER[H.weapon].constructor.automatic = false;
                 };
 
                 if (updateMenu) {
