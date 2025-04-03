@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre13
+// @version      3.4.3-pre14
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -241,8 +241,8 @@ let attemptedInjection = false;
     const commitFeedURL = `https://api.github.com/repos/${githubID}/commits?path=StateFarmClient.js`;
     const badgeListURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/ingamebadges/`;
     const iconURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/StateFarmClientLogo384px.png`;
-    const itsOverURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/its%20over/ItsOver4Smaller.png`;
-    const eggShowURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/show/EggShowSmaller.png`;
+    const itsOverURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/its%20over/ItsOver4Smaller_.png`;
+    const eggShowURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/show/EggShowSmaller_.png`;
     const sfxURL = `https://api.github.com/repos/${githubID}/contents/soundpacks/sfx`;
     const skyboxListURL = `https://api.github.com/repos/${githubID}/contents/skyboxes/`;
 
