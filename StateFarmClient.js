@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre15
+// @version      3.4.3-pre16
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -2483,10 +2483,11 @@ StateFarm Client was unable to retrieve matching VarData from GitHub. Here are s
 1. Multiple scripts are running. This is usually the most common reason.
 2. There are multiple userscript managers. If you're using ViolentMonkey, check if Tampermonkey is installed and also affecting the site.<br>
 <strong>What is VarData?</strong>
-Shell Shockers uses obfuscation to protect its code. This makes the names of all the variables scrambled every update. VarData is an automatically generated JSON file that restores some information to make mods possible. It is maintained by the StateFarm dev team and hosted on GitHub.<br>
+VarData is an automatically generated JSON file that restores some information to make mods possible. It is maintained by the StateFarm dev team and hosted on GitHub.<br>
 <strong>How do I generate VarData?</strong>
 You can generate VarData by using the command "sf.vardata" in the ${discordName} Discord bot channel.
 <a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the ${discordName} Discord server</a> to generate VarData!`;
+
         const message2 = `<br>Alternatively, if you know what you're doing you can enable one of these options:`;
         const image = `<img src='${itsOverURL}' style='width: 20%; height: 20%; margin-right: 15px; vertical-align: middle;'>`;
         vardataPopup.innerHTML = `${image}<strong>${title}</strong><br><small style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Hash: ${hash}</small><br><br>${message}<br>
@@ -6260,7 +6261,7 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
             } catch (error) {
                 log(error);
                 change("vardataType", 0);
-                alert("Bollocks! If you're getting this message, injection probably failed. To solve this, perform CTRL+F5 - this performs a hard reload. Check your VarData too! If this does not work, contact the developers.");
+                alert("An error occured, probably on our end. We recommend you use CTRL (cmd on mac) + SHIFT + R to \"hard reload\" the page. If this does not fix it, join our Discord server: " + discordURL);
                 createPopup("Reloading page in 5 seconds...");
                 setTimeout(() => {
                     reloadPage();
