@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre12
+// @version      3.4.3-pre13
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1283,7 +1283,6 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", tooltip: "Creates boxes around enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", tooltip: "Creates lines pointing from the center of the screen to the location of enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: "Renders players through walls", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.renderTab.pages[0], title: "Trajectories", storeAs: "trajectories", tooltip: "Shows the path your grenade will take when thrown", bindLocation: tp.renderTab.pages[1], });
             //initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", tooltip: "It's borked rn", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "Creates an ESP box at the predicted position of the player", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
@@ -4040,7 +4039,7 @@ z-index: 999999;
             unsafeWindow.globalSS.findBadgesForUsername = findBadgesForUsername;
             unsafeWindow.globalSS.badgeList = badgeList;
             unsafeWindow.globalSS.crosshairsPosition = crosshairsPosition;
-            unsafeWindow.globalSS.predictGrenade = predictGrenade;
+            // unsafeWindow.globalSS.predictGrenade = predictGrenade;
             unsafeWindow.globalSS.miniCamera = miniCamera;
             unsafeWindow.globalSS.configMain = configMain;
             unsafeWindow.globalSS.configBots = configBots;
@@ -5467,152 +5466,6 @@ z-index: 999999;
         };
 
         return direction;
-    };
-    var v1grenade, v2grenade, v3grenade, finalPos;
-    const predictGrenade = function (player = ss.MYPLAYER, grenadeThrowPower = 0) {
-        var rotMat = L.BABYLON.Matrix.RotationYawPitchRoll(player[H.yaw], -player[H.pitch], 0);
-        var vec = L.BABYLON.Matrix.Translation(0, .1, 1).multiply(rotMat).getTranslation();
-        var posMat = L.BABYLON.Matrix.Translation(0, -.10, -.1);
-        var pos = (posMat = (posMat = posMat.multiply(rotMat)).add(L.BABYLON.Matrix.Translation(player[H.x], player[H.y] + 0.3, player[H.z]))).getTranslation();
-        var speed = .13 * grenadeThrowPower + .08;
-
-        vec.x *= speed;
-        vec.y *= speed;
-        vec.z *= speed;
-        pos.x = Math.floor(256 * pos.x) / 256;
-        pos.y = Math.floor(256 * pos.y) / 256;
-        pos.z = Math.floor(256 * pos.z) / 256;
-        vec.x = Math.floor(256 * vec.x) / 256;
-        vec.y = Math.floor(256 * vec.y) / 256;
-        vec.z = Math.floor(256 * vec.z) / 256;
-
-        v1grenade = v1grenade || new L.BABYLON.Vector3();
-        v2grenade = v2grenade || new L.BABYLON.Vector3();
-        v3grenade = v3grenade || new L.BABYLON.Vector3();
-
-        var ttl = 75;
-        var resting = false;
-        var active = true;
-
-        var grenadeCollidesWithCell = ss.RAYS.grenadeCollidesWithCell;
-        var rayCollidesWithMap = ss.RAYS[H.rayCollidesWithMap];
-
-        var x = pos.x;
-        var y = pos.y;
-        var z = pos.z;
-        var dx = -vec.x*2;
-        var dy = vec.y*2;
-        var dz = -vec.z*2;
-
-        const update = function () {
-            // log("update", 1)
-            if (ttl <= 0) {
-                active = false;
-                return;
-            };
-            // log("update", 2)
-            if (!resting) {
-                var pdx2 = dx;
-                var pdy = dy;
-                var pdz2 = dz;
-                var ndx = 0.5 * (dx + pdx2);
-                var ndy = 0.5 * (dy + pdy);
-                var ndz = 0.5 * (dz + pdz2);
-                var vel = Math.length3(ndx, ndy, ndz);
-                // log("update", 3)
-                if (!collidesWithMap()) {
-                    x += ndx;
-                    y += ndy;
-                    z += ndz;
-                    dy -= 0.012;
-                    // log("update", 4)
-                };
-                // log("update", 5)
-                dx *= 0.96;
-                dz *= 0.96;
-            };
-        };
-
-        const collidesWithMap = function () {
-            // log("collidesWithMap", 1)
-            v1grenade.set(x, y - 0.07, z);
-            v2grenade.set(dx, dy, dz);
-            v3grenade.set(dx, dy, dz);
-            // log("collidesWithMap", 2)
-            var res = rayCollidesWithMap(v1grenade, v2grenade, grenadeCollidesWithCell);
-            // log("collidesWithMap", 3)
-            if (res) {
-                // log("collidesWithMap", 3)
-                if (res.normal.y == 1 && v3grenade.length() < 0.05) {
-                    // log("collidesWithMap", 4)
-                    resting = true;
-                } else {
-                    // log("collidesWithMap", 5)
-                    v3grenade.subtractInPlace(res.normal.scale(1.6 * res.dot));
-                    dx = v3grenade.x * 0.98;
-                    dy = v3grenade.y;
-                    dz = v3grenade.z * 0.98;
-                    return res;
-                }
-            }
-            // log("collidesWithMap", 6)
-            return false;
-        };
-
-        // log(
-        //     "pos", {
-        //         x, y, z
-        //     },
-        //     "velocity", {
-        //         dx, dy, dz
-        //     },
-        //     "speed", speed,
-        //     "vec", vec,
-        //     "ttl", ttl,
-        //     "resting", resting,
-        //     "active", active
-        // );
-
-        var result = {
-            positions: [],
-            finalPos: null,
-        };
-
-        // log("about to predict grenade");
-
-        while (active || ttl > 0) {
-            /*
-            log(
-                "pos", {
-                    x, y, z
-                },
-                "velocity", {
-                    dx, dy, dz
-                },
-                "speed", speed,
-                "vec", vec,
-                "ttl", ttl,
-                "resting", resting,
-                "active", active
-            );
-            */
-            // log(ttl, active, 1);
-            result.positions.push({x, y, z});
-            // log(ttl, active, 2);
-            update();
-            // log(ttl, active, 3);
-            ttl--;
-            // log(ttl, active, 4);
-        };
-
-        finalPos = finalPos || new L.BABYLON.Vector3();
-        finalPos.x = x; finalPos.y = y; finalPos.z = z;
-
-        result.finalPos = finalPos;
-
-        // log(result);
-
-        return result;
     };
 
     const setupNameSpriteNew = function (actor) {
@@ -7634,41 +7487,6 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                         item.exists = objExists;
                     };
                 });
-            };
-            //trajectories
-            if (trajectory) {
-                trajectory.dispose();
-                trajectory = null;
-            };
-            if (extract("trajectories") && ss.MYPLAYER[H.grenadeCount] >= 1 && ss.MYPLAYER[H.playing]) {
-                if (!trajectoryNade) {
-                    const clone = ss.cloneMesh('grenadeItem', ss.SCENE, null);
-                    if (clone) {
-                        clone.setEnabled(true);
-                        trajectoryNade = clone;
-                        trajectoryNade.renderOverlay = true;
-                        trajectoryNade[H.renderingGroupId] = 1;
-                    };
-                };
-
-                let power = 0;
-
-                if (document.getElementById("grenadeThrowContainer").style.visibility === "visible") {
-                    power = ss.grenadeThrowPower;
-                } else if (extract("grenadeMax")) {
-                    power = extract("grenadePower");
-                };
-
-                const result = predictGrenade(ss.MYPLAYER, power);
-                const lines = [result.positions];
-                trajectory = L.BABYLON.MeshBuilder.CreateLineSystem("trajectory", { lines: lines }, ss.SCENE);
-                trajectory.color = new L.BABYLON.Color3(1, 0, 0);
-                trajectory[H.renderingGroupId] = 1;
-
-                trajectoryNade.position = result.finalPos;
-            } else if (trajectoryNade) {
-                trajectoryNade.dispose();
-                trajectoryNade = null;
             };
             // log("done updating lines")
             //garbage collection
