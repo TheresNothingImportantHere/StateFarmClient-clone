@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre11
+// @version      3.4.3-pre12
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.shell.onlypuppy7.online/*
@@ -1873,12 +1873,6 @@ debug mode).`},
                 initModule({ location: tp.banFolder, title: "Reload Page", storeAs: "reload", tooltip: "Reloads the page", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function(){
                     reloadPage();
                 },});
-            tp.miscTab.pages[0].addSeparator();
-            initFolder({ location: tp.miscTab.pages[0], title: "Ad & Privacy Options", storeAs: "adFolder", });
-                initModule({ location: tp.adFolder, title: "Ad Block", storeAs: "adBlock", tooltip: "Prevents the anti-adblocker code. NOTE: this will always display the VIP badge as a side effect", bindLocation: tp.miscTab.pages[1], });
-                initModule({ location: tp.adFolder, title: "VIP Spoof", storeAs: "spoofVIP", tooltip: "Makes the VIP badge visible locally (other players won't see)", bindLocation: tp.miscTab.pages[1], });
-                initModule({ location: tp.adFolder, title: "NoAnnoyances", storeAs: "noAnnoyances", tooltip: "Removes ads", bindLocation: tp.miscTab.pages[1], });
-                initModule({ location: tp.adFolder, title: "NoTrack", storeAs: "noTrack", tooltip: "Removes some user data tracking code", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "Bypasses AFK kicks", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", tooltip: "Respawns quicker than usual", bindLocation: tp.miscTab.pages[1], });
@@ -4561,41 +4555,6 @@ z-index: 999999;
             };
 
             log("swapping out google analytics...");
-            oldGa = unsafeWindow.ga;
-            unsafeWindow.ga = F.interceptGa;
-
-            const vueAppisUpgraded = Object.getOwnPropertyDescriptor(vueApp, 'isUpgraded')?.get;
-            Object.defineProperty(vueApp, 'isUpgraded', {
-                get: function() {
-                    if ((!extract("spoofVIP")) && vueAppisUpgraded) {
-                        return vueAppisUpgraded.call(vueApp);
-                    } else {
-                        return true;
-                    }
-                }
-            });
-
-            const vueAppisSubscriber = Object.getOwnPropertyDescriptor(vueApp, 'isSubscriber')?.get;
-            Object.defineProperty(vueApp, 'isSubscriber', {
-                get: function() {
-                    if ((!extract("spoofVIP")) && vueAppisSubscriber) {
-                        return vueAppisSubscriber.call(vueApp);
-                    } else {
-                        return true;
-                    }
-                }
-            });
-
-            const vueDataisSubscriber = Object.getOwnPropertyDescriptor(vueData, 'isSubscriber')?.get;
-            Object.defineProperty(vueData, 'isSubscriber', {
-                get: function() {
-                    if ((!extract("spoofVIP")) && vueDataisSubscriber) {
-                        return vueDataisSubscriber.call(vueData);
-                    } else {
-                        return true;
-                    }
-                }
-            });
 
             ranEverySecond = true;
         };
@@ -5794,51 +5753,6 @@ z-index: 999999;
 
             // };
         });
-        createAnonFunction('interceptGa', function () {
-            // log(arguments);
-            if (arguments['3'] == 'Reward item') {
-                let itemName = arguments['4'].slice(0, -4);
-                let tier = arguments['4'].slice(-1);
-
-                let accountRecords = GM_getValue("StateFarm_AccountRecords") || {};
-                let itemCount = 0;
-                Object.entries(accountRecords).forEach(([key, account]) => {
-                    if (account) {
-                        account.inventory.forEach(item=>{
-                            if (item.name == itemName) {
-                                itemCount++
-                            };
-                        });
-                    };
-                });
-
-                log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw result: item: ${itemName} is tier ${tier} (${itemCount} of this item)`);
-                let tierCache = GM_getValue("StateFarm_TierCache") || {};
-                tierCache[itemName] = tier;
-                GM_setValue("StateFarm_TierCache", tierCache);
-
-                if (extract("chickenWinnerNotifs")) {
-                    let isSlightlyRare = Number(tier) >= 4;
-                    createPrompt(`Chicken Winner:\nYou won: ${itemName} [T${tier}]\n\n${isSlightlyRare ? "High value item! GG." : "Low value item."}`, [], 10e3);
-                    if (isSlightlyRare) BAWK.play("challenge_notify");
-                };
-            };
-            if (arguments['3'] == 'Reward amount') {
-                let eggs = arguments['4'];
-
-                log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw result: eggs: ${eggs}`);
-
-                if (extract("chickenWinnerNotifs")) {
-                    let isSlightlyRare = eggs >= 1000;
-                    createPrompt(`Chicken Winner:\nYou won: ${eggs} eggs.\n\n${isSlightlyRare ? "High egg amount! GG." : "Low egg amount."}`, [], 10e3);
-                    if (isSlightlyRare) BAWK.play("challenge_notify");
-                };
-            };
-            if (arguments['3'] == 'Reward') {
-                log(`[${unsafeWindow.extern.account.inventory.length}, ${unsafeWindow.extern.account.currentBalance}] SFcw reward: ${arguments['4']}`);
-            };
-            if (!extract("noTrack")) oldGa.apply(this, arguments); //does google really need to know that we cracked the egg in the middle instead of the one on the right?
-        });
         createAnonFunction('interceptDeath', (KILLER, DEAD) => {
             if (DEAD.name === KILLER.name === ss.MYPLAYER.name) return; // killed self (with grenade)
 
@@ -6121,24 +6035,6 @@ z-index: 999999;
                     };
                     return CONTROLKEYS;
                 };
-            };
-        });
-        createAnonFunction('adBlocker', function (input) {
-            try {
-                if (input == 10 && sneakyDespawning) {
-                    return 1;
-                } else if (extract("adBlock")) {
-                    if (typeof (input) == 'boolean') {
-                        return true;
-                    } else if (input == 10) {
-                        return 5;
-                    } else if (input == "adsBlocked") {
-                        return false;
-                    };
-                };
-                return input;
-            } catch (error) {
-                return true;
             };
         });
         createAnonFunction("quickRespawn", function (input) {
@@ -6447,11 +6343,7 @@ z-index: 999999;
                 log("DEATHARGS", DEATHARGS);
                 modifyJS('function ' + f(H._deathFunction) + '(' + DEATHARGS + '){', 'function ' + f(H._deathFunction) + '(' + f(DEATHARGS) + '){window.' + functionNames.interceptDeath + '(' + f(DEATHARGS) + ');');
                 //vip spoof/no ads credit absolutely goes to OakSwingZZZ
-                modifyJS('adsBlocked=' + FUNCTIONPARAM, 'adsBlocked=' + functionNames.adBlocker + '("adsBlocked")');
-                modifyJS('"user-has-adblock"', functionNames.adBlocker + '("user-has-adblock")');
-                modifyJS('layed=!1', 'layed=window.' + functionNames.adBlocker + '(!1)');
                 modifyJS('showAdBlockerVideo', 'hideAdBlockerVideo'); //hello eggs bullshit
-                modifyJS(H.USERDATA + '.playerAccount.isUpgraded()', functionNames.adBlocker + '(' + f(H.USERDATA) + '.playerAccount.isUpgraded())');
                 //respawn time stuff
                 modifyJS('5:10', functionNames.quickRespawn + '(5):' + functionNames.adBlocker + '(10)');
                 modifyJS(',3e3),console.log', `,window["${functionNames.quickRespawn}"](3e3)),console.log`);
@@ -6614,7 +6506,6 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
         let params = "";
 
         addParam("autoFireType", 1); //while visible
-        addParam("adBlock", true);
 
         //blacklist stuff
         addParam("blacklist", botBlacklist);
