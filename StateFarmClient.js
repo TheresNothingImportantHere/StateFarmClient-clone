@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre18
+// @version      3.4.3-pre19
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -2017,8 +2017,8 @@ debug mode).`},
                 title: "WIP", content:
 `Sorry! No guide yet!`},
         ]);
-            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", tooltip: "What to try if varData loading fails", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "none", });
-            initModule({ location: tp.clientTab.pages[0], title: "Fallback Behavior", storeAs: "vardataType", tooltip: "When to use fallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "never", });
+            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", tooltip: "What to try if varData loading fails", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "loadLatest", });
+            initModule({ location: tp.clientTab.pages[0], title: "Fallback Behavior", storeAs: "vardataType", tooltip: "When to use fallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "always", });
             initModule({ location: tp.clientTab.pages[0], title: "Custom VarData", storeAs: "vardataCustom", tooltip: "Uses the entered varData", defaultValue: "{}", enableConditions: [["vardataFallback", "loadCustom"]] });
             tp.clientTab.pages[0].addSeparator();
             initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", tooltip: "Hides the big StateFarm menu. default key to do this is H", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
