@@ -1,14 +1,13 @@
 <div align='center'>﻿<img src='https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/sfc%20banner/shell%20logo%20(transparent%20for%20white%20backgrounds).png?raw=true' width='80%'></div>
 <h1 align='center'>StateFarm Client</h1>
 <h3 align='center'>for Shell Shockers</h3>
-<br><br>   
-![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)
+<br>   
 
-![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)
+![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)<br>
 
-![Discord Members](https://shields.io/discord/1351719903781978142?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)
+![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)<br>
 
-<br>
+![Discord Members](https://shields.io/discord/1351719903781978142?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)<br>
 
 ## This mod is intended for educational purposes only. Any abuse or misuse of the mod is solely the user's responsibility. By downloading, intalling, or using the mod, you agree to our [Terms and Disclaimers](https://docs.google.com/document/d/18A226mG4kVyd-BoNSxXxoXOuhwtm9M3CFwTaFf0-sZU/edit?usp=sharing).
 <br>
