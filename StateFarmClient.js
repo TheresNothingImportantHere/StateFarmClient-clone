@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre20
+// @version      3.4.3-pre21
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -269,6 +269,11 @@ let attemptedInjection = false;
     //misc: non sfc external things
     const babylonURL = `https://cdn.jsdelivr.net/npm/babylonjs@{0}/babylon.min.js`;
     const violentmonkeyURL = `https://violentmonkey.github.io/get-it/`;
+
+    //various debug fun things
+    const __DEBUG__ = {
+        forceTriggerVarData: true
+    }
 
     //startup sequence
     const startUp = function () {
@@ -2469,7 +2474,7 @@ debug mode).`},
         vardataPopup.style.position = 'fixed';
         vardataPopup.style.left = '50%';
         vardataPopup.style.top = '50%';
-        vardataPopup.style.width = '40em';
+        vardataPopup.style.width = '50em';
         vardataPopup.style.transform = 'translate(-50%, -50%)';
         vardataPopup.style.color = '#fff';
         vardataPopup.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
@@ -2480,32 +2485,24 @@ debug mode).`},
         vardataPopup.style.pointerEvents = 'auto';
         vardataPopup.style.opacity = '0';
         vardataPopup.style.transition = 'opacity 0.4s ease-in-out';
-        vardataPopup.style.fontFamily = 'Bahnschrift, sans-serif';
+        vardataPopup.style.fontFamily = 'Nunito, sans-serif';
         vardataPopup.style.fontSize = '16px';
+        vardataPopup.style.letterSpacing = '0.3px';
         vardataPopup.style.zIndex = '9999';
         vardataPopup.style.whiteSpace = 'pre-wrap';
+        vardataPopup.style.fontWeight = 'bold';
 
         //set vardataPopup content
-        const title = "Valid VarData for this hash could not be retrieved.";
-        const message = `This could be due to a conflicting script or StateFarm Client is out of date.<br>
-<strong>Why am I seeing this?</strong>
-StateFarm Client was unable to retrieve matching VarData from GitHub. Here are some common reasons for this happening:<br>
-1. Multiple scripts are running. This is usually the most common reason.
-2. There are multiple userscript managers. If you're using ViolentMonkey, check if Tampermonkey is installed and also affecting the site.<br>
-<strong>What is VarData?</strong>
-VarData is an automatically generated JSON file that restores some information to make mods possible. It is maintained by the StateFarm dev team and hosted on GitHub.<br>
-<strong>How do I generate VarData?</strong>
-You can generate VarData by using the command "sf.vardata" in the ${discordName} Discord bot channel.
-<a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Join the ${discordName} Discord server</a> to generate VarData!`;
+        const title = "Valid VarData failed to load!"
+        const message = `This is likely because you have two versions of StateFarm installed, or that your client needs to be updated.<br>
+<strong>Steps to fix (go through until it works)</strong>
+1. click the "load latest" button below (most likely fix)
+2. confirm that you only have either Violentmonkey OR Tampermonkey with ONE version of StateFarm installed
+3. update statefarm by clicking <a href="${GM_info.script.downloadURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">here</a> and clicking the "Update" button
+4. join our <a href="${discordURL}" target="_blank" style="color: #1944ff; text-decoration: underline; font-size: inherit;">Discord server</a> and opening a ticket in #sfc-support`;
 
-        const message2 = `<br>Alternatively, if you know what you're doing you can enable one of these options:`;
-        const image = `<img src='${itsOverURL}' style='width: 20%; height: 20%; margin-right: 15px; vertical-align: middle;'>`;
-        vardataPopup.innerHTML = `${image}<strong>${title}</strong><br><small style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Hash: ${hash}</small><br><br>${message}<br>
-                           <label for="vardataInput">Enter VarData:</label>
-                           <div style="display: flex; align-items: center;">
-                               <input type="text" id="vardataInput" style="flex: 1; padding: 5px; width: 250px; border: 1px solid rgba(255, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.1); color: #fff; border-radius: 5px; margin-right: 10px;">
-                               <button id="submitVarData" style="padding: 5px 15px; background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; cursor: pointer; transition: background-color 0.2s;">GO</button>
-                           </div>${message2}`;
+        const image = `<img src='${itsOverURL}' style='width: 7%; height: 7%; margin-right: 15px; vertical-align: middle;'>`;
+        vardataPopup.innerHTML = `${image}<strong style="font-size: 20px; margin-top: 5px;">${title}</strong><br><br>${message}<br><br>`;
 
         //create buttons
         const vardataButtonContainer = document.createElement('div');
@@ -2513,11 +2510,11 @@ You can generate VarData by using the command "sf.vardata" in the ${discordName}
         vardataButtonContainer.style.justifyContent = 'space-between';
         vardataButtonContainer.style.marginTop = '10px';
 
-        vardataButtonsInfo.forEach(({ id, text, action }) => {
+        vardataButtonsInfo.forEach(({ id, text, isHighlighted, action }) => {
             const button = document.createElement('button');
             button.id = id;
             button.innerHTML = text;
-            button.style.padding = '5px 10px';
+            button.style.padding = '7px 10px';
             button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
             button.style.color = '#fff';
             button.style.border = '1px solid rgba(255, 255, 255, 0.5)';
@@ -2526,12 +2523,18 @@ You can generate VarData by using the command "sf.vardata" in the ${discordName}
             button.style.transition = 'background-color 0.2s';
             button.style.flex = '1';
             button.style.marginRight = '10px';
-            button.style.fontSize = '12px';
+            button.style.fontSize = '14px';
             button.style.whiteSpace = 'pre-wrap';
+            button.style.fontFamily = vardataPopup.style.fontFamily;
+            button.style.fontWeight = vardataPopup.style.fontWeight;
 
             button.addEventListener('click', action);
             button.addEventListener('mouseenter', () => button.style.backgroundColor = 'rgba(255, 255, 255, 0.3)');
             button.addEventListener('mouseleave', () => button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)');
+
+            if (isHighlighted) {
+                button.style.border = '3px solid lime';
+            }
 
             vardataButtonContainer.appendChild(button);
         });
@@ -2589,6 +2592,7 @@ You can generate VarData by using the command "sf.vardata" in the ${discordName}
 
         document.body.appendChild(vardataPopup);
 
+      /*
         //add inputs stuff
         const input = document.getElementById('vardataInput');
         const submitButton = document.getElementById('submitVarData');
@@ -2620,6 +2624,7 @@ You can generate VarData by using the command "sf.vardata" in the ${discordName}
                 submitButton.click();
             }
         });
+        */
 
         //fade anims
         setTimeout(() => {
@@ -6062,7 +6067,7 @@ z-index: 999999;
             const vardataCache = GM_getValue("StateFarm_VarDataCache") || {};
             const previousHash = GM_getValue("StateFarm_PreviousHash") || "";
 
-            if (onlineClientKeys == "value_undefined" || onlineClientKeys == null) {
+            if (onlineClientKeys == "value_undefined" || onlineClientKeys == null || __DEBUG__.forceTriggerVarData) {
                 onlineClientKeys = getVardata("latest");
 
                 const vardataFallback = extract("vardataFallback");
@@ -6090,27 +6095,40 @@ z-index: 999999;
 
                 log(cachedForHash, cachedRecent)
 
-                if (vardataType != "never" && convertedCustom && vardataFallback == "loadCustom" && convertedCustom.vars && convertedCustom.checksum) {
+                if (vardataType != "never" && convertedCustom && vardataFallback == "loadCustom" && convertedCustom.vars && convertedCustom.checksum && !__DEBUG__.forceTriggerVarData) {
                     clientKeys = convertedCustom;
-                } else if (vardataType != "never" && onlineClientKeys && vardataFallback == "loadLatest") {
+                } else if (vardataType != "never" && onlineClientKeys && vardataFallback == "loadLatest" && !__DEBUG__.forceTriggerVarData) {
                     //l8er dealt with
-                } else if (vardataType != "never" && cachedForHash && vardataFallback == "loadCached") {
+                } else if (vardataType != "never" && cachedForHash && vardataFallback == "loadCached" && !__DEBUG__.forceTriggerVarData) {
                     clientKeys = JSON.parse(cachedForHash);
-                } else if (vardataType != "never" && cachedRecent && vardataFallback == "loadRecent") {
+                } else if (vardataType != "never" && cachedRecent && vardataFallback == "loadRecent" && !__DEBUG__.forceTriggerVarData) {
                     clientKeys = JSON.parse(cachedRecent);
                 } else {
                     const vardataButtonsInfo = [
-                        { id: 'loadLatest', enabled: !!onlineClientKeys, text: 'Load Latest\n(online)', action: () => {
+                        { id: 'loadLatest', enabled: !!onlineClientKeys, text: 'Load Latest\n(online) (RECOMMENDED)', isHighlighted: true, action: () => {
                             change("vardataFallback", 1);
                             if (extract("vardataType") == "never") change("vardataType", 1);
+                            if (extract("vardataType") == "justOnce") change("vardataType", 3);
                             closeVardataPopup();
                         }},
-                        { id: 'loadCached', enabled: !!vardataCache[hash], text: 'Load Cached\n(this hash)', action: () => {
-                            change("vardataFallback", 2);
-                            if (extract("vardataType") == "never") change("vardataType", 1);
-                            closeVardataPopup();
+                        { id: 'loadCached', enabled: true, text: 'Input Custom', isHighlighted: false, action: () => {
+                            const error = () => createPopup("Inputted VarData isn't valid.", "error");
+
+                            try {
+                                let converted = JSON.parse(inputValue);
+                                if (converted.vars && converted.checksum) {
+                                    change("vardataCustom", inputValue);
+                                    change("vardataFallback", 4);
+                                    change("vardataType", 1); //custom isnt consistent enough
+                                    closeVardataPopup();
+                                } else {
+                                    error();
+                                };
+                            } catch (e) {
+                                error();
+                            }
                         }},
-                        { id: 'loadRecent', enabled: !!vardataCache.latest, text: 'Load Cached\n(most recent)', action: () => {
+                        { id: 'loadRecent', enabled: !!vardataCache.latest, text: 'Load Cached\n(most recent)', isHighlighted: false, action: () => {
                             change("vardataFallback", 3);
                             if (extract("vardataType") == "never") change("vardataType", 1);
                             closeVardataPopup();
