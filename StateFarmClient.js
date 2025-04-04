@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre19
+// @version      3.4.3-pre20
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -117,8 +117,7 @@
 // @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
 // ==/UserScript==
 
-/*
-(function() {
+if (false) {
   const consoleMethods = ["log", "warn", "info", "error", "exception", "table", "trace"];
   const _innerConsole = console;
 
@@ -133,8 +132,7 @@
       });
     }
   });
-})();
-*/
+}
 
 let _dateNow = unsafeWindow.Date.now;
 /*unsafeWindow.Date.now = () => {
@@ -1298,6 +1296,7 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", tooltip: "Creates boxes around enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", tooltip: "Creates lines pointing from the center of the screen to the location of enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: "Renders players through walls", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "Trajectories", storeAs: "trajectories", tooltip: "Shows the path your grenade will take when thrown", bindLocation: tp.renderTab.pages[1], });
             //initModule({ location: tp.renderTab.pages[0], title: "Targets", storeAs: "targets", tooltip: "It's borked rn", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "PredictionESP", storeAs: "predictionESP", tooltip: "Creates an ESP box at the predicted position of the player", bindLocation: tp.renderTab.pages[1], });
             tp.renderTab.pages[0].addSeparator();
@@ -4055,7 +4054,7 @@ z-index: 999999;
             unsafeWindow.globalSS.findBadgesForUsername = findBadgesForUsername;
             unsafeWindow.globalSS.badgeList = badgeList;
             unsafeWindow.globalSS.crosshairsPosition = crosshairsPosition;
-            // unsafeWindow.globalSS.predictGrenade = predictGrenade;
+            unsafeWindow.globalSS.predictGrenade = newPredictGrenade;
             unsafeWindow.globalSS.miniCamera = miniCamera;
             unsafeWindow.globalSS.configMain = configMain;
             unsafeWindow.globalSS.configBots = configBots;
@@ -5478,6 +5477,48 @@ z-index: 999999;
         return direction;
     };
 
+    const newPredictGrenade = (player = ss.MYPLAYER, grenadeThrowPower = 0) => {
+        const ssGrenade = new ss.Grenade(null, true);
+        var rotMat = L.BABYLON.Matrix.RotationYawPitchRoll(player[H.yaw], -player[H.pitch], 0);
+        var vec = L.BABYLON.Matrix.Translation(0, .1, 1).multiply(rotMat).getTranslation();
+        var posMat = L.BABYLON.Matrix.Translation(0, -.10, -.1);
+        var pos = (posMat = (posMat = posMat.multiply(rotMat)).add(L.BABYLON.Matrix.Translation(player[H.x], player[H.y] + 0.3, player[H.z]))).getTranslation();
+        var speed = .13 * grenadeThrowPower + .08;
+
+        vec.x *= speed;
+        vec.y *= speed;
+        vec.z *= speed;
+        pos.x = Math.floor(256 * pos.x) / 256;
+        pos.y = Math.floor(256 * pos.y) / 256;
+        pos.z = Math.floor(256 * pos.z) / 256;
+        vec.x = Math.floor(256 * vec.x) / 256;
+        vec.y = Math.floor(256 * vec.y) / 256;
+        vec.z = Math.floor(256 * vec.z) / 256;
+
+        var x = pos.x;
+        var y = pos.y;
+        var z = pos.z;
+        var dx = -vec.x*2;
+        var dy = vec.y*2;
+        var dz = -vec.z*2;
+
+        ssGrenade.throw(player, { x, y, z }, { x: dx, y: dy, z: dz });
+
+        const result = {
+             positions: [],
+             finalPos: null,
+        };
+
+        while (ssGrenade.ttl > 0) {
+            result.positions.push({ x: ssGrenade.x, y: ssGrenade.y, z: ssGrenade.z });
+            ssGrenade.update();
+        }
+
+        result.finalPos = { x: ssGrenade.x, y: ssGrenade.y, z: ssGrenade.z };
+
+        return result;
+    }
+
     const setupNameSpriteNew = function (actor) {
         let player = actor[H.player_];
 
@@ -6258,6 +6299,12 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                   +`${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
                   +splitted[1]
                 )
+
+                // grenade stuff
+                match = js.match(/function Grenade\(([a-zA-Z$_]+)\)\{/);
+                modifyJS(`function Grenade(${match[1]}){`, `function Grenade(${match[1]}, ignoreActor){`);
+                match = js.match(/this\.([a-zA-Z$_]+)=new GrenadeActor\(this\)/);
+                modifyJS(`this.${match[1]}=new GrenadeActor(this)`, `this.${match[1]}=ignoreActor?new Proxy({},{get: () => () => {}}):new GrenadeActor(this)`)
 
                 log(H);
                 log(js);
@@ -7498,6 +7545,45 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                         item.exists = objExists;
                     };
                 });
+            };
+            //trajectories
+            if (trajectory) {
+               trajectory.dispose();
+               trajectory = null;
+             };
+             if (extract("trajectories") && ss.MYPLAYER[H.grenadeCount] >= 1 && ss.MYPLAYER[H.playing]) {
+                 if (!trajectoryNade) {
+                     const clone = ss.cloneMesh('grenadeItem', ss.SCENE, null);
+                     if (clone) {
+                         clone.setEnabled(true);
+                         trajectoryNade = clone;
+                         trajectoryNade.renderOverlay = true;
+                         trajectoryNade[H.renderingGroupId] = 1;
+                         trajectoryNade.scaling.x = 2.5;
+                         trajectoryNade.scaling.y = 2.5;
+                         trajectoryNade.scaling.z = 2.5;
+                         trajectoryNade.color = new L.BABYLON.Color3(0.627, 0.125, 0.941); // https://3dwebgs.github.io/color4bbyln/
+                     };
+                 };
+
+                 let power = 0;
+
+                 if (extract("grenadeMax")) {
+                     power = extract("grenadePower");
+                 } else if (document.getElementById("grenadeThrowContainer").style.visibility === "visible") {
+                     power = ss.grenadeThrowPower;
+                 }
+
+                 const result = newPredictGrenade(ss.MYPLAYER, power);
+                 const lines = [result.positions.map(e => new L.BABYLON.Vector3(e.x, e.y, e.z))];
+                 trajectory = L.BABYLON.MeshBuilder.CreateLineSystem("traject", { lines: lines }, ss.SCENE);
+                 trajectory.color = new L.BABYLON.Color3(0.627, 0.125, 0.941); // https://3dwebgs.github.io/color4bbyln/
+                 trajectory[H.renderingGroupId] = 1;
+
+                 trajectoryNade.position = new L.BABYLON.Vector3(result.finalPos.x, result.finalPos.y, result.finalPos.z);
+             } else if (trajectoryNade) {
+                 trajectoryNade.dispose();
+                 trajectoryNade = null;
             };
             // log("done updating lines")
             //garbage collection
