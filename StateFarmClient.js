@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre17
+// @version      3.4.3-pre18
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -118,7 +118,6 @@
 // ==/UserScript==
 
 /*
-// dont TOUCH our console bwd
 (function() {
   const consoleMethods = ["log", "warn", "info", "error", "exception", "table", "trace"];
   const _innerConsole = console;
@@ -138,7 +137,17 @@
 */
 
 let _dateNow = unsafeWindow.Date.now;
-unsafeWindow.Date.now = () => 0;
+/*unsafeWindow.Date.now = () => {
+    try {
+        throw new Error("skibidi");
+    } catch (e) {
+        //console.log(e.stack);
+        if (e.stack.includes('imports.wbg.__wbg_now')) {
+            //return 1743774560481;
+        }
+        else return _dateNow();
+    }
+};*/
 
 let attemptedInjection = false;
 // log("StateFarm: running (before function)");
@@ -5304,12 +5313,7 @@ z-index: 999999;
             } else {
                 log("StateFarm: didn't modify grenade packet")
             };
-        } else if (arr[0] == C.chat) {
-            log('%c Chat packet sent, chat handler!!!');
-            return chatPacketHandler(data);
-        } else {
-
-        };
+        }
 
         return data;
     };
