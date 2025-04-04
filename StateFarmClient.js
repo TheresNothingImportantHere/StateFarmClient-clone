@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre21
+// @version      3.4.3-pre22
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -272,7 +272,7 @@ let attemptedInjection = false;
 
     //various debug fun things
     const __DEBUG__ = {
-        forceTriggerVarData: true
+        forceTriggerVarData: false
     }
 
     //startup sequence
