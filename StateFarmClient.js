@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre16
+// @version      3.4.3-pre17
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -136,6 +136,9 @@
   });
 })();
 */
+
+let _dateNow = unsafeWindow.Date.now;
+unsafeWindow.Date.now = () => 0;
 
 let attemptedInjection = false;
 // log("StateFarm: running (before function)");
@@ -435,7 +438,6 @@ let attemptedInjection = false;
                             url = url.replace("//api.github.com/repos/", "//raw.githubusercontent.com/");
                             url = url.replace("/contents/", "/master/");
                             url = `${url.split("?")[0]}/`;
-                            log(folder.name, url, folder);
                             loadedSkyboxes.push({
                                 text: folder.name,
                                 value: btoa(url)
@@ -4230,7 +4232,6 @@ z-index: 999999;
                     console.warn("Unsupported compression method:", compressionMethod);
                 }
 
-                console.log("Extracted:", fileName);
                 offset += compressedSize;
             }
 
@@ -5281,7 +5282,7 @@ z-index: 999999;
         return packet;
     };
     const modifyPacket = function (data) {
-        if (!C || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
+        if (!C || !C.throwGrenade || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
             return data;
         };
 
@@ -5295,7 +5296,7 @@ z-index: 999999;
         //     log(arr)
         // };
 
-        if (arr[0] == C.throwGrenade) { // comm code 27 = client to server grenade throw
+        if (arr[0] == C.throwGrenade) {
             if (extract("grenadeMax")) {
                 arr[1] = 255 * (0 || extract("grenadePower"));
                 log("StateFarm: modified a grenade packet to be at full power");
@@ -5331,8 +5332,8 @@ z-index: 999999;
     */
     WebSocket.prototype._send = WebSocket.prototype.send;
     WebSocket.prototype.send = function (data) {
-        var modified = modifyPacket(data);
-        this._send(modified);
+        let newPacket = this.url.includes('/game/') ? modifyPacket(data) : data;
+        this._send(newPacket);
 
         /*
         if (is39Packet(data) && ghostSpamToggle.enabled) {
@@ -5937,6 +5938,7 @@ z-index: 999999;
           console.log(args.join(""));
           if (args.join('').includes('(()=>{var ')) {
             unsafeWindow.Function = originalFunction;
+            unsafeWindow.Date.now = _dateNow;
 
             // this is the right script
             return originalFunction(applyStateFarm(...args));
@@ -6009,7 +6011,7 @@ z-index: 999999;
                 return fetchTextContent(clientKeysURL + hash + ".json?v=" + Date.now());
             };
 
-            hash = sha256(originalJS);
+            hash = sha256(js);
             onlineClientKeys = getVardata(hash);
 
             const vardataCache = GM_getValue("StateFarm_VarDataCache") || {};
@@ -6102,7 +6104,7 @@ z-index: 999999;
             log(hash, onlineClientKeys, clientKeys);
 
             H = clientKeys.vars;
-            C = clientKeys.commCodes?.codes;
+            //C = clientKeys.commCodes?.codes;
 
             if (!C) log('WARNING: YOU SHOULD REALLY ADD COMMCODES TO YOUR VARDATA')
 
@@ -6180,9 +6182,9 @@ z-index: 999999;
                 //bypass chat filter
                 modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
                 //hook for control interception
-                match = new RegExp(`\\.prototype\\.${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)[0];
+                match = new RegExp(`\\.prototype\\.${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)?.[0];
                 log("player update function:", match);
-                modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
+                if (match) modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
                 //admin spoof lol
                 modifyJS('isGameOwner(){return ', 'isGameOwner(){return window.' + functionNames.getAdminSpoof + '()?true:')
                 modifyJS('adminRoles(){return ', 'adminRoles(){return window.' + functionNames.getAdminSpoof + '()?255:')
