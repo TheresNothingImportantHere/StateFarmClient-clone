@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre22
+// @version      3.4.3-pre23
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -5294,6 +5294,7 @@ z-index: 999999;
         // };
         return packet;
     };
+    /*
     const modifyPacket = function (data) {
         if (!C || !C.throwGrenade || (data instanceof String)) { // avoid server comm, ping, etc. necessary to load
             return data;
@@ -5321,6 +5322,7 @@ z-index: 999999;
 
         return data;
     };
+    */
     //dead code
     /*
     const is39Packet = function (packetData) { // packet only sent if we are in-game
@@ -5338,19 +5340,13 @@ z-index: 999999;
     const ghostSpamToggle = function () { }
     ghostSpamToggle.enabled = false;
     */
+    /*
     WebSocket.prototype._send = WebSocket.prototype.send;
     WebSocket.prototype.send = function (data) {
         let newPacket = this.url.includes('/game/') ? modifyPacket(data) : data;
         this._send(newPacket);
-
-        /*
-        if (is39Packet(data) && ghostSpamToggle.enabled) {
-            for (var i = 0; i < 5; i++) {
-                this._send(constructChatPacket("spammeroonie number #" + new Date().getTime() % 1000));
-            };
-        };
-        */
     };
+    */
 
     // [sfc] PREDICTION CODE
 
@@ -5626,6 +5622,13 @@ z-index: 999999;
                 return false;
             };
         });
+        createAnonFunction('getGrenadeValue', function () {
+            try {
+                if (extract('grenadeMax')) return extract('grenadePower');
+            } catch {
+                return ss.grenadeThrowPower;
+            }
+        })
         createAnonFunction('getAdminSpoof', function () {
             try {
                 return extract('adminSpoof');
@@ -6318,11 +6321,14 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                   +splitted[1]
                 )
 
-                // grenade stuff
+                // grenade trajectories
                 match = js.match(/function Grenade\(([a-zA-Z$_]+)\)\{/);
                 modifyJS(`function Grenade(${match[1]}){`, `function Grenade(${match[1]}, ignoreActor){`);
                 match = js.match(/this\.([a-zA-Z$_]+)=new GrenadeActor\(this\)/);
                 modifyJS(`this.${match[1]}=new GrenadeActor(this)`, `this.${match[1]}=ignoreActor?new Proxy({},{get: () => () => {}}):new GrenadeActor(this)`)
+
+                // grenademax
+                modifyJS(`${H.grenadeThrowPower},0,1))`, `window.${functionNames.getGrenadeValue}(),0,1))`)
 
                 log(H);
                 log(js);
