@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre25
+// @version      3.4.3-pre26
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -1354,6 +1354,7 @@ sniping and someone sneaks up on you
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "FOV", storeAs: "fov", tooltip: "Controls the FOV of the game", slider: { min: 0, max: 360, step: 3 }, defaultValue: 72, });
             initModule({ location: tp.renderTab.pages[0], title: "Zoom FOV", storeAs: "zoom", tooltip: "Controls how zoomed in/out you are. Default keybind is C to zoom", slider: { min: 0, max: 72, step: 1 }, defaultValue: 15, bindLocation: tp.renderTab.pages[1], defaultBind: "C", });
+            initModule({ location: tp.renderTab.pages[0], title: "No Mini Egg", storeAs: "noMiniEgg", tooltip: "Makes the screen not squished when under the Mini Egg effect.", bindLocation: tp.renderTab.pages[1] })
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "Perspective", storeAs: "perspective", tooltip: "Allows you to switch between third and first person. Think Minecraft F5!", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "1st Person (Default)", value: "firstPerson" }, { text: "3rd Person", value: "thirdPerson" }, { text: "3rd Person (Alt)", value: "thirdPersonAlt" } ], defaultValue: "disabled", defaultBind: "Digit5", });
             initFolder({ location: tp.renderTab.pages[0], title: "Perspective Options", storeAs: "perspectiveFolder", });
@@ -5614,6 +5615,9 @@ z-index: 999999;
             } catch (error) { };
             return url;
         })
+        createAnonFunction('noMiniEgg', () => {
+            return extract('noMiniEgg');
+        })
         createAnonFunction('fixCamera', function () {
             return isKeyToggled[bindsArray.zoom] && (extract("zoom") * (Math.PI / 180)) || (extract("fov") * (Math.PI / 180)) || 1.25;
         });
@@ -6330,6 +6334,10 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                 // replacefeeds
                 match = js.match(/requestJson\(([a-zA-Z$_]+),([a-zA-Z$_]+)\)\{getRequest\(/);
                 modifyJS(match[0], `requestJson(${match[1]},${match[2]}){${match[1]}=window.${functionNames.replaceFeeds}(${match[1]});getRequest(`)
+
+                // nominiegg
+                match = js.match(/\.prototype\.shellStreakShrinkPlayer=function\([a-zA-Z$_]+,[a-zA-Z$_]+,[a-zA-Z$_]+,[a-zA-Z$_]+\)\{/)
+                modifyJS(match[0], `${match[0]}if (window.${functionNames.noMiniEgg}())return;`)
 
                 try {
                     if (extract('debug')) {
@@ -7279,6 +7287,7 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                         doImport();
                     };
                 };
+
                 ranOneTime = true;
             };
         };
