@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre23
+// @version      3.4.3-pre24
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -1361,7 +1361,7 @@ sniping and someone sneaks up on you
                 // tp.perspectiveFolder.addSeparator();
                 initModule({ location: tp.perspectiveFolder, title: "Y Offset", storeAs: "perspectiveY", tooltip: "Offset of the camera in y-direction (how far behind should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 0.5});
                 initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", tooltip: "Offset of the camera in z-direction (how far above should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2});
-            initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", tooltip: "Still a WIP (lazy devs lmaooooooooooo)", bindLocation: tp.renderTab.pages[1], });
+            initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", tooltip: "Forever a WIP!!!", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Wireframe", storeAs: "wireframe", tooltip: "Outlines map objects to allow you to see directly though walls. Will leave rendering artifacts on the skybox, making the game basically unplayable", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Particle Speed", storeAs: "particleSpeedMultiplier", tooltip: "Adjusts speed of particles :D", slider: { min: 0.05, max: 5, step: 0.05 }, defaultValue: 1, });
             initModule({ location: tp.renderTab.pages[0], title: "Egg Size", storeAs: "eggSize", tooltip: "Changes how big eggs are. This does not affect hitboxes and is client-side only", slider: { min: 0, max: 10, step: 0.25 }, defaultValue: 1, });
@@ -5605,7 +5605,15 @@ z-index: 999999;
     */
 
     const injectScript = function () {
-        //TODO: replace with anon functions
+        createAnonFunction('replaceFeeds', (url) => {
+            try {
+                if (extract("replaceFeeds")) {
+                    if (url.includes("data/shellYouTube.json")) return replacementFeedURL + "shellYouTube.json";
+                    else if (url.includes("data/shellNews.json")) return replacementFeedURL + "shellNews.json";
+                }
+            } catch (error) { };
+            return url;
+        })
         createAnonFunction('fixCamera', function () {
             return isKeyToggled[bindsArray.zoom] && (extract("zoom") * (Math.PI / 180)) || (extract("fov") * (Math.PI / 180)) || 1.25;
         });
@@ -5998,17 +6006,6 @@ z-index: 999999;
           }
           return originalFunction(...args);
       };
-      /*
-                let replaceFeeds = false;
-                try {
-                    replaceFeeds = extract("replaceFeeds");
-                } catch (error) { };
-                if (replaceFeeds) {
-                    if (url.includes("data/shellYouTube.json")) args[1]   = replacementFeedURL+"shellYouTube.json"+refresh;
-                    else if (url.includes("data/shellNews.json")) args[1] = replacementFeedURL+"shellNews.json"+refresh;
-                };
-            };
-            */
         function sha256(str) {
             const utf8 = new TextEncoder().encode(str);
             const k = Uint32Array.of(
@@ -6329,6 +6326,17 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
 
                 // grenademax
                 modifyJS(`${H.grenadeThrowPower},0,1))`, `window.${functionNames.getGrenadeValue}(),0,1))`)
+
+                // replacefeeds
+                match = js.match(/requestJson\(([a-zA-Z$_]+),([a-zA-Z$_]+)\)\{getRequest\(/);
+                modifyJS(match[0], `requestJson(${match[1]},${match[2]}){${match[1]}=window.${functionNames.replaceFeeds}(${match[1]});getRequest(`)
+
+                try {
+                    if (extract('debug')) {
+                        modifyJS(`(()=>{var __defProp`, 'var __defProp');
+                        modifyJS(`})();`, '');
+                    }
+                } catch { }
 
                 log(H);
                 log(js);
@@ -7793,10 +7801,6 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                         }
                     });
                     myPlayerDot.style.display = 'none';
-                };
-
-                if (extract("freecam")) {
-                    ss.MYPLAYER[H.actor][H.mesh].position.y = ss.MYPLAYER[H.actor][H.mesh].position.y + 1;
                 };
 
                 //credit to helloworld for the idea (worked it out on my own tho :P)
