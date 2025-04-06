@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre24
+// @version      3.4.3-pre25
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -4219,7 +4219,7 @@ z-index: 999999;
 
             while (offset < dataView.byteLength) {
                 if (dataView.getUint32(offset, true) !== 0x04034b50) {
-                    console.log("ZIP header not found at offset (ZIP has likely ended):", offset);
+                    log("ZIP header not found at offset (ZIP has likely ended):", offset);
                     break;
                 }
 
@@ -4248,7 +4248,7 @@ z-index: 999999;
                 offset += compressedSize;
             }
 
-            console.log('finished unzipping :v')
+            log('finished unzipping :v')
 
             return files;
         }
@@ -4261,7 +4261,7 @@ z-index: 999999;
                 const arrayBuffer = await response.arrayBuffer();
                 const files = await unzip(arrayBuffer);
 
-                console.log('finished files', files);
+                log('finished files', files);
 
                 const mp3Files = Object.keys(files).filter(f => f.endsWith('.mp3'));
                 const jsonFiles = Object.keys(files).filter(f => f.endsWith('.json'));
@@ -5996,7 +5996,7 @@ z-index: 999999;
       const originalFunction = Function;
 
       unsafeWindow.Function = function (...args) {
-          console.log(args.join(""));
+          log(args.join(""));
           if (args.join('').includes('(()=>{var ')) {
             unsafeWindow.Function = originalFunction;
             unsafeWindow.Date.now = _dateNow;
@@ -6233,10 +6233,10 @@ z-index: 999999;
                 const chatCull = /return\}[a-zA-Z$_]+\.length>4/.exec(js)[0];
                 modifyJS(chatCull, chatCull.originalReplace('4', `window.${functionNames.getChatLimit}()`));
                 //chat mods: disable filter (credit to A3+++ for this finding)
-                modifyJS(`!${f(H._filterFunction)}(${f(H._insideFilterFunction)})`, `((!${f(H._filterFunction)}(${f(H._insideFilterFunction)}))||window.${functionNames.getDisableChatFilter}())`);
+                modifyJS(`!${f(H.isBadWord)}(${f(H._insideFilterFunction)})`, `((!${f(H.isBadWord)}(${f(H._insideFilterFunction)}))||window.${functionNames.getDisableChatFilter}())`);
                 //chat mods: make filtered text red
                 let [_, elm, str] = js.match(/\)\),([a-zA-Z$_]+)\.innerHTML=([a-zA-Z$_]+),/);
-                modifyJS(_, _ + `${f(H._filterFunction)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[3]&&(${elm}.style.color="red"),`);
+                modifyJS(_, _ + `${f(H.isBadWord)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[3]&&(${elm}.style.color="red"),`);
                 //skins
                 match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
                 if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
@@ -7551,9 +7551,9 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                             const regime = extract("ammoESPRegime");
                             if (regime == "whendepleted" && ammo.store == 0) {
                                 willBeVisible = true;
-                            } else if (regime == "whenlow" && ammo.store <= ammo.capacity) {
+                            } else if (regime == "whenlow" && ammo.store <= ammo[H.capacity]) {
                                 willBeVisible = true;
-                            } else if (regime == "belowmax" && ammo.store < ammo.storeMax) {
+                            } else if (regime == "belowmax" && ammo.store < ammo[H.storeMax]) {
                                 willBeVisible = true;
                             } else if (regime == "alwayson") {
                                 willBeVisible = true;
