@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre28
+// @version      3.4.3-pre29
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -152,10 +152,12 @@ let attemptedInjection = false;
 
 (function () {
     //onlypuppy7 leaving alert
+    /*
     if (!GM_getValue("onlypuppy7Alert")) {
         alert("Notice: onlypuppy7 is no longer maintaining this script. Please report any bugs to Hydroflame521 or 1ust. Thank you for your understanding.");
         GM_setValue("onlypuppy7Alert", true);
     };
+    */
 
     if ((location.hostname.includes('getstate.farm') || location.hostname == 'localhost') && typeof unsafeWindow !== 'undefined') {
         unsafeWindow.userscript = typeof GM_info !== 'undefined' ? GM_info : false;
@@ -4281,12 +4283,12 @@ z-index: 999999;
                     const key = fileName.replace('.mp3', '');
                     audioBuffer.disablePanning = !!config.disablePanning;
                     soundsSFC[key] = audioBuffer;
-                    log("Loaded sound for:", key);
+                    // log("Loaded sound for:", key);
 
                     loadedCount++;
                     if (loadedCount === totalRequests) {
                         createPopup("Loaded Custom SFX!", "success");
-                        log("LOADED!");
+                        log("LOADED CUSTOM SFX!");
                     }
                 }
             } catch (error) {
@@ -6178,7 +6180,7 @@ z-index: 999999;
             //             onlineClientKeys = getVardata(hash);
             //             clientKeys = JSON.parse(onlineClientKeys);
             //         } catch {
-            //             //at this point, fuck it. it's not happening
+            //             //at this point, fuck it. it's not happening this is why we love puppy :sob: "fuck it its not happening" goes hard
             //         };
 
             log(hash, onlineClientKeys, clientKeys);
@@ -6191,10 +6193,12 @@ z-index: 999999;
             let injectionString = "";
 
             try {
+                log('%cSTATEFARM INJECTION STAGE 1: GATHER VARS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
+
                 //SERVERSYNC
-                match = new RegExp(`function serverSync\\(\\)\\{(.*?)\\)\\}`).exec(js)
+                match = new RegExp(`\.OPEN&&[a-zA-Z$_]+\.[a-zA-Z$_]+&&![a-zA-Z$_]+&&(.*?)\(\)\}`).exec(js)
                 log("SERVERSYNC:", match);
-                H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) + ')' : "function(){console.log('no serversync womp womp')}";
+                H.SERVERSYNC = match ? match[1].replace(/[a-zA-Z$_\.\[\]]+shots/, 0) + '}}}' : "function(){console.log('no serversync womp womp')}";
                 //PAUSE
                 match = new RegExp(`,setTimeout\\(\\(\\(\\)=>\\{([=A-z0-9\\(\\),\\{ \\.;!\\|\\?:\\}]+send\\([a-zA-Z$_]+\\))`).exec(js);
                 log("PAUSE:", match);
@@ -6212,8 +6216,6 @@ z-index: 999999;
                         crashplease = "balls2";
                     };
                 };
-
-                log('%cSTATEFARM INJECTION STAGE 1: GATHER VARS', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
 
                 const modifyJS = function (find, replace) {
                     let oldJS = js;
@@ -6257,7 +6259,8 @@ z-index: 999999;
                 modifyJS(_, _ + `${f(H.isBadWord)}(${str})&&window.${functionNames.getDisableChatFilter}()&&!arguments[3]&&(${elm}.style.color="red"),`);
                 //skins
                 match = js.match(/inventory\[[a-zA-Z$_]+\].id===[a-zA-Z$_]+.id\)return!0;return!1/);
-                if (match) { modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`) };
+                if (match) modifyJS(match[0], match[0] + `||window.${functionNames.getSkinHack}()`)
+                else log('skin hack is broken');
                 //reset join/leave msgs
                 modifyJS('gameJoined_ received"),', 'gameJoined_ received"),window.' + functionNames.setNewGame + '(),');
                 //bypass chat filter
@@ -6266,6 +6269,7 @@ z-index: 999999;
                 match = new RegExp(`\\.prototype\\.${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)?.[0];
                 log("player update function:", match);
                 if (match) modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
+                else log('player update is broken');
                 //admin spoof lol
                 modifyJS('isGameOwner(){return ', 'isGameOwner(){return window.' + functionNames.getAdminSpoof + '()?true:')
                 modifyJS('adminRoles(){return ', 'adminRoles(){return window.' + functionNames.getAdminSpoof + '()?255:')
@@ -6296,9 +6300,8 @@ z-index: 999999;
 
                 //Modifies matchmaker JS to block gamecodes.
                 match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
-                if (match) {
-                    modifyJS('region,', `region,window.${functionNames.gameBlacklisted}(${match[2]})?(${match[2]}.uuid="${getScrambled()}",${match[1]}(${match[2]}),vueApp.hideSpinner()):`);
-                };
+                if (match) modifyJS('region,', `region,window.${functionNames.gameBlacklisted}(${match[2]})?(${match[2]}.uuid="${getScrambled()}",${match[1]}(${match[2]}),vueApp.hideSpinner()):`);
+                else log('blacklisted game is not wrking')
                 //intercept and replace audio
                 match = js.match(/static play\(([a-zA-Z$_,]+)\){/);
                 log("AUDIO INTERCEPTION", match);
@@ -6307,7 +6310,7 @@ z-index: 999999;
                 // skybox (yay)
                 modifyJS(`infiniteDistance=!0;`, `infiniteDistance=!0;window["${skyboxName}"]=${H.skybox};`);
                 //intercept player names before they are censored
-modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
+                modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData}(${H.playerData});if(${H.playerData}.`);
                 //intercept player names before they are censored
                 modifyJS(`"transparent")},`, `"transparent");window.${functionNames.interceptDrawTextOnNameTexture}(${H.nameTexture}, arguments, this.${H.player_})},`);
                 //intercept signedIn function
@@ -6347,7 +6350,7 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
                 modifyJS(`${H.grenadeThrowPower},0,1))`, `window.${functionNames.getGrenadeValue}(),0,1))`)
 
 
-		// replacefeeds
+                // replacefeeds
                 match = js.match(/requestJson:function\(([a-zA-Z$_]+),([a-zA-Z$_]+)\)\{getRequest\(/);
                 modifyJS(match[0], `requestJson:function(${match[1]},${match[2]}){${match[1]}=window.${functionNames.replaceFeeds}(${match[1]});getRequest(`)
 
@@ -6368,6 +6371,8 @@ modifyJS(`:{}};if(${H.playerData}.`, `:{}};window.${functionNames.realPlayerData
 
                 log(H);
                 log(js);
+
+                // window.open('about:blank').document.write(js);
 
                 attemptedInjection = true;
                 return js;
