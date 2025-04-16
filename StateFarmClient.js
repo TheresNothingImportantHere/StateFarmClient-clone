@@ -117,7 +117,14 @@
 // @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
 // ==/UserScript==
 
-if (false) {
+//various debug fun things
+const __DEBUG__ = {
+    doTraceLogging: false,
+    forceTriggerVarData: false,
+    preventConsoleBlock: false
+}
+
+if (__DEBUG__.preventConsoleBlock) {
   const consoleMethods = ["log", "warn", "info", "error", "exception", "table", "trace"];
   const _innerConsole = console;
 
@@ -212,7 +219,8 @@ let attemptedInjection = false;
             condition = GM_getValue(storageKey + "DisableLogs");
         };
         if (!condition) {
-            console.log(...args);
+            if (__DEBUG__.doTraceLogging) console.trace(...args);
+            else console.log(...args);
         };
     };
 
@@ -271,11 +279,6 @@ let attemptedInjection = false;
     //misc: non sfc external things
     const babylonURL = `https://cdn.jsdelivr.net/npm/babylonjs@{0}/babylon.min.js`;
     const violentmonkeyURL = `https://violentmonkey.github.io/get-it/`;
-
-    //various debug fun things
-    const __DEBUG__ = {
-        forceTriggerVarData: false
-    }
 
     //startup sequence
     const startUp = function () {
@@ -6183,7 +6186,7 @@ z-index: 999999;
             //             //at this point, fuck it. it's not happening this is why we love puppy :sob: "fuck it its not happening" goes hard
             //         };
 
-            log(hash, onlineClientKeys, clientKeys);
+            log(hash, clientKeys);
 
             H = clientKeys.vars;
             //C = clientKeys.commCodes?.codes;
@@ -6267,7 +6270,7 @@ z-index: 999999;
                 modifyJS('value.trim();', 'value.trim();' + f(H._chat) + '=window.' + functionNames.modifyChat + '(' + f(H._chat) + ');')
                 //hook for control interception
                 match = new RegExp(`\\.prototype\\.${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)?.[0];
-                log("player update function:", match);
+                if (!match) match = new RegExp(`\\.prototype\\.\\${H._update}=function\\([a-zA-Z$_,]+\\)\\{`).exec(js)?.[0];
                 if (match) modifyJS(match, `${match}${f(H.CONTROLKEYS)}=window.${functionNames.modifyControls}(${f(H.CONTROLKEYS)});`);
                 else log('player update is broken');
                 //admin spoof lol
