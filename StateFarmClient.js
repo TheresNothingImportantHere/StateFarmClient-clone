@@ -6304,7 +6304,7 @@ z-index: 999999;
                 //Modifies matchmaker JS to block gamecodes.
                 match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
                 if (match) modifyJS('region,', `region,window.${functionNames.gameBlacklisted}(${match[2]})?(${match[2]}.uuid="${getScrambled()}",${match[1]}(${match[2]}),vueApp.hideSpinner()):`);
-                else log('blacklisted game is not wrking')
+                else log('blacklisted game is not working')
                 //intercept and replace audio
                 match = js.match(/static play\(([a-zA-Z$_,]+)\){/);
                 log("AUDIO INTERCEPTION", match);
