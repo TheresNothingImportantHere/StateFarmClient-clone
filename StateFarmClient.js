@@ -7695,7 +7695,7 @@ z-index: 999999;
             };
         });
 
-        const getOverlay = () => {
+        const getOverlay = (name) => {
             document.body.insertAdjacentHTML('beforeend', `
                 <style>
                     .factoryOverlay {
@@ -7728,7 +7728,7 @@ z-index: 999999;
                 </style>
 
                 <div class="factoryOverlay">
-                    <span class="factoryText">Factory</span>
+                    <span class="factoryText">${name}</span>
                     <span class="factoryStatus"></span>
                 </div>
             `);
@@ -7749,7 +7749,7 @@ z-index: 999999;
         }
 
         createAnonFunction("runFactory", async () => {
-            const factory = getOverlay();
+            const factory = getOverlay("Factory");
 
             factory.write('Fetching Account...');
 
@@ -7790,7 +7790,7 @@ z-index: 999999;
         });
 
         createAnonFunction("runKiln", async () => {
-            const factory = getOverlay();
+            const factory = getOverlay("Kiln");
 
             factory.write('Creating Account...');
 
