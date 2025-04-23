@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre30
+// @version      3.4.3-pre31
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -1867,8 +1867,10 @@ debug mode).`},
                 } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (Factory)", storeAs: "factoryFolder", });
-            initModule({ location: tp.factoryFolder, title: 'Factory Key', storeAs: 'factoryKey', tooltip: "Factory access token (for the lucky few)", defaultValue: "" });
-            initModule({ location: tp.factoryFolder, title: 'Factory Gen', storeAs: 'factoryGen', tooltip: "Get an account from the Factory database", button: 'Generate!', clickFunction: () => F.register(), bindLocation: tp.accountsTab.pages[1] });
+                initModule({ location: tp.factoryFolder, title: 'Factory Key', storeAs: 'factoryKey', tooltip: "Factory access token (for the lucky few)", defaultValue: "" });
+                initModule({ location: tp.factoryFolder, title: 'Factory Gen', storeAs: 'factoryGen', tooltip: "Get an account from the Factory database", button: 'Generate!', clickFunction: () => F.runFactory(), bindLocation: tp.accountsTab.pages[1] });
+            tp.accountsTab.pages[0].addSeparator();
+            initModule({ location: tp.accountsTab.pages[0], title: 'Email Verified Gen', storeAs: 'kilnGen', tooltip: 'Instantly generates an email-verified account to chat with using the Kiln project', button: 'Generate!', clickFunction: () => F.runKiln(), bindLocation: tp.accountsTab.pages[1] })
             tp.accountsTab.pages[0].addSeparator();
         //MISC MODULES
         initFolder({ location: tp.mainPanel, title: "Misc", storeAs: "miscFolder", });
@@ -7693,9 +7695,7 @@ z-index: 999999;
             };
         });
 
-        createAnonFunction("register", async () => {
-            let wait = (ms) => new Promise((res) => setTimeout(res, ms));
-
+        const getOverlay = () => {
             document.body.insertAdjacentHTML('beforeend', `
                 <style>
                     .factoryOverlay {
@@ -7745,7 +7745,15 @@ z-index: 999999;
                 }
             };
 
+            return factory;
+        }
+
+        createAnonFunction("runFactory", async () => {
+            const factory = getOverlay();
+
             factory.write('Fetching Account...');
+
+            await firebase.auth().signOut();
 
             let account;
 
@@ -7778,8 +7786,27 @@ z-index: 999999;
             await signIn();
 
             factory.write('Fully signed in! 🎉');
-            await wait(1000);
-            factory.remove();
+            setTimeout(() => factory.remove(), 1000);
+        });
+
+        createAnonFunction("runKiln", async () => {
+            const factory = getOverlay();
+
+            factory.write('Creating Account...');
+
+            await firebase.auth().signOut();
+            await firebase.auth().createUserWithEmailAndPassword(getScrambled() + '@getstate.farm', getScrambled());
+            await firebase.auth().currentUser.sendEmailVerification();
+
+            factory.write('Created Account! 🎉 Verifying....');
+
+            let i = setInterval(() => {
+                if (ss.USERDATA.playerAccount.isEmailVerified) clearInterval(i);
+                else globalSS.ss.apiAuth();
+            }, 1000);
+
+            factory.write('Signed in + email verified! 🎉');
+            setTimeout(() => factory.remove(), 1000);
         });
 
         const applySkybox = () => {
