@@ -6138,7 +6138,7 @@ z-index: 999999;
                             const error = () => createPopup("Inputted VarData isn't valid.", "error");
 
                             try {
-                                let converted = JSON.parse(inputValue);
+                                let converted = JSON.parse(prompt('Enter vardata:'));
                                 if (converted.vars && converted.checksum) {
                                     change("vardataCustom", inputValue);
                                     change("vardataFallback", 4);
