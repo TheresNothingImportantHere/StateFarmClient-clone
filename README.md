@@ -21,7 +21,7 @@
 
 [![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)][greasyfork]
 [![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)][raw]
-[![Discord Members](https://shields.io/discord/1351719903781978142?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)][discord]
+[![Discord Members](https://shields.io/discord/1361474831639379988?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)][discord]
 
 </div>
 
