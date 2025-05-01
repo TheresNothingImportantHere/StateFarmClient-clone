@@ -274,7 +274,7 @@ let attemptedInjection = false;
 
     //misc: statefarm external services
     const factoryURL = 'https://factory.getstate.farm/api/account?key=';
-    const clientKeysURL = `https://js.getstate.farm/vardata/`;
+    const clientKeysURL = `https://archive.getstate.farm/vars/`;
     const sfChatURL = `https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html`;
 
     //misc: non sfc external things
