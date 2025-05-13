@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre31
+// @version      3.4.3-pre32
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -274,7 +274,7 @@ let attemptedInjection = false;
 
     //misc: statefarm external services
     const factoryURL = 'https://factory.getstate.farm/api/account?key=';
-    const clientKeysURL = `https://archive.getstate.farm/vars/`;
+    const clientKeysURL = `https://raw.githubusercontent.com/StateFarmNetwork/client-keys/refs/heads/main/statefarm_`;
     const sfChatURL = `https://raw.githack.com/OakSwingZZZ/StateFarmChatFiles/main/index.html`;
 
     //misc: non sfc external things
@@ -6020,14 +6020,39 @@ z-index: 999999;
       };
       */
 
-      let _apc = HTMLElement.prototype.appendChild;
+        let _apc = HTMLElement.prototype.appendChild;
+        let shellshock_og = null;
 
-      HTMLElement.prototype.appendChild = function(node) {
-        if (node.tagName === 'SCRIPT' && node.innerHTML && node.innerHTML.startsWith('(()=>{')) {
-            node.innerHTML = applyStateFarm(node.innerHTML);
-        }
-        return _apc.call(this, node);
-      }
+        HTMLElement.prototype.appendChild = function(node) {
+            if (node.tagName === 'SCRIPT' && node.innerHTML && node.innerHTML.startsWith('(()=>{')) {
+                shellshock_og = node.innerHTML;
+                node.innerHTML = applyStateFarm(node.innerHTML);
+            };
+            return _apc.call(this, node);
+        };
+        
+        const proto = unsafeWindow.HTMLScriptElement.prototype;
+        const existing = Object.getOwnPropertyDescriptor(proto, "textContent");
+
+        const original = existing || Object.getOwnPropertyDescriptor(unsafeWindow.Node.prototype, "textContent");
+
+        Object.defineProperty(proto, "textContent", {
+            get: function () {
+                // if (this === unsafeWindow.document.currentScript) {
+                //     prompt("[Hook] document.currentScript.textContent accessed");
+                //     debugger; // <-- triggers breakpoint
+                // };
+                let textContent = original.get.call(this);
+                if (textContent && textContent.startsWith('(()=>{')) {
+                    return shellshock_og;
+                } else {
+                    return textContent;
+                };
+            },
+            set: original.set,
+            configurable: true,
+            enumerable: true
+        });
 
         function sha256(str) {
             const utf8 = new TextEncoder().encode(str);
@@ -6081,7 +6106,8 @@ z-index: 999999;
             if (crackedShell) originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
-                return fetchTextContent(clientKeysURL + "latest.json?v=" + Date.now());
+                hash = "latest";
+                return fetchTextContent(clientKeysURL + hash + ".json?v=" + Date.now());
             };
 
             hash = sha256(js);
