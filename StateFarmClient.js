@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre34
+// @version      3.4.3-pre35
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -246,6 +246,8 @@ let attemptedInjection = false;
         const pattern = [0x03, 0x40, 0x0C, 0x00, 0x0B];
         const replacement = [0x01, 0x01, 0x01, 0x01, 0x01]; // five nops
 
+        const start = performance.now();
+
         // search and patch
         for (let i = 0; i < bytes.length - pattern.length; i++) {
             if (pattern.every((b, j) => bytes[i + j] === b)) {
@@ -256,14 +258,17 @@ let attemptedInjection = false;
             };
         };
 
+        const end = performance.now();
+
+        log(`[sfc] Loop patching took ${end - start}ms`);
         
         const wbg = importObj.wbg;
-        let blockedCalls = ["sethref"];
+        let blockedCalls = ["sethref", "setInterval"];
 
         for (const key in wbg) {
             if (
                 typeof wbg[key] === "function" &&
-                blockedCalls.some(call => key.toLowerCase().includes(call))
+                blockedCalls.some(call => key.toLowerCase().includes(call.toLowerCase()))
             ) {
                 log(`[sfc] Patching: ${key}`);
                 wbg[key] = function (...args) {
