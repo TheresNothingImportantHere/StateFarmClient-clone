@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre32
+// @version      3.4.3-pre33
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -140,7 +140,7 @@ if (__DEBUG__.preventConsoleBlock) {
       });
     }
   });
-}
+};
 
 let _dateNow = unsafeWindow.Date.now;
 /*unsafeWindow.Date.now = () => {
@@ -178,15 +178,15 @@ let attemptedInjection = false;
             keyArr = keyArr.filter((key) => !bannedKeys.includes(key));
             keyArr.forEach((key) => allValues[key] = GM_getValue(key));
             unsafeWindow.gm = allValues;
-        }
+        };
 
         if (typeof GM_setValue !== 'undefined') unsafeWindow.onmessage = (m) => {
             if (m.data.source !== 'getstate.farm') return;
 
             if (m.data.type == 'GM.setValue') GM_setValue(m.data.key, m.data.value);
-        }
+        };
         return;
-    }
+    };
 
     if (typeof isCrackedShell !== 'undefined') alert('CrackedShell v1 is no longer supported. Upgrade to v2.');
 
@@ -234,6 +234,33 @@ let attemptedInjection = false;
     String.prototype.originalReplaceAll = function () {
         return originalReplaceAll.apply(this, arguments);
     };
+
+    // const orig = WebAssembly.instantiateStreaming;
+
+    WebAssembly.instantiateStreaming = async (resp, importObj) => {
+        const response = await resp;
+        const buffer = await response.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+
+        // pattern: loop + void type + br + depth 0 + end
+        const pattern = [0x03, 0x40, 0x0C, 0x00, 0x0B];
+        const replacement = [0x01, 0x01, 0x01, 0x01, 0x01]; // five nops
+
+        // search and patch
+        for (let i = 0; i < bytes.length - pattern.length; i++) {
+            if (pattern.every((b, j) => bytes[i + j] === b)) {
+                log(`[sfc] Found loop at offset ${i}, patching...`);
+                for (let j = 0; j < replacement.length; j++) {
+                    bytes[i + j] = replacement[j];
+                };
+            };
+        };
+
+        // instantiate patched WASM
+        return WebAssembly.instantiate(bytes.buffer, importObj);
+    };
+
+    log("[sfc] WASM hook installed.");
 
     log("StateFarm: running (after function)");
     //script info
