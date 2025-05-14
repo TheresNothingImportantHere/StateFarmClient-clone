@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre33
+// @version      3.4.3-pre34
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -255,6 +255,26 @@ let attemptedInjection = false;
                 };
             };
         };
+
+        
+        const wbg = importObj.wbg;
+        let blockedCalls = ["sethref"];
+
+        for (const key in wbg) {
+            if (
+                typeof wbg[key] === "function" &&
+                blockedCalls.some(call => key.toLowerCase().includes(call))
+            ) {
+                log(`[sfc] Patching: ${key}`);
+                wbg[key] = function (...args) {
+                    // console.warn(`Blocked call to ${key}`, args);
+                };
+            };
+        };
+
+        ss.WASMOBJECT = {response, importObj};
+
+        // debugger;
 
         // instantiate patched WASM
         return WebAssembly.instantiate(bytes.buffer, importObj);
@@ -7729,7 +7749,7 @@ z-index: 999999;
             }; newGame = false;
         };
         createAnonFunction("retrieveFunctions", function (vars, doStateFarm) {
-            ss = vars;
+            Object.assign(ss, vars);
 
             // unsafeWindow.vueApp._showGenericPopup = unsafeWindow.vueApp.showGenericPopup; //this just doesnt work
 
