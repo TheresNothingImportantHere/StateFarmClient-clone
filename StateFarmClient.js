@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre35
+// @version      3.4.3-pre36
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -242,25 +242,55 @@ let attemptedInjection = false;
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
 
-        // pattern: loop + void type + br + depth 0 + end
-        const pattern = [0x03, 0x40, 0x0C, 0x00, 0x0B];
-        const replacement = [0x01, 0x01, 0x01, 0x01, 0x01]; // five nops
+        const replacements = [
+            {
+                // pattern: loop + void type + br + depth 0 + end
+                pattern:     [0x03, 0x40, 0x0C, 0x00, 0x0B],
+                replacement: [0x01, 0x01, 0x01, 0x01, 0x01] // five nops
+            },
+            {
+                pattern:     [0x41, 0x20, 0x41, 0x01, 0x10, 0xA7], // 0x01 = i32.const 1
+                replacement: [0x41, 0x20, 0x41, 0x4B, 0x10, 0xA7]
+            }
+        ];
 
         const start = performance.now();
 
-        // search and patch
-        for (let i = 0; i < bytes.length - pattern.length; i++) {
-            if (pattern.every((b, j) => bytes[i + j] === b)) {
-                log(`[sfc] Found loop at offset ${i}, patching...`);
-                for (let j = 0; j < replacement.length; j++) {
-                    bytes[i + j] = replacement[j];
+        const formatBytes = (bytes, base = 10) => ([ ...bytes]).map(b => b.toString(base).padStart(base === 16 ? 2 : 3, '0')).join(' ');
+
+        let index = 0;
+        // loop through all replacements
+        for (const { pattern, replacement } of replacements) {
+            // search and patch
+            for (let i = 0; i < bytes.length - pattern.length; i++) {
+                if (pattern.every((b, j) => bytes[i + j] === b)) {
+                    let before = bytes.slice(i, i + pattern.length);
+                    let before10 = formatBytes(before, 10);
+                    let before16 = formatBytes(before, 16);
+
+                    for (let j = 0; j < replacement.length; j++) {
+                        bytes[i + j] = replacement[j];
+                    };
+
+                    let after = bytes.slice(i, i + replacement.length);
+                    let after10 = formatBytes(after, 10);
+                    let after16 = formatBytes(after, 16);
+
+                    log(
+                        `[sfc] Found loop at offset ${i} (hex: 0x${i.toString(16)}), patching ${index}...\n` +
+                        `Before: ${before10}\n` +
+                        `After:  ${after10}\n` +
+                        `Before (hex): ${before16}\n` +
+                        `After  (hex):  ${after16}\n`
+                    );
                 };
             };
+            index++;
         };
 
         const end = performance.now();
 
-        log(`[sfc] Loop patching took ${end - start}ms`);
+        log(`[sfc] Loop patching for ${replacements.length} patches took ${end - start}ms`);
         
         const wbg = importObj.wbg;
         let blockedCalls = ["sethref", "setInterval"];
@@ -282,7 +312,7 @@ let attemptedInjection = false;
         // debugger;
 
         // instantiate patched WASM
-        return WebAssembly.instantiate(bytes.buffer, importObj);
+        return WebAssembly.instantiate(bytes, importObj);
     };
 
     log("[sfc] WASM hook installed.");
@@ -4088,7 +4118,54 @@ z-index: 999999;
         let oldMonitorObjects = JSON.parse(JSON.stringify(monitorObjects));
 
         if (extract("debug")) {
-            unsafeWindow.globalSS = {};
+            unsafeWindow.globalSS = {
+                ss,
+                H,
+                F,
+                L,
+                C,
+                tp,
+                initMenu,
+                extractAsDropdownInt,
+                extract,
+                extractDropdownList,
+                save,
+                load,
+                GM_listValues,
+                GM_getValue,
+                GM_setValue,
+                crackedShell,
+                createPopup,
+                createPrompt,
+                remove,
+                change,
+                unban,
+                GM_info: (typeof GM_info !== 'undefined') ? GM_info : undefined,
+                GM: (typeof GM !== 'undefined') ? GM : undefined,
+                getScrambled,
+                soundsSFC,
+                accountStatus,
+                cachedRealData,
+                retrievedSFX,
+                findBadgesForUsername,
+                badgeList,
+                crosshairsPosition,
+                predictGrenade: newPredictGrenade,
+                miniCamera,
+                configMain,
+                configBots,
+                predictBloom,
+                verification,
+                createVarDataPopup,
+                // pathfindingInfo: {
+                //     activePath: activePath,
+                //     pathfindingTargetOverride: pathfindingTargetOverride,
+                //     activePath: activePath,
+                //     activeNodeTarget: activeNodeTarget,
+                //     mapNodes: GLOBAL_NODE_LIST,
+                // },
+                log,
+            };
             unsafeWindow.globalSS.ss = ss;
             unsafeWindow.globalSS.H = H;
             unsafeWindow.globalSS.F = F;
@@ -4134,6 +4211,8 @@ z-index: 999999;
             //     activeNodeTarget: activeNodeTarget,
             //     mapNodes: GLOBAL_NODE_LIST,
             // };
+        } else {
+            delete unsafeWindow.globalSS;
         };
         save("DisableLogs", extract("consoleLogs"));
         if (extract('sfChatAutoStart') && !sfChatContainer){
