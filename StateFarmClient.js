@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre37
+// @version      3.4.3-pre40
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -293,23 +293,64 @@ let attemptedInjection = false;
         log(`[sfc] Loop patching for ${replacements.length} patches took ${end - start}ms`);
         
         const wbg = importObj.wbg;
+
+        function randomChars(len) {
+            let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let result = "";
+            for (let i = 0; i < len; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
         let blockedCalls = ["sethref", "setInterval"];
+        let exceptions = ["SELF", "WINDOW", "GLOBAL_THIS", "GLOBAL", "is_undefined", "init_", "document", "createElement", "settextContent", "body", "appendChild", "querySelector", "get"];
+
+        let _textContent_old = wbg[Object.keys(wbg).find(x => x.includes('_textContent'))]
+
+        let rewrites = { // nice try but you only publicly get to see the prod rewrites
+            '_textContent': function (arg0, arg1) { // _ is important to avoid hooking settextContent
+                let content = arg1.textContent;
+                if (!content.startsWith("(()=>{")) {
+                    let dummy = document.createElement("p");
+                    dummy.textContent = "Shell Shockers " + randomChars(10); // nice try bwd, you got me for a little while here
+                    // console.log("replacing", arg1.textContent, "with", dummy.textContent);
+                    return _textContent_old(arg0, dummy);
+                } else {
+                    return _textContent_old(arg0, arg1); // let shellshock.js integrity check be redirected to document patch
+                }
+            }
+
+        }
 
         for (const key in wbg) {
-            if (
-                typeof wbg[key] === "function" &&
-                blockedCalls.some(call => key.toLowerCase().includes(call.toLowerCase()))
-            ) {
-                log(`[sfc] Patching: ${key}`);
+            if (blockedCalls.some(call => key.toLowerCase().includes(call.toLowerCase()))) {
+                log(`${key}: Patching blank`);
                 wbg[key] = function (...args) {
-                    // console.warn(`Blocked call to ${key}`, args);
+                    console.warn(`Blocked call to ${key}`, args);
                 };
             };
+            // console.log(`wbg.${key}:`, wbg[key].toString()); 
+            if (exceptions.some(exception => key.includes(exception))) {
+                console.log(`${key}: Skipping patch (raw: ${wbg[key].toString()})`);
+                continue;
+            } else if (Object.keys(rewrites).some(rew => key.includes(rew))) {
+                console.log(`${key}: Custom patch`);
+                wbg[key] = rewrites[Object.keys(rewrites).find(rew => key.includes(rew))];
+            } else {
+                // console.log(`${key}: Default patch (print args)`)
+                /* wbg[key] = function () {
+                    console.log("Called", key);
+                    console.log("Args", arguments);
+                } */
+            }
         };
 
-        ss.WASMOBJECT = {response, importObj};
+        ss.WASMOBJECT = { response, importObj };
+        window.WASMOBJECT = { response, importObj };
 
         // debugger;
+        console.log(`importObj wbg hooks:`, importObj.wbg);
 
         // instantiate patched WASM
         return WebAssembly.instantiate(bytes, importObj);
