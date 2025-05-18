@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre40
+// @version      3.4.3-pre41
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -235,6 +235,11 @@ let attemptedInjection = false;
         return originalReplaceAll.apply(this, arguments);
     };
 
+    const createStatefarmElement = function (tagName, options) {
+        let elem = document.createElement(tagName, options);
+        elem.classList.add('tp-statefarm');
+        return elem
+    }
     // const orig = WebAssembly.instantiateStreaming;
 
     WebAssembly.instantiateStreaming = async (resp, importObj) => {
@@ -304,22 +309,30 @@ let attemptedInjection = false;
         }
 
         let blockedCalls = ["sethref", "setInterval"];
-        let exceptions = ["SELF", "WINDOW", "GLOBAL_THIS", "GLOBAL", "is_undefined", "init_", "document", "createElement", "settextContent", "body", "appendChild", "querySelector", "get"];
+        let exceptions = ["SELF", "WINDOW", "GLOBAL_THIS", "GLOBAL", "is_undefined", "init_", "document", "createElement", "settextContent", "body", "appendChild", "get"];
 
         let _textContent_old = wbg[Object.keys(wbg).find(x => x.includes('_textContent'))]
 
         let rewrites = { // nice try but you only publicly get to see the prod rewrites
-            '_textContent': function (arg0, arg1) { // _ is important to avoid hooking settextContent
+            /* '_textContent': function (arg0, arg1) { // _ is important to avoid hooking settextContent
                 let content = arg1.textContent;
                 if (!content.startsWith("(()=>{")) {
-                    let dummy = document.createElement("p");
+                    let dummy = createStatefarmElement("p");
                     dummy.textContent = "Shell Shockers " + randomChars(10); // nice try bwd, you got me for a little while here
                     // console.log("replacing", arg1.textContent, "with", dummy.textContent);
                     return _textContent_old(arg0, dummy);
                 } else {
                     return _textContent_old(arg0, arg1); // let shellshock.js integrity check be redirected to document patch
                 }
-            }
+            } */
+           'querySelector': function (item, wasm_str_offset, len) {
+                if (len == 1) { // '*'
+                    console.log("Hooked querySelector", item, wasm_str_offset, len);
+                    let items = document.querySelectorAll("*:not(.tp-statefarm):not(.tp-statefarm *):not(.tp-statefarm > *):not(.tp-statefarm > * *)");
+                    console.log("Hooked length:", items.length);
+                    return items
+                }
+           }
 
         }
 
@@ -456,8 +469,8 @@ let attemptedInjection = false;
                 };
 
                 const createAndAppendCommitHistoryBox = function(existingContainer) {
-                    let commitHistoryBox = document.createElement('div');
-                    commitHistoryBox.className = 'media-tabs-wrapper box_relative border-blue5 roundme_sm bg_blue6 common-box-shadow ss_margintop_sm';
+                    let commitHistoryBox = createStatefarmElement('div');
+                    commitHistoryBox.className = 'tp-statefarm media-tabs-wrapper box_relative border-blue5 roundme_sm bg_blue6 common-box-shadow ss_margintop_sm';
 
                     let commitHistoryContent = `
                     <div class="media-tab-container display-grid align-items-center gap-sm bg_blue3">
@@ -867,7 +880,7 @@ let attemptedInjection = false;
             unsafeWindow.BAWK.play("ks_double_eggs_end");
 
             //create verificationPopup
-            let verificationPopup = document.createElement('div');
+            let verificationPopup = createStatefarmElement('div');
             verificationPopup.style.position = 'fixed';
             verificationPopup.style.left = '50%';
             verificationPopup.style.top = '50%';
@@ -1259,6 +1272,7 @@ let attemptedInjection = false;
         if (tp.botPanel) { tp.botPanel.dispose() };
 
         tp.mainPanel = new Tweakpane.Pane(); // eslint-disable-line
+        tp.mainPanel.containerElem_.classList.add('tp-statefarm');
         tp.mainPanel.hidden = true;
         if (alreadyOpen) tp.mainPanel.hidden = false;
 
@@ -2501,7 +2515,7 @@ debug mode).`},
     const createPrompt = function(text = "No text set", buttons = [], duration = 5000) {
         unsafeWindow.BAWK.play("kotc_zonespawn");
         // log(arguments);
-        const promptElement = document.createElement('div');
+        const promptElement = createStatefarmElement('div');
         promptElement.innerText = text;
         promptElement.setAttribute('style', `
             position: absolute;
@@ -2525,7 +2539,7 @@ debug mode).`},
             white-space: pre-wrap;
             width: 300px;
         `);
-        const buttonContainer = document.createElement('div');
+        const buttonContainer = createStatefarmElement('div');
         buttonContainer.setAttribute('style', 'margin-top: 10px; pointer-events: auto; text-align: center;');
 
         const deleteButton = function(){
@@ -2541,7 +2555,7 @@ debug mode).`},
         ];
 
         buttons.forEach(([buttonText, buttonFunction]) => {
-            const button = document.createElement('button');
+            const button = createStatefarmElement('button');
             button.innerText = buttonText;
             button.setAttribute('style', `
                 background: #6c757d;
@@ -2570,7 +2584,7 @@ debug mode).`},
     };
     const createVarDataOverlay = function () {
         //create vardataOverlay
-        vardataOverlay = document.createElement('div');
+        vardataOverlay = createStatefarmElement('div');
         vardataOverlay.style.position = 'fixed';
         vardataOverlay.style.top = '0';
         vardataOverlay.style.left = '0';
@@ -2602,7 +2616,7 @@ debug mode).`},
         createVarDataOverlay();
 
         //create vardataPopup
-        vardataPopup = document.createElement('div');
+        vardataPopup = createStatefarmElement('div');
         vardataPopup.style.position = 'fixed';
         vardataPopup.style.left = '50%';
         vardataPopup.style.top = '50%';
@@ -2637,13 +2651,13 @@ debug mode).`},
         vardataPopup.innerHTML = `${image}<strong style="font-size: 20px; margin-top: 5px;">${title}</strong><br><br>${message}<br><br>`;
 
         //create buttons
-        const vardataButtonContainer = document.createElement('div');
+        const vardataButtonContainer = createStatefarmElement('div');
         vardataButtonContainer.style.display = 'flex';
         vardataButtonContainer.style.justifyContent = 'space-between';
         vardataButtonContainer.style.marginTop = '10px';
 
         vardataButtonsInfo.forEach(({ id, text, isHighlighted, action }) => {
-            const button = document.createElement('button');
+            const button = createStatefarmElement('button');
             button.id = id;
             button.innerHTML = text;
             button.style.padding = '7px 10px';
@@ -2689,19 +2703,19 @@ debug mode).`},
         }, 200));
 
         //create checkbox
-        const vardataCheckboxContainer = document.createElement('div');
+        const vardataCheckboxContainer = createStatefarmElement('div');
         vardataCheckboxContainer.style.display = 'flex';
         vardataCheckboxContainer.style.justifyContent = 'center';
         vardataCheckboxContainer.style.alignItems = 'center';
         vardataCheckboxContainer.style.marginTop = '15px';
         vardataCheckboxContainer.style.fontSize = '16px';
 
-        const checkbox = document.createElement('input');
+        const checkbox = createStatefarmElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = 'rememberCheckbox';
         checkbox.style.display = 'none';
 
-        const customCheckbox = document.createElement('span');
+        const customCheckbox = createStatefarmElement('span');
         customCheckbox.style.width = '20px';
         customCheckbox.style.height = '20px';
         customCheckbox.style.display = 'inline-block';
@@ -2803,9 +2817,9 @@ debug mode).`},
             };
         };
 
-        sfChatContainer = document.createElement("div");
+        sfChatContainer = createStatefarmElement("div");
         sfChatContainer.style.padding = "1px";
-        let title = document.createElement("p");
+        let title = createStatefarmElement("p");
         title.style.fontSize = "medium";
         title.style.color = "#D6D6D6";
         title.innerHTML = "StateFarm Chat";
@@ -2831,7 +2845,7 @@ debug mode).`},
         };
 
         makeChatDragable(sfChatContainer);
-        sfChatIframe = document.createElement("iframe");
+        sfChatIframe = createStatefarmElement("iframe");
         sfChatIframe.setAttribute(
             "src", sfChatURL
         );
@@ -2911,7 +2925,7 @@ debug mode).`},
         const head = document.head || document.getElementsByTagName('head').pages[0];
 
         if (AUTOMATED) {
-            automatedBorder = document.createElement('div');
+            automatedBorder = createStatefarmElement('div');
             automatedBorder.setAttribute('id', 'automated-border');
             document.body.appendChild(automatedBorder);
 
@@ -2929,7 +2943,7 @@ debug mode).`},
         };
 
         //menu customisation (apply font, button widths, adjust checkbox right slightly, make menu appear on top, add anim to message)
-        const styleElement = document.createElement('style');
+        const styleElement = createStatefarmElement('style');
         styleElement.textContent = `
             @font-face {
                 font-family: "Bahnschrift";
@@ -3008,7 +3022,7 @@ debug mode).`},
         applyTheme();
 
         //initiate message div and css and shit
-        msgElement = document.createElement('div'); // create the element directly
+        msgElement = createStatefarmElement('div'); // create the element directly
         scrambledMsgEl = getScrambled();
         msgElement.classList.add(scrambledMsgEl);
         msgElement.setAttribute('style', `
@@ -3031,11 +3045,11 @@ debug mode).`},
         `);
         document.body.appendChild(msgElement);
         msgElement.style.display = 'none';
-        const messageContainer = document.createElement('div'); //so it can be cloned. i think.
+        const messageContainer = createStatefarmElement('div'); //so it can be cloned. i think.
         messageContainer.id = 'message-container';
         document.body.appendChild(messageContainer);
         //initiate tooltip div and css and shit
-        tooltipElement = document.createElement('div');
+        tooltipElement = createStatefarmElement('div');
         tooltipElement.style.cssText = `
             position: absolute;
             color: #fff;
@@ -3057,7 +3071,7 @@ debug mode).`},
         `;
         document.body.appendChild(tooltipElement);
         //initiate coord div and css and shit
-        coordElement = document.createElement('div'); // create the element directly
+        coordElement = createStatefarmElement('div'); // create the element directly
         coordElement.classList.add('coords');
         coordElement.setAttribute('style', `
             position: fixed;
@@ -3079,7 +3093,7 @@ debug mode).`},
         document.body.appendChild(coordElement);
         coordElement.style.display = 'none';
         //initiate game info div and css and shit
-        gameInfoElement = document.createElement('div'); // create the element directly
+        gameInfoElement = createStatefarmElement('div'); // create the element directly
         gameInfoElement.classList.add('gameinfo');
         gameInfoElement.setAttribute('style', `
             position: fixed;
@@ -3101,7 +3115,7 @@ debug mode).`},
         document.body.appendChild(gameInfoElement);
         gameInfoElement.style.display = 'none';
         //initiate hp div and css and shit
-        playerstatsElement = document.createElement('div'); // create the element directly
+        playerstatsElement = createStatefarmElement('div'); // create the element directly
         playerstatsElement.classList.add('playerstats');
         playerstatsElement.setAttribute('style', `
             position: absolute;
@@ -3122,7 +3136,7 @@ debug mode).`},
         document.body.appendChild(playerstatsElement);
         playerstatsElement.style.display = 'none';
         //initiate player info div and css and shit
-        playerinfoElement = document.createElement('div'); // create the element directly
+        playerinfoElement = createStatefarmElement('div'); // create the element directly
         playerinfoElement.classList.add('playerinfo');
         playerinfoElement.setAttribute('style', `
             position: absolute;
@@ -3143,7 +3157,7 @@ debug mode).`},
         document.body.appendChild(playerinfoElement);
         playerinfoElement.style.display = 'none';
         //initiate player info div and css and shit
-        performanceElement = document.createElement('div'); // create the element directly
+        performanceElement = createStatefarmElement('div'); // create the element directly
         performanceElement.classList.add('performanceinfo');
         performanceElement.setAttribute('style', `
             position: absolute;
@@ -3164,7 +3178,7 @@ debug mode).`},
         document.body.appendChild(performanceElement);
         performanceElement.style.display = 'none';
         //initiate first use div and css and shit
-        firstUseElement = document.createElement('div'); // create the element directly
+        firstUseElement = createStatefarmElement('div'); // create the element directly
         firstUseElement.classList.add('firstuse');
         firstUseElement.setAttribute('style', `
             position: fixed;
@@ -3181,7 +3195,7 @@ debug mode).`},
         document.body.appendChild(firstUseElement);
         firstUseElement.style.display = 'none';
         //initiate bloom indicator div and css and shit
-        redCircle = document.createElement('div');
+        redCircle = createStatefarmElement('div');
         redCircle.style.position = 'fixed';
         redCircle.style.width = '5px';
         redCircle.style.height = '5px';
@@ -3190,7 +3204,7 @@ debug mode).`},
         redCircle.style.transform = 'translate(-50%, -50%)';
         document.body.appendChild(redCircle);
         //initiate minangle indicator div and css and shit
-        minangleCircle = document.createElement('div');
+        minangleCircle = createStatefarmElement('div');
         minangleCircle.style.position = 'fixed';
         minangleCircle.style.borderRadius = '100%';
         minangleCircle.style.border = 'thin solid red'
@@ -3502,13 +3516,13 @@ debug mode).`},
         };
 
         //menu customisation (apply font, button widths, adjust checkbox right slightly, make menu appear on top, add anim to message)
-        const styleElement = document.createElement('style');
+        const styleElement = createStatefarmElement('style');
         styleElement.textContent = `
             :root { ${rootTheme} }
         `;
         document.head.appendChild(styleElement);
     };
-    const temp = document.createElement('div');
+    const temp = createStatefarmElement('div');
     temp.innerHTML = `
 <style>
 .notif {
@@ -3604,7 +3618,7 @@ z-index: 999999;
             //existingPlayerDot.style.transform = 'translate(-50%, -50%) rotate(' + yawToDeg(player[H.yaw]) + 'deg)'; // could uncomment but then names unreadable,
         } else {
             // If it doesn't exist, create a new player dot element
-            const newPlayerDot = document.createElement('div');
+            const newPlayerDot = createStatefarmElement('div');
             newPlayerDot.className = 'playerDot';
             newPlayerDot.style.border = player.team === 1 ? '5px solid blue' : '5px solid red';
 
@@ -3925,10 +3939,10 @@ z-index: 999999;
         functionNames[name] = funcName
     };
     const processChatItem = function (text, playerName, playerTeam, highlightColor) {
-        let chatItem = document.createElement("div");
-        let playerNameSpan = document.createElement("span");
-        let playerInfoContainer = document.createElement("div");
-        let serverIcon = document.createElement("i");
+        let chatItem = createStatefarmElement("div");
+        let playerNameSpan = createStatefarmElement("span");
+        let playerInfoContainer = createStatefarmElement("div");
+        let serverIcon = createStatefarmElement("i");
 
         chatItem.classList.add("chat-item");
         playerInfoContainer.style.display = "inline-block";
@@ -3940,7 +3954,7 @@ z-index: 999999;
         playerInfoContainer.appendChild(serverIcon);
         playerInfoContainer.appendChild(playerNameSpan);
 
-        let messageSpan = document.createElement("span");
+        let messageSpan = createStatefarmElement("span");
         messageSpan.innerHTML = text;
         chatItem.style.fontStyle = "italic";
         messageSpan.style.backgroundColor = highlightColor;
@@ -4372,7 +4386,7 @@ z-index: 999999;
         };
 
         if (extract("noAnnoyances") && !annoyancesRemoved) {
-            const styleElement = document.createElement('style');
+            const styleElement = createStatefarmElement('style');
             styleElement.textContent = `
             /* remove ads because annoying stop adding spyware yarg */
                 .house-small,
@@ -4559,7 +4573,7 @@ z-index: 999999;
                 if (playerSlotNameElement) {
                     let highlightSpan = playerSlotNameElement.querySelector('span');
                     if (!highlightSpan) {
-                        highlightSpan = document.createElement('span');
+                        highlightSpan = createStatefarmElement('span');
                         highlightSpan.textContent = playerSlotNameElement.textContent;
                         playerSlotNameElement.textContent = '';
                         playerSlotNameElement.appendChild(highlightSpan);
@@ -4684,7 +4698,7 @@ z-index: 999999;
                 existingFavicons.forEach(function (favicon) {
                     favicon.parentNode.removeChild(favicon);
                 });
-                let favicon = document.createElement('link');
+                let favicon = createStatefarmElement('link');
                 favicon.type = 'image/x-icon';
                 favicon.rel = 'shortcut icon';
                 if (extract("titleAnimation")) {
@@ -5196,8 +5210,8 @@ z-index: 999999;
                 let nameValue = streams[i].querySelector(".stream_name").textContent;
                 const streamElement = inGameUIElement.querySelector('div[data-name="' + nameValue + '"]');
                 if (extract("showStreams") && !streamElement) {
-                    let containerDiv = document.createElement("div");
-                    let nameDiv = document.createElement("div");
+                    let containerDiv = createStatefarmElement("div");
+                    let nameDiv = createStatefarmElement("div");
                     nameDiv.textContent = nameValue;
                     nameDiv.setAttribute('data-href', hrefValue);
                     nameDiv.style.color = 'white';
@@ -6553,8 +6567,8 @@ z-index: 999999;
 
 
                 // replacefeeds
-                match = js.match(/requestJson:function\(([a-zA-Z$_]+),([a-zA-Z$_]+)\)\{getRequest\(/);
-                modifyJS(match[0], `requestJson:function(${match[1]},${match[2]}){${match[1]}=window.${functionNames.replaceFeeds}(${match[1]});getRequest(`)
+                // match = js.match(/requestJson:function\(([a-zA-Z$_]+),([a-zA-Z$_]+)\)\{getRequest\(/);
+                // modifyJS(match[0], `requestJson:function(${match[1]},${match[2]}){${match[1]}=window.${functionNames.replaceFeeds}(${match[1]});getRequest(`)
 
                 // nominiegg
                 match = js.match(/\.prototype\.shellStreakShrinkPlayer=function\([a-zA-Z$_]+,[a-zA-Z$_]+,[a-zA-Z$_]+,[a-zA-Z$_]+\)\{/)
@@ -7482,7 +7496,7 @@ z-index: 999999;
 
                 const doImport = () => {
                     log('%c(Fallback) STATEFARM IS ATTEMPTING TO LOAD L.BABYLON', 'color: yellow; font-weight: bold; font-size: 1.2em; text-decoration: underline;');
-                    var script = document.createElement("script");
+                    var script = createStatefarmElement("script");
                     script.src = babylonURL.format(H?.BabylonVersion || "7.21.1");
                     script.onload = function () {
                         if (unsafeWindow.BABYLON) {
@@ -8205,7 +8219,7 @@ z-index: 999999;
                         const eggIcon = !!(slot.querySelector('.playerSlot--icons .fas.fa-egg:not(.hidden)') || slot.querySelector('.playerSlot--icons .fab.fa-twitch:not(.hidden)'));
                         log(eggIcon, username)
                         badgeURLs.forEach((badgeURL, index) => {
-                            const badgeImage = document.createElement('img');
+                            const badgeImage = createStatefarmElement('img');
                             badgeImage.src = badgeListURL + badgeURL;
                             badgeImage.className = 'badge-image';
                             badgeImage.style.position = 'absolute';
