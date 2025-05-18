@@ -28,11 +28,11 @@
 // @require      https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js
 
 // version naming:
-//3.#.#-pre[number] for development versions, increment for every commit (not full release) note: please increment it
-//3.#.#-release for release (in the unlikely event that happens)
+    //3.#.#-pre[number] for development versions, increment for every commit (not full release) note: please increment it
+    //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre35
+// @version      3.4.3-pre37
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -126,20 +126,20 @@ const __DEBUG__ = {
 }
 
 if (__DEBUG__.preventConsoleBlock) {
-    const consoleMethods = ["log", "warn", "info", "error", "exception", "table", "trace"];
-    const _innerConsole = console;
+  const consoleMethods = ["log", "warn", "info", "error", "exception", "table", "trace"];
+  const _innerConsole = console;
 
-    consoleMethods.forEach(method => {
-        if (unsafeWindow.console[method]) {
-            Object.defineProperty(unsafeWindow.console, method, {
-                configurable: false,
-                get: (...args) => {
-                    return _innerConsole[method].bind(_innerConsole);
-                },
-                set: () => { }
-            });
-        }
-    });
+  consoleMethods.forEach(method => {
+    if (unsafeWindow.console[method]) {
+      Object.defineProperty(unsafeWindow.console, method, {
+        configurable: false,
+        get: (...args) => {
+          return _innerConsole[method].bind(_innerConsole);
+        },
+        set: () => {}
+      });
+    }
+  });
 };
 
 let _dateNow = unsafeWindow.Date.now;
@@ -212,7 +212,7 @@ let attemptedInjection = false;
     };
 
     const storageKey = "StateFarm_" + (unsafeWindow.document.location.host.replaceAll(".", "")) + "_";
-    const log = function (...args) {
+    const log = function(...args) {
         let condition;
         try {
             condition = extract("consoleLogs");
@@ -237,114 +237,79 @@ let attemptedInjection = false;
 
     // const orig = WebAssembly.instantiateStreaming;
 
-    let oldAtob = atob;
-    unsafeWindow.atob = function (arg) {
-        if (oldAtob(arg) == 'verify') {
-            console.log("Hooked verify check");
-            unsafeWindow.garbage = () => console.log("Hooked verify check called uwu");
-            return 'garbage';
-        };
-        return oldAtob(arg);
-    }
-    // WASM hooks
     WebAssembly.instantiateStreaming = async (resp, importObj) => {
         const response = await resp;
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
 
-        // pattern: loop + void type + br + depth 0 + end
-        const patterns = [
-            // [0x1a, 0x41, 0x01, 0x21, 0x01, 0x20, 0x00, 0x41, 0x01, 0x10, 0xA7, 0x02],
-            // [0x03, 0x40, 0x0c, 0x00, 0x0b]
-            // [0x02, 0x7f, 0x20, 0x01, 0x41, 0x09, 0x4f] // branch (push local; push 9; ge_u)
-            // [0x10, 0x25]
-        ];
         const replacements = [
-            // [0x1a, 0x41, 0x01, 0x21, 0x01, 0x20, 0x00, 0x41, 0x01, 0x01, 0x01, 0x01],
-            // [0x01, 0x01, 0x01, 0x01, 0x01] // five nops
-            //[0x02, 0x7f, 0x20, 0x01, 0x41, 0x09, 0x4c] // branch (push return; return; nop; nop; nop)
-            // [0x01, 0x01]
+            {
+                // pattern: loop + void type + br + depth 0 + end
+                pattern:     [0x03, 0x40, 0x0C, 0x00, 0x0B],
+                replacement: [0x01, 0x01, 0x01, 0x01, 0x01] // five nops
+            },
+            {
+                pattern:     [0x41, 0x20, 0x41, 0x01, 0x10, 0xA7], // 0x01 = i32.const 1
+                replacement: [0x41, 0x20, 0x41, 0x4B, 0x10, 0xA7]
+            }
         ];
 
         const start = performance.now();
 
-        // search and patch
-        for (let k = 0; k < patterns.length; k++) {
-            let pattern = patterns[k];
-            let replacement = replacements[k];
+        const formatBytes = (bytes, base = 10) => ([ ...bytes]).map(b => b.toString(base).padStart(base === 16 ? 2 : 3, '0')).join(' ');
+
+        let index = 0;
+        // loop through all replacements
+        for (const { pattern, replacement } of replacements) {
+            // search and patch
             for (let i = 0; i < bytes.length - pattern.length; i++) {
                 if (pattern.every((b, j) => bytes[i + j] === b)) {
-                    log(`[sfc] Found ${pattern} at offset ${i}, patching...`);
+                    let before = bytes.slice(i, i + pattern.length);
+                    let before10 = formatBytes(before, 10);
+                    let before16 = formatBytes(before, 16);
+
                     for (let j = 0; j < replacement.length; j++) {
                         bytes[i + j] = replacement[j];
                     };
+
+                    let after = bytes.slice(i, i + replacement.length);
+                    let after10 = formatBytes(after, 10);
+                    let after16 = formatBytes(after, 16);
+
+                    log(
+                        `[sfc] Found loop at offset ${i} (hex: 0x${i.toString(16)}), patching ${index}...\n` +
+                        `Before: ${before10}\n` +
+                        `After:  ${after10}\n` +
+                        `Before (hex): ${before16}\n` +
+                        `After  (hex):  ${after16}\n`
+                    );
                 };
             };
-        }
+            index++;
+        };
 
         const end = performance.now();
 
-        log(`[sfc] Loop patching took ${end - start}ms`);
-
+        log(`[sfc] Loop patching for ${replacements.length} patches took ${end - start}ms`);
+        
         const wbg = importObj.wbg;
-
-        function randomChars(len) {
-            let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            let result = "";
-            for (let i = 0; i < len; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
         let blockedCalls = ["sethref", "setInterval"];
-        let exceptions = ["SELF", "WINDOW", "GLOBAL_THIS", "GLOBAL", "is_undefined", "init_", "document", "createElement", "settextContent", "body", "appendChild", "querySelector", "get"];
-
-        let _textContent_old = wbg[Object.keys(wbg).find(x => x.includes('_textContent'))]
-
-        let rewrites = { // nice try but you only publicly get to see the prod rewrites
-            '_textContent': function (arg0, arg1) { // _ is important to avoid hooking settextContent
-                let content = arg1.textContent;
-                if (!content.startsWith("(()=>{")) {
-                    let dummy = document.createElement("p");
-                    dummy.textContent = "Shell Shockers " + randomChars(10); // nice try bwd, you got me for a little while here
-                    // console.log("replacing", arg1.textContent, "with", dummy.textContent);
-                    return _textContent_old(arg0, dummy);
-                } else {
-                    return _textContent_old(arg0, arg1); // let shellshock.js integrity check be redirected to document patch
-                }
-            }
-
-        }
 
         for (const key in wbg) {
-            if (blockedCalls.some(call => key.toLowerCase().includes(call.toLowerCase()))) {
-                log(`${key}: Patching blank`);
+            if (
+                typeof wbg[key] === "function" &&
+                blockedCalls.some(call => key.toLowerCase().includes(call.toLowerCase()))
+            ) {
+                log(`[sfc] Patching: ${key}`);
                 wbg[key] = function (...args) {
-                    console.warn(`Blocked call to ${key}`, args);
+                    // console.warn(`Blocked call to ${key}`, args);
                 };
             };
-            // console.log(`wbg.${key}:`, wbg[key].toString()); 
-            if (exceptions.some(exception => key.includes(exception))) {
-                console.log(`${key}: Skipping patch (raw: ${wbg[key].toString()})`);
-                continue;
-            } else if (Object.keys(rewrites).some(rew => key.includes(rew))) {
-                console.log(`${key}: Custom patch`);
-                wbg[key] = rewrites[Object.keys(rewrites).find(rew => key.includes(rew))];
-            } else {
-                // console.log(`${key}: Default patch (print args)`)
-                /* wbg[key] = function () {
-                    console.log("Called", key);
-                    console.log("Args", arguments);
-                } */
-            }
         };
 
-        ss.WASMOBJECT = { response, importObj };
-        window.WASMOBJECT = { response, importObj };
+        ss.WASMOBJECT = {response, importObj};
 
         // debugger;
-        console.log(`importObj wbg hooks:`, importObj.wbg);
 
         // instantiate patched WASM
         return WebAssembly.instantiate(bytes, importObj);
@@ -434,7 +399,7 @@ let attemptedInjection = false;
                 const interval = 500;
                 let attempts = 0;
 
-                const checkForElement = function () {
+                const checkForElement = function() {
                     const existingContainer = document.querySelector('.secondary-aside-wrap');
 
                     if (existingContainer) {
@@ -449,7 +414,7 @@ let attemptedInjection = false;
                     }
                 };
 
-                const createAndAppendCommitHistoryBox = function (existingContainer) {
+                const createAndAppendCommitHistoryBox = function(existingContainer) {
                     let commitHistoryBox = document.createElement('div');
                     commitHistoryBox.className = 'media-tabs-wrapper box_relative border-blue5 roundme_sm bg_blue6 common-box-shadow ss_margintop_sm';
 
@@ -541,8 +506,8 @@ let attemptedInjection = false;
                     </div>
                     `;
 
-                        commitHistoryBox.innerHTML = commitHistoryContent;
-                        existingContainer.appendChild(commitHistoryBox);
+                    commitHistoryBox.innerHTML = commitHistoryContent;
+                    existingContainer.appendChild(commitHistoryBox);
                     }).catch(error => {
                         log('Error:', error);
                     });
@@ -550,7 +515,7 @@ let attemptedInjection = false;
 
 
                 checkForElement();
-            };
+                        };
 
             (async () => {
                 try {
@@ -657,7 +622,7 @@ let attemptedInjection = false;
         "OTHER9": createAudioContext(),
         "SOUNDS": createAudioContext(),
     };
-    const loadedSkyboxes = [
+    const loadedSkyboxes =  [
         { text: 'Default', value: 'default' }
     ];
     const divertContexts = {
@@ -1284,45 +1249,44 @@ let attemptedInjection = false;
         initTabs({ location: tp.sfChatFolder, storeAs: "sfChatTab" }, [
             {
                 title: "WIP", content:
-                    `Sorry! No guide yet!`
-            },
+`Sorry! No guide yet!`},
         ]);
-        initModule({ location: tp.sfChatTab.pages[0], title: "Username", storeAs: "sfChatUsername", tooltip: "Your username in the chatroom", defaultValue: ("Guest" + (Math.floor(Math.random() * 8999) + 1000)), });
-        // initModule({ location: tp.sfChatTab.pages[0], title: "Join Chat", storeAs: "sfChatJoin", button: "Join", bindLocation: tp.sfChatTab.pages[1], clickFunction: function(){
-        //     if (sfChatIframe != undefined){
-        //         createPopup("Already Started. Try Showing it.");
-        //     } else {
-        //         startStateFarmChat();
-        //     };
-        // },});
-        tp.sfChatTab.pages[0].addSeparator();
-        initModule({
-            location: tp.sfChatTab.pages[0], title: "Show/Hide", storeAs: "sfChatShowHide", tooltip: "Toggle chat panel visibility", button: "Show/Hide", bindLocation: tp.sfChatTab.pages[1], defaultBind: "K", clickFunction: function () {
-                if (sfChatContainer != undefined) {
-                    if (sfChatContainer.style.display == "none") {
-                        sfChatContainer.style.display = "block";
+            initModule({ location: tp.sfChatTab.pages[0], title: "Username", storeAs: "sfChatUsername", tooltip: "Your username in the chatroom", defaultValue: ("Guest" + (Math.floor(Math.random() * 8999) + 1000)), });
+            // initModule({ location: tp.sfChatTab.pages[0], title: "Join Chat", storeAs: "sfChatJoin", button: "Join", bindLocation: tp.sfChatTab.pages[1], clickFunction: function(){
+            //     if (sfChatIframe != undefined){
+            //         createPopup("Already Started. Try Showing it.");
+            //     } else {
+            //         startStateFarmChat();
+            //     };
+            // },});
+            tp.sfChatTab.pages[0].addSeparator();
+            initModule({
+                location: tp.sfChatTab.pages[0], title: "Show/Hide", storeAs: "sfChatShowHide", tooltip: "Toggle chat panel visibility", button: "Show/Hide", bindLocation: tp.sfChatTab.pages[1], defaultBind: "K", clickFunction: function () {
+                    if (sfChatContainer != undefined) {
+                        if (sfChatContainer.style.display == "none") {
+                            sfChatContainer.style.display = "block";
+                        } else {
+                            sfChatContainer.style.display = "none";
+                        };
                     } else {
-                        sfChatContainer.style.display = "none";
+                        startStateFarmChat(); //its just easier this way imo
                     };
-                } else {
-                    startStateFarmChat(); //its just easier this way imo
-                };
-            },
-        });
-        tp.sfChatTab.pages[0].addSeparator();
-        initModule({ location: tp.sfChatTab.pages[0], title: "Notifications", storeAs: "sfChatNotifications", tooltip: "Shows an in-game notification for every new chat message", bindLocation: tp.sfChatTab.pages[1], });
-        initModule({ location: tp.sfChatTab.pages[0], title: "Notification Sound", storeAs: "sfChatNotificationSound", tooltip: "Play a sound for every new message", bindLocation: tp.sfChatTab.pages[1], });
-        tp.sfChatTab.pages[0].addSeparator();
-        initModule({ location: tp.sfChatTab.pages[0], title: "Auto Start Chat", storeAs: "sfChatAutoStart", tooltip: "Automatically connects to the chatroom on startup", bindLocation: tp.sfChatTab.pages[1], });
-        tp.sfChatTab.pages[0].addSeparator();
-        initModule({ location: tp.sfChatTab.pages[0], title: "Prompt Invitations", storeAs: "sfChatInvitations", tooltip: "Show invite prompts when someone sends a game code in the chatroom", bindLocation: tp.sfChatTab.pages[1], defaultValue: true, });
+                },
+            });
+            tp.sfChatTab.pages[0].addSeparator();
+            initModule({ location: tp.sfChatTab.pages[0], title: "Notifications", storeAs: "sfChatNotifications", tooltip: "Shows an in-game notification for every new chat message", bindLocation: tp.sfChatTab.pages[1], });
+            initModule({ location: tp.sfChatTab.pages[0], title: "Notification Sound", storeAs: "sfChatNotificationSound", tooltip: "Play a sound for every new message", bindLocation: tp.sfChatTab.pages[1], });
+            tp.sfChatTab.pages[0].addSeparator();
+            initModule({ location: tp.sfChatTab.pages[0], title: "Auto Start Chat", storeAs: "sfChatAutoStart", tooltip: "Automatically connects to the chatroom on startup", bindLocation: tp.sfChatTab.pages[1], });
+            tp.sfChatTab.pages[0].addSeparator();
+            initModule({ location: tp.sfChatTab.pages[0], title: "Prompt Invitations", storeAs: "sfChatInvitations", tooltip: "Show invite prompts when someone sends a game code in the chatroom", bindLocation: tp.sfChatTab.pages[1], defaultValue: true, });
         //COMBAT MODULES
         if (allowAccess) {
-            initFolder({ location: tp.mainPanel, title: "Combat", storeAs: "combatFolder", });
-            initTabs({ location: tp.combatFolder, storeAs: "combatTab" }, [
-                {
-                    title: "Basics", content:
-                        `This is the combat tab. Here you will find
+        initFolder({ location: tp.mainPanel, title: "Combat", storeAs: "combatFolder", });
+        initTabs({ location: tp.combatFolder, storeAs: "combatTab" }, [
+            {
+                title: "Basics", content:
+`This is the combat tab. Here you will find
 options relating to aimbotting, and other
 useful macros. Aimbot is made active by
 turning it on. Using ToggleRM will give you
@@ -1342,9 +1306,9 @@ mode allows you to refill at the moment
 when you will not have a long
 reload time. GrenadeMAX makes all
 grenades get thrown at max strength.`},
-                {
-                    title: "Visibility", content:
-                        `There are a couple of options related to
+            {
+                title: "Visibility", content:
+`There are a couple of options related to
 visibility (Line-of-Sight). First is
 TargetVisible. This tunes the aimbot to
 be more strategic with where it aims.
@@ -1353,9 +1317,9 @@ targeted player goes behind a wall, you
 stop aimlocking them. There is also an
 AutoFire mode with this sort of
 functionality.`},
-                {
-                    title: "Advanced", content:
-                        `If you want to increase stealthiness,
+            {
+                title: "Advanced", content:
+`If you want to increase stealthiness,
 make use of MinAngle and AntiSnap. The
 first will make it so that you have to
 manually move your reticle within your
@@ -1379,30 +1343,30 @@ shooting with your primary gun, and then
 the pistol. Ideal use case is when you are
 sniping and someone sneaks up on you
 (...hence it is called... AntiSneak).`},
-            ]);
+        ]);
             initModule({ location: tp.combatTab.pages[0], title: "Aimbot", storeAs: "aimbot", tooltip: "Locks onto targeted player", bindLocation: tp.combatTab.pages[1], defaultBind: "V", });
             initFolder({ location: tp.combatTab.pages[0], title: "Aimbot Options", storeAs: "aimbotFolder", });
-            initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "Decides the priority for which player aimbot should target", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }, { text: "Lowest HP", value: "lowestHp" }, { text: "Most Kills", value: "mostKills" }, { text: "Aiming At Me", value: "aimingAt" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
-            initModule({ location: tp.aimbotFolder, title: "TargetVisible", storeAs: "aimbotVisibilityMode", tooltip: "A filter, applied after TargetMode helping to pick the aimbot target", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Prioritise Visible", value: "prioritise" }, { text: "Only Visible", value: "onlyvisible" }], defaultValue: "disabled", enableConditions: [["aimbot", true]] });
-            tp.aimbotFolder.addSeparator();
-            initModule({ location: tp.aimbotFolder, title: "ToggleRM", storeAs: "aimbotRightClick", tooltip: "Modifies aimbot to only lock when the right mouse is held", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-            initModule({ location: tp.aimbotFolder, title: "SilentAim", storeAs: "silentAimbot", tooltip: "Shoots without moving the camera. ONLY visual, VERY blatant cheating. Refer to the GitHub README for more information", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-            initModule({ location: tp.aimbotFolder, title: "SemiSilent", storeAs: "aimbSemiSilent", tooltip: "SilentAimbot behavior, but will move the camera after a shot has been fired", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", true]], });
-            initModule({ location: tp.aimbotFolder, title: "NoWallTrack", storeAs: "noWallTrack", tooltip: "Aimbot ignores the player if they're behind obstacles", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", false]], });
-            tp.aimbotFolder.addSeparator();
-            initModule({ location: tp.aimbotFolder, title: "Prediction", storeAs: "prediction", tooltip: "Predicts where the player will be when the bullet hits them and ajusts aimbot accordingly", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
-            initModule({ location: tp.aimbotFolder, title: "AntiBloom", storeAs: "antiBloom", tooltip: "Locks onto the predicted bloom point. Good for shooting & moving", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
-            tp.aimbotFolder.addSeparator();
-            initModule({ location: tp.aimbotFolder, title: "AntiSwitch", storeAs: "antiSwitch", tooltip: "Prevents the aimbot from changing the target until they die", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-            initModule({ location: tp.aimbotFolder, title: "1 Kill", storeAs: "oneKill", tooltip: "Disables aimbot when the targeted player dies", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
-            tp.aimbotFolder.addSeparator();
-            initModule({ location: tp.aimbotFolder, title: "MinAngle", storeAs: "aimbotMinAngle", tooltip: "Prevents you from snapping if the angle between you and the player is greater than this value (in degrees)", slider: { min: 0.05, max: 360, step: 1 }, defaultValue: 360, enableConditions: [["aimbot", true]], });
-            initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
-            tp.aimbotFolder.addSeparator();
-            initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "This makes snapping smooth at higher values. useful to avoid being spotted", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
-            initFolder({ location: tp.aimbotFolder, title: "AntiSnap Options", storeAs: "antisnapFolder", });
-            initModule({ location: tp.antisnapFolder, title: "AntiSnap Regime", storeAs: "aimbotAntiSnapRegime", tooltip: "Changes the method of smoothing\n\nCredit to de_Neuublue for this code", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Linear", value: "linear" }, { text: "Slow End", value: "slowEnd" }, { text: "Fast End", value: "fastEnd" }, { text: "Time Based", value: "timeBased" }], defaultValue: "linear", enableConditions: [["aimbot", true], ["silentAimbot", false]], });
-            initModule({ location: tp.antisnapFolder, title: "Max Aim Time (ms)", storeAs: "maxAimTime", tooltip: "How long to aim for until you force the locking.", slider: { min: 10, max: 5000, step: 1 }, defaultValue: 700, enableConditions: [["aimbot", true], ["silentAimbot", false]], showConditions: [["aimbotAntiSnapRegime", "timeBased"]], });
+                initModule({ location: tp.aimbotFolder, title: "TargetMode", storeAs: "aimbotTargetMode", tooltip: "Decides the priority for which player aimbot should target", bindLocation: tp.combatTab.pages[1], defaultBind: "T", dropdown: [{ text: "Pointing At", value: "pointingat" }, { text: "Nearest", value: "nearest" }, { text: "Lowest HP", value: "lowestHp" }, { text: "Most Kills", value: "mostKills" }, {text: "Aiming At Me", value: "aimingAt" }], defaultValue: "pointingat", enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "TargetVisible", storeAs: "aimbotVisibilityMode", tooltip: "A filter, applied after TargetMode helping to pick the aimbot target", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Prioritise Visible", value: "prioritise" }, { text: "Only Visible", value: "onlyvisible" }], defaultValue: "disabled", enableConditions: [["aimbot", true]] });
+                tp.aimbotFolder.addSeparator();
+                initModule({ location: tp.aimbotFolder, title: "ToggleRM", storeAs: "aimbotRightClick", tooltip: "Modifies aimbot to only lock when the right mouse is held", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "SilentAim", storeAs: "silentAimbot", tooltip: "Shoots without moving the camera. ONLY visual, VERY blatant cheating. Refer to the GitHub README for more information", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "SemiSilent", storeAs: "aimbSemiSilent", tooltip: "SilentAimbot behavior, but will move the camera after a shot has been fired", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "NoWallTrack", storeAs: "noWallTrack", tooltip: "Aimbot ignores the player if they're behind obstacles", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                tp.aimbotFolder.addSeparator();
+                initModule({ location: tp.aimbotFolder, title: "Prediction", storeAs: "prediction", tooltip: "Predicts where the player will be when the bullet hits them and ajusts aimbot accordingly", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
+                initModule({ location: tp.aimbotFolder, title: "AntiBloom", storeAs: "antiBloom", tooltip: "Locks onto the predicted bloom point. Good for shooting & moving", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], defaultValue: true, });
+                tp.aimbotFolder.addSeparator();
+                initModule({ location: tp.aimbotFolder, title: "AntiSwitch", storeAs: "antiSwitch", tooltip: "Prevents the aimbot from changing the target until they die", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "1 Kill", storeAs: "oneKill", tooltip: "Disables aimbot when the targeted player dies", bindLocation: tp.combatTab.pages[1], enableConditions: [["aimbot", true]], });
+                tp.aimbotFolder.addSeparator();
+                initModule({ location: tp.aimbotFolder, title: "MinAngle", storeAs: "aimbotMinAngle", tooltip: "Prevents you from snapping if the angle between you and the player is greater than this value (in degrees)", slider: { min: 0.05, max: 360, step: 1 }, defaultValue: 360, enableConditions: [["aimbot", true]], });
+                initModule({ location: tp.aimbotFolder, title: "AntiSneak", storeAs: "antiSneak", tooltip: "Recommended distance under 2. This automatically kills players in the given range", slider: { min: 0, max: 5, step: 0.2 }, defaultValue: 0, enableConditions: [["aimbot", true]], });
+                tp.aimbotFolder.addSeparator();
+                initModule({ location: tp.aimbotFolder, title: "AntiSnap", storeAs: "aimbotAntiSnap", tooltip: "This makes snapping smooth at higher values. useful to avoid being spotted", slider: { min: 0, max: 0.99, step: 0.01 }, defaultValue: 0, enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                initFolder({ location: tp.aimbotFolder, title: "AntiSnap Options", storeAs: "antisnapFolder", });
+                    initModule({ location: tp.antisnapFolder, title: "AntiSnap Regime", storeAs: "aimbotAntiSnapRegime", tooltip: "Changes the method of smoothing\n\nCredit to de_Neuublue for this code", bindLocation: tp.combatTab.pages[1], dropdown: [{ text: "Linear", value: "linear" }, { text: "Slow End", value: "slowEnd" }, { text: "Fast End", value: "fastEnd" }, { text: "Time Based", value: "timeBased" }], defaultValue: "linear", enableConditions: [["aimbot", true], ["silentAimbot", false]], });
+                    initModule({ location: tp.antisnapFolder, title: "Max Aim Time (ms)", storeAs: "maxAimTime", tooltip: "How long to aim for until you force the locking.", slider: { min: 10, max: 5000, step: 1 }, defaultValue: 700, enableConditions: [["aimbot", true], ["silentAimbot", false]], showConditions: [["aimbotAntiSnapRegime", "timeBased"]], });
 
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "Auto Refill", storeAs: "autoRefill", tooltip: "This automatically reloads your gun if there is no more ammo", bindLocation: tp.combatTab.pages[1], });
@@ -1415,14 +1379,13 @@ sniping and someone sneaks up on you
             tp.combatTab.pages[0].addSeparator();
             initModule({ location: tp.combatTab.pages[0], title: "GrenadeMAX", storeAs: "grenadeMax", tooltip: "Sets grenades to be thrown to max power immediately without the need of charging", bindLocation: tp.combatTab.pages[1], });
             initModule({ location: tp.combatTab.pages[0], title: "Nade Power", storeAs: "grenadePower", tooltip: "porcupane hijinks ensue — Today at 6:33 PM• goo/ber grenade power override for how long you hold ot", slider: { min: 0, max: 1, step: 0.05 }, defaultValue: 1, });
-            //RENDER MODULES
-            initFolder({ location: tp.mainPanel, title: "Render", storeAs: "renderFolder", });
-            initTabs({ location: tp.renderFolder, storeAs: "renderTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
+        //RENDER MODULES
+        initFolder({ location: tp.mainPanel, title: "Render", storeAs: "renderFolder", });
+        initTabs({ location: tp.renderFolder, storeAs: "renderTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
             initModule({ location: tp.renderTab.pages[0], title: "PlayerESP", storeAs: "playerESP", tooltip: "Creates boxes around enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Tracers", storeAs: "tracers", tooltip: "Creates lines pointing from the center of the screen to the location of enemy players", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Chams", storeAs: "chams", tooltip: "Renders players through walls", bindLocation: tp.renderTab.pages[1], });
@@ -1435,58 +1398,58 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "Info Update Interval", storeAs: "nametagInfoInterval", tooltip: "If the info updater lags you, increase this value to make it update less often.", slider: { min: 1, max: 180, step: 1 }, defaultValue: 180, showConditions: [["nametagInfo", true]], });
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Player ESP/Tracers Options", storeAs: "tracersFolder", });
-            initModule({ location: tp.tracersFolder, title: "TargetedColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", showConditions: [["aimbotRainbow", false]] });
-            initModule({ location: tp.tracersFolder, title: "Targeted RGB", storeAs: "aimbotRainbow", tooltip: "Adds RGB to the ESP, for fun", defaultValue: true, bindLocation: tp.renderTab.pages[1] });
-            tp.aimbotFolder.addSeparator();
-            initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "The mode for how ESP/Tracers are coloured. Different colour options present themselves based on option.\n\nStatic: Just stays as one colour.\nProximity: Fades between three colours based on how close someone is.\nVisibility: Switches between two colours if there is Line of Sight.", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
-            initModule({ location: tp.tracersFolder, title: "RGB Color 1", storeAs: "tracersColor1Rainbow", tooltip: "rainbow. 🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], });
-            initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersColor1Rainbow", false]], });
-            //TODO: I hate having it like that so maybe a initmodule helper func for color with creates both color opt and rainbow opt. Same with the getColors() btw ~Sq
-            //also speed customisation and shit, people love customization.
-            //--------
-            initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "Static: (Unused)\nProximity: Moderately close colour\nVisibility: Visible.", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
-            //initModule({ location: tp.tracersFolder, title: "C2 rainbow", storeAs: "tracersColor2Rainbow", tooltip: "🌈", defaultValue: true, disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
-            //--------
-            initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", tooltip: "Static: (Unused)\nProximity: Furthest colour\nVisibility: (Unused)", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
-            //initModule({ location: tp.tracersFolder, title: "C3 rainbow", storeAs: "tracersColor3Rainbow", tooltip: "🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
-            //-------ä
-            initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", tooltip: "Proximity: Distance from which it fades from 1 to 2. Should be the smaller range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
-            initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", tooltip: "Proximity: Distance from which it fades from 2 to 3. Should be the larger range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
-            tp.tracersFolder.addSeparator();
-            initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", tooltip: "Colour to use for the PredictionESP box", defaultValue: "#ff0000", disableConditions: [["predictionESP", false]], });
-            initModule({ location: tp.tracersFolder, title: "PredictionESPColorRainbow", storeAs: "predictionESPColorRainbow", tooltip: "Color to use for the PredictionESP box rainbow?", defaultValue: false, disableConditions: [["predictionESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "TargetedColor", storeAs: "aimbotColor", tooltip: "The color used to highlight the ESP line of a targeted player. Useless if PlayerESP is disabled", defaultValue: "#0000ff", showConditions: [["aimbotRainbow", false]] });
+                initModule({ location: tp.tracersFolder, title: "Targeted RGB", storeAs: "aimbotRainbow", tooltip: "Adds RGB to the ESP, for fun", defaultValue: true, bindLocation: tp.renderTab.pages[1] });
+                tp.aimbotFolder.addSeparator();
+                initModule({ location: tp.tracersFolder, title: "Type", storeAs: "tracersType", tooltip: "The mode for how ESP/Tracers are coloured. Different colour options present themselves based on option.\n\nStatic: Just stays as one colour.\nProximity: Fades between three colours based on how close someone is.\nVisibility: Switches between two colours if there is Line of Sight.", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Static", value: "static" }, { text: "Proximity", value: "proximity" }, { text: "Visibility", value: "visibility" }], defaultValue: "static", disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "RGB Color 1", storeAs: "tracersColor1Rainbow", tooltip: "rainbow. 🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Color 1", storeAs: "tracersColor1", tooltip: "Static: Just stays this colour.\nProximity: Very close colour\nVisibility: Not visible.", defaultValue: "#ff0000", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersColor1Rainbow", false]], });
+                //TODO: I hate having it like that so maybe a initmodule helper func for color with creates both color opt and rainbow opt. Same with the getColors() btw ~Sq
+                //also speed customisation and shit, people love customization.
+                //--------
+                initModule({ location: tp.tracersFolder, title: "Color 2", storeAs: "tracersColor2", tooltip: "Static: (Unused)\nProximity: Moderately close colour\nVisibility: Visible.", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
+                //initModule({ location: tp.tracersFolder, title: "C2 rainbow", storeAs: "tracersColor2Rainbow", tooltip: "🌈", defaultValue: true, disableConditions: [["tracers", false], ["playerESP", false]], hideConditions: [["tracersType", "static"]], });
+                //--------
+                initModule({ location: tp.tracersFolder, title: "Color 3", storeAs: "tracersColor3", tooltip: "Static: (Unused)\nProximity: Furthest colour\nVisibility: (Unused)", defaultValue: "#ffffff", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
+                //initModule({ location: tp.tracersFolder, title: "C3 rainbow", storeAs: "tracersColor3Rainbow", tooltip: "🌈", defaultValue: false, disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["tracersType", "proximity"]], });
+                //-------ä
+                initModule({ location: tp.tracersFolder, title: "Dist 1->2", storeAs: "tracersColor1to2", tooltip: "Proximity: Distance from which it fades from 1 to 2. Should be the smaller range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 5, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "Dist 2->3", storeAs: "tracersColor2to3", tooltip: "Proximity: Distance from which it fades from 2 to 3. Should be the larger range.", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 15, showConditions: [["tracersType", "proximity"]], disableConditions: [["tracers", false], ["playerESP", false]], });
+                tp.tracersFolder.addSeparator();
+                initModule({ location: tp.tracersFolder, title: "PredictionESPColor", storeAs: "predictionESPColor", tooltip: "Colour to use for the PredictionESP box", defaultValue: "#ff0000", disableConditions: [ ["predictionESP", false]], });
+                initModule({ location: tp.tracersFolder, title: "PredictionESPColorRainbow", storeAs: "predictionESPColorRainbow", tooltip: "Color to use for the PredictionESP box rainbow?", defaultValue: false, disableConditions: [ ["predictionESP", false]], });
 
             tp.renderTab.pages[0].addSeparator();
             initFolder({ location: tp.renderTab.pages[0], title: "Ammo ESP/Tracers Options", storeAs: "tracersAmmoFolder", });
-            initFolder({ location: tp.tracersAmmoFolder, title: "Ammo", storeAs: "ammoFolder", });
-            initModule({ location: tp.ammoFolder, title: "AESP", storeAs: "ammoESP", tooltip: "Displays where ammo is on the map", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.ammoFolder, title: "ATracers", storeAs: "ammoTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
-            tp.ammoFolder.addSeparator();
-            initModule({ location: tp.ammoFolder, title: "ARegime", storeAs: "ammoESPRegime", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
-            initModule({ location: tp.ammoFolder, title: "AColor", storeAs: "ammoESPColor", tooltip: "No tooltip available", defaultValue: "#ffff00", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
-            initFolder({ location: tp.tracersAmmoFolder, title: "Grenades", storeAs: "grenadesFolder", });
-            initModule({ location: tp.grenadesFolder, title: "GESP", storeAs: "grenadeESP", tooltip: "Displays where grenade pickupables is on the map", bindLocation: tp.renderTab.pages[1], });
-            initModule({ location: tp.grenadesFolder, title: "GTracers", storeAs: "grenadeTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
-            tp.grenadesFolder.addSeparator();
-            initModule({ location: tp.grenadesFolder, title: "GRegime", storeAs: "grenadeESPRegime", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
-            initModule({ location: tp.grenadesFolder, title: "GColor", storeAs: "grenadeESPColor", tooltip: "No tooltip available", defaultValue: "#00ffff", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
+                initFolder({ location: tp.tracersAmmoFolder, title: "Ammo", storeAs: "ammoFolder", });
+                    initModule({ location: tp.ammoFolder, title: "AESP", storeAs: "ammoESP", tooltip: "Displays where ammo is on the map", bindLocation: tp.renderTab.pages[1], });
+                    initModule({ location: tp.ammoFolder, title: "ATracers", storeAs: "ammoTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+                    tp.ammoFolder.addSeparator();
+                    initModule({ location: tp.ammoFolder, title: "ARegime", storeAs: "ammoESPRegime", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
+                    initModule({ location: tp.ammoFolder, title: "AColor", storeAs: "ammoESPColor", tooltip: "No tooltip available", defaultValue: "#ffff00", disableConditions: [["ammoESP", false], ["ammoTracers", false]], });
+                initFolder({ location: tp.tracersAmmoFolder, title: "Grenades", storeAs: "grenadesFolder", });
+                    initModule({ location: tp.grenadesFolder, title: "GESP", storeAs: "grenadeESP", tooltip: "Displays where grenade pickupables is on the map", bindLocation: tp.renderTab.pages[1], });
+                    initModule({ location: tp.grenadesFolder, title: "GTracers", storeAs: "grenadeTracers", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], });
+                    tp.grenadesFolder.addSeparator();
+                    initModule({ location: tp.grenadesFolder, title: "GRegime", storeAs: "grenadeESPRegime", tooltip: "No tooltip available", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "When Depleted", value: "whendepleted" }, { text: "When Low", value: "whenlow" }, { text: "Below Max", value: "belowmax" }, { text: "Always On", value: "alwayson" },], defaultValue: "whendepleted", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
+                    initModule({ location: tp.grenadesFolder, title: "GColor", storeAs: "grenadeESPColor", tooltip: "No tooltip available", defaultValue: "#00ffff", disableConditions: [["grenadeESP", false], ["grenadeTracers", false]], });
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "Show Look Dir", storeAs: "lookTracers", tooltip: "Renders the looking direction of each player as a line", bindLocation: tp.renderTab.pages[1], });
             initFolder({ location: tp.renderTab.pages[0], title: "Look Direction Options", storeAs: "lookTracersFolder", });
-            initModule({ location: tp.lookTracersFolder, title: "Render Above", storeAs: "lookTracersRGI1", tooltip: "Renders LookTracers above obstacles", bindLocation: tp.renderTab.pages[1], });
-            //initModule({ location: tp.lookTracersFolder, title: "length", storeAs: "lookTracersLength", slider: { min: 0, max: 100, step: 0.25 }, defaultValue: 75, });
-            initModule({ location: tp.lookTracersFolder, title: "LookTracerColor", storeAs: "lookTracersColor", tooltip: "Color of the LookTracers", defaultValue: "#00ffff", });
+                initModule({ location: tp.lookTracersFolder, title: "Render Above", storeAs: "lookTracersRGI1", tooltip: "Renders LookTracers above obstacles", bindLocation: tp.renderTab.pages[1], });
+                //initModule({ location: tp.lookTracersFolder, title: "length", storeAs: "lookTracersLength", slider: { min: 0, max: 100, step: 0.25 }, defaultValue: 75, });
+                initModule({ location: tp.lookTracersFolder, title: "LookTracerColor", storeAs: "lookTracersColor", tooltip: "Color of the LookTracers", defaultValue: "#00ffff", });
             tp.renderTab.pages[0].addSeparator();
             initModule({ location: tp.renderTab.pages[0], title: "FOV", storeAs: "fov", tooltip: "Controls the FOV of the game", slider: { min: 0, max: 360, step: 3 }, defaultValue: 72, });
             initModule({ location: tp.renderTab.pages[0], title: "Zoom FOV", storeAs: "zoom", tooltip: "Controls how zoomed in/out you are. Default keybind is C to zoom", slider: { min: 0, max: 72, step: 1 }, defaultValue: 15, bindLocation: tp.renderTab.pages[1], defaultBind: "C", });
             initModule({ location: tp.renderTab.pages[0], title: "No Mini Egg", storeAs: "noMiniEgg", tooltip: "Makes the screen not squished when under the Mini Egg effect.", bindLocation: tp.renderTab.pages[1] })
             tp.renderTab.pages[0].addSeparator();
-            initModule({ location: tp.renderTab.pages[0], title: "Perspective", storeAs: "perspective", tooltip: "Allows you to switch between third and first person. Think Minecraft F5!", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "1st Person (Default)", value: "firstPerson" }, { text: "3rd Person", value: "thirdPerson" }, { text: "3rd Person (Alt)", value: "thirdPersonAlt" }], defaultValue: "disabled", defaultBind: "Digit5", });
+            initModule({ location: tp.renderTab.pages[0], title: "Perspective", storeAs: "perspective", tooltip: "Allows you to switch between third and first person. Think Minecraft F5!", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "1st Person (Default)", value: "firstPerson" }, { text: "3rd Person", value: "thirdPerson" }, { text: "3rd Person (Alt)", value: "thirdPersonAlt" } ], defaultValue: "disabled", defaultBind: "Digit5", });
             initFolder({ location: tp.renderTab.pages[0], title: "Perspective Options", storeAs: "perspectiveFolder", });
-            // initModule({ location: tp.perspectiveFolder, title: "Alpha Effect", storeAs: "perspectiveAlpha", tooltip: "Makes players a bit transparent when in third person", bindLocation: tp.renderTab.pages[1], });
-            // tp.perspectiveFolder.addSeparator();
-            initModule({ location: tp.perspectiveFolder, title: "Y Offset", storeAs: "perspectiveY", tooltip: "Offset of the camera in y-direction (how far behind should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 0.5 });
-            initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", tooltip: "Offset of the camera in z-direction (how far above should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2 });
+                // initModule({ location: tp.perspectiveFolder, title: "Alpha Effect", storeAs: "perspectiveAlpha", tooltip: "Makes players a bit transparent when in third person", bindLocation: tp.renderTab.pages[1], });
+                // tp.perspectiveFolder.addSeparator();
+                initModule({ location: tp.perspectiveFolder, title: "Y Offset", storeAs: "perspectiveY", tooltip: "Offset of the camera in y-direction (how far behind should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 0.5});
+                initModule({ location: tp.perspectiveFolder, title: "Z Offset", storeAs: "perspectiveZ", tooltip: "Offset of the camera in z-direction (how far above should it be?)", slider: { min: 0, max: 30, step: 0.25 }, defaultValue: 2});
             initModule({ location: tp.renderTab.pages[0], title: "CamWIP", storeAs: "freecam", tooltip: "Forever a WIP!!!", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Wireframe", storeAs: "wireframe", tooltip: "Outlines map objects to allow you to see directly though walls. Will leave rendering artifacts on the skybox, making the game basically unplayable", bindLocation: tp.renderTab.pages[1], });
             initModule({ location: tp.renderTab.pages[0], title: "Particle Speed", storeAs: "particleSpeedMultiplier", tooltip: "Adjusts speed of particles :D", slider: { min: 0.05, max: 5, step: 0.05 }, defaultValue: 1, });
@@ -1495,14 +1458,13 @@ sniping and someone sneaks up on you
             initModule({ location: tp.renderTab.pages[0], title: "Set Detail", storeAs: "setDetail", tooltip: "Changes quality of game graphics", bindLocation: tp.renderTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Auto Detail", value: "autodetail" }, { text: "No Details", value: "nodetails" }, { text: "Shadows", value: "shadows" }, { text: "High Res", value: "highres" }, { text: "Shadows+High Res", value: "shadowshighres" }], defaultValue: "disabled" });
             initModule({ location: tp.renderTab.pages[0], title: "Textures", storeAs: "enableTextures", tooltip: "Disables some textures. primarily, the sky", bindLocation: tp.renderTab.pages[1], defaultValue: true, });
             initModule({ location: tp.renderTab.pages[0], title: "Render Delay", storeAs: "renderDelay", tooltip: "Basically, this adds extra FPS buffer", slider: { min: 0, max: 30000, step: 10 }, defaultValue: 0, });
-            //HUD MODULES
-            initFolder({ location: tp.mainPanel, title: "HUD", storeAs: "hudFolder", });
-            initTabs({ location: tp.hudFolder, storeAs: "hudTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
+        //HUD MODULES
+        initFolder({ location: tp.mainPanel, title: "HUD", storeAs: "hudFolder", });
+        initTabs({ location: tp.hudFolder, storeAs: "hudTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
             initModule({ location: tp.hudTab.pages[0], title: "Show Bloom", storeAs: "revealBloom", tooltip: "Displays the next shot's bloom as a red dot onscreen", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "Show LOS", storeAs: "showLOS", tooltip: "Changes the crosshair's color if the player is in an enemy's line of sight", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "Show MinAngle", storeAs: "showMinAngle", tooltip: "Draws a circle representing the aimbot's minAngle to the hud", bindLocation: tp.hudTab.pages[1], });
@@ -1519,14 +1481,13 @@ sniping and someone sneaks up on you
             initModule({ location: tp.hudTab.pages[0], title: "MiniMap", storeAs: "minimap", tooltip: "Displays a top down view of your game", bindLocation: tp.hudTab.pages[1], });
             initModule({ location: tp.hudTab.pages[0], title: "MiniMap Zoom", storeAs: "minimapZoom", tooltip: "How much the minimap camera should zoom in", slider: { min: 0.1, max: 20, step: 0.1 }, defaultValue: 5, showConditions: [["minimap", true]], });
             initModule({ location: tp.hudTab.pages[0], title: "MiniMap Size", storeAs: "minimapSize", tooltip: "How big the minimap should be on the screen", slider: { min: 0.1, max: 5, step: 0.1 }, defaultValue: 1, showConditions: [["minimap", true]], });
-            //CHAT MODULES
-            initFolder({ location: tp.mainPanel, title: "Chat", storeAs: "chatFolder", });
-            initTabs({ location: tp.chatFolder, storeAs: "chatTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
+        //CHAT MODULES
+        initFolder({ location: tp.mainPanel, title: "Chat", storeAs: "chatFolder", });
+        initTabs({ location: tp.chatFolder, storeAs: "chatTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
             initModule({ location: tp.chatTab.pages[0], title: "InfiniHistory", storeAs: "chatExtend", tooltip: "Disables the default limiting of message history", bindLocation: tp.chatTab.pages[1], });
             initModule({ location: tp.chatTab.pages[0], title: "HighlightTxt", storeAs: "chatHighlight", tooltip: "Allows you to highlight text from the chat to copy somewhere else", bindLocation: tp.chatTab.pages[1], });
             // initModule({ location: tp.chatTab.pages[0], title: "RestoreScroll", storeAs: "restoreScroll", tooltip: "Dont fucking add tooltips to modules that HAVE BEEN COMMENTED OUT WTF PUPPY?", bindLocation: tp.chatTab.pages[1], });
@@ -1538,23 +1499,20 @@ sniping and someone sneaks up on you
             initModule({ location: tp.chatTab.pages[0], title: "Tall Chat", storeAs: "tallChat", tooltip: "Makes the chat text taller, appends a character to all sent messages", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "FakeMessage", storeAs: "fakeMessageFolder", });
-            let listOfIDs = [];
-            if (unsafeWindow.extern && unsafeWindow.extern.inGame && ss && ss.PLAYERS) {
-                ss.PLAYERS.forEach((player) => {
-                    listOfIDs.push({ text: player.name, value: String(player.id) });
-                    log({ text: player.name, value: player.id })
-                });
-            };
-            initModule({ location: tp.fakeMessageFolder, title: "Send As", storeAs: "fakeMessageID", tooltip: "Who to send fake message as", bindLocation: tp.chatTab.pages[1], dropdown: [...listOfIDs, { text: "MOD", value: "254" }, { text: "SERVER", value: "255" }], defaultValue: "255" });
-            initModule({
-                location: tp.fakeMessageFolder, title: '(Refresh List)', storeAs: 'fakeMessageRefresh', button: 'REFRESH', tooltip: "Refreshes list", bindLocation: tp.chatTab.pages[1], clickFunction: function () {
+                let listOfIDs = [];
+                if (unsafeWindow.extern && unsafeWindow.extern.inGame && ss && ss.PLAYERS) {
+                    ss.PLAYERS.forEach((player) => {
+                        listOfIDs.push({ text: player.name, value: String(player.id) });
+                        log({ text: player.name, value: player.id })
+                    });
+                };
+                initModule({ location: tp.fakeMessageFolder, title: "Send As", storeAs: "fakeMessageID", tooltip: "Who to send fake message as", bindLocation: tp.chatTab.pages[1], dropdown: [ ...listOfIDs, { text: "MOD", value: "254" }, { text: "SERVER", value: "255" } ], defaultValue: "255" });
+                initModule({ location: tp.fakeMessageFolder, title: '(Refresh List)', storeAs: 'fakeMessageRefresh', button: 'REFRESH', tooltip: "Refreshes list", bindLocation: tp.chatTab.pages[1], clickFunction: function () {
                     updateMenu = true;
-                }
-            });
-            initModule({ location: tp.fakeMessageFolder, title: "Content", storeAs: "fakeMessageText", tooltip: "The content of the fake message", defaultValue: "ЅtateFarm Client On Top! ", });
-            initModule({ location: tp.fakeMessageFolder, title: "Bold Text", storeAs: "fakeMessageBold", tooltip: "Bold text", bindLocation: tp.chatTab.pages[1], });
-            initModule({
-                location: tp.fakeMessageFolder, title: 'SEND', storeAs: 'fakeMessageSend', button: 'SEND MESSAGE', tooltip: "Allows sending messages as MOD or SERVER (client sided only)", bindLocation: tp.chatTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.fakeMessageFolder, title: "Content", storeAs: "fakeMessageText", tooltip: "The content of the fake message", defaultValue: "ЅtateFarm Client On Top! ", });
+                initModule({ location: tp.fakeMessageFolder, title: "Bold Text", storeAs: "fakeMessageBold", tooltip: "Bold text", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.fakeMessageFolder, title: 'SEND', storeAs: 'fakeMessageSend', button: 'SEND MESSAGE', tooltip: "Allows sending messages as MOD or SERVER (client sided only)", bindLocation: tp.chatTab.pages[1], clickFunction: function () {
                     if (ss.addChat && unsafeWindow.extern.inGame) {
                         try {
                             if (ss.isBadWord(extract("fakeMessageText"))) createPopup("Message would be filtered.", "error");
@@ -1563,58 +1521,55 @@ sniping and someone sneaks up on you
                             log("shit, sending a fake message failed. damn lmao.", error)
                         };
                     }
-                }
-            });
+                } });
             tp.chatTab.pages[0].addSeparator();
             initModule({ location: tp.chatTab.pages[0], title: "Spammer", storeAs: "spamChat", tooltip: "Automatically send messages", bindLocation: tp.chatTab.pages[1], });
             initFolder({ location: tp.chatTab.pages[0], title: "Spammer Options", storeAs: "spammerFolder", });
-            initModule({ location: tp.spammerFolder, title: "Delay (ms)", storeAs: "spamChatDelay", tooltip: "The interval to send messages", slider: { min: 250, max: 60000, step: 10 }, defaultValue: 500, enableConditions: [["spamChat", true]], });
-            initModule({ location: tp.spammerFolder, title: "Spam Text", storeAs: "spamChatText", tooltip: "The message to spam", defaultValue: "ЅtateFarm Client On Top! ", });
+                initModule({ location: tp.spammerFolder, title: "Delay (ms)", storeAs: "spamChatDelay", tooltip: "The interval to send messages", slider: { min: 250, max: 60000, step: 10 }, defaultValue: 500, enableConditions: [["spamChat", true]], });
+                initModule({ location: tp.spammerFolder, title: "Spam Text", storeAs: "spamChatText", tooltip: "The message to spam", defaultValue: "ЅtateFarm Client On Top! ", });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "Trolling", storeAs: "trollingFolder", });
-            initModule({ location: tp.trollingFolder, title: "Mock", storeAs: "mockMode", tooltip: "Rudely mocks people talking in chat", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.trollingFolder, title: "Mock no repeat", storeAs: "mockModeNoRePeat", tooltip: "Makes mock not respond if it doesn't have an answer, instead of copying the message", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.trollingFolder, title: "Announcer", storeAs: "announcer", tooltip: "Announces when you change GUI config", bindLocation: tp.chatTab.pages[1], });
-            tp.trollingFolder.addSeparator();
-            initModule({ location: tp.trollingFolder, title: "AutoEZ", storeAs: "autoEZ", tooltip: "Gloats on people when you kill them", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.trollingFolder, title: "CheatAccuse", storeAs: "cheatAccuse", tooltip: "Accuses your killer of cheating", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "Mock", storeAs: "mockMode", tooltip: "Rudely mocks people talking in chat", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "Mock no repeat", storeAs: "mockModeNoRePeat", tooltip: "Makes mock not respond if it doesn't have an answer, instead of copying the message", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "Announcer", storeAs: "announcer", tooltip: "Announces when you change GUI config", bindLocation: tp.chatTab.pages[1], });
+                tp.trollingFolder.addSeparator();
+                initModule({ location: tp.trollingFolder, title: "AutoEZ", storeAs: "autoEZ", tooltip: "Gloats on people when you kill them", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.trollingFolder, title: "CheatAccuse", storeAs: "cheatAccuse", tooltip: "Accuses your killer of cheating", bindLocation: tp.chatTab.pages[1], });
             tp.chatTab.pages[0].addSeparator();
             initFolder({ location: tp.chatTab.pages[0], title: "Join/Leave Msgs Options", storeAs: "joinLeaveFolder", });
-            initModule({ location: tp.joinLeaveFolder, title: "Join Msgs", storeAs: "joinMessages", tooltip: " Notify you when players join", bindLocation: tp.chatTab.pages[1], });
-            initModule({ location: tp.joinLeaveFolder, title: "Leave Msgs", storeAs: "leaveMessages", tooltip: "Notify you when players leave", bindLocation: tp.chatTab.pages[1], });
-            tp.joinLeaveFolder.addSeparator();
-            initModule({ location: tp.joinLeaveFolder, title: "Send2Chat", storeAs: "publicBroadcast", tooltip: "Decides if these messages are shown to only you or everyone", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
-            initModule({ location: tp.joinLeaveFolder, title: "[SFC]Added", storeAs: "joinLeaveBranding", tooltip: "If send2chat is enabled, this will add [SFC] to the beginning of the join/leave messages", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
-            //LISTS MODULES
-            initFolder({ location: tp.mainPanel, title: "Lists", storeAs: "listsFolder", });
-            initTabs({ location: tp.listsFolder, storeAs: "listsTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
+                initModule({ location: tp.joinLeaveFolder, title: "Join Msgs", storeAs: "joinMessages", tooltip: " Notify you when players join", bindLocation: tp.chatTab.pages[1], });
+                initModule({ location: tp.joinLeaveFolder, title: "Leave Msgs", storeAs: "leaveMessages", tooltip: "Notify you when players leave", bindLocation: tp.chatTab.pages[1], });
+                tp.joinLeaveFolder.addSeparator();
+                initModule({ location: tp.joinLeaveFolder, title: "Send2Chat", storeAs: "publicBroadcast", tooltip: "Decides if these messages are shown to only you or everyone", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
+                initModule({ location: tp.joinLeaveFolder, title: "[SFC]Added", storeAs: "joinLeaveBranding", tooltip: "If send2chat is enabled, this will add [SFC] to the beginning of the join/leave messages", bindLocation: tp.chatTab.pages[1], disableConditions: [["joinMessages", false], ["leaveMessages", false]], });
+        //LISTS MODULES
+        initFolder({ location: tp.mainPanel, title: "Lists", storeAs: "listsFolder", });
+        initTabs({ location: tp.listsFolder, storeAs: "listsTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
             initModule({ location: tp.listsTab.pages[0], title: "Whitelist", storeAs: "whitelist", tooltip: "A list of names to use the below configuration. Separate with commas", defaultValue: "User-1, User-2", });
             initFolder({ location: tp.listsTab.pages[0], title: "Whitelist (Target Only) Options", storeAs: "whitelistFolder", });
-            initModule({ location: tp.whitelistFolder, title: "WAimbot", storeAs: "enableWhitelistAimbot", tooltip: "Only will aimbot on the specified whitelist player(s). if the player(s) are all dead, you will target nothing", bindLocation: tp.listsTab.pages[1], });
-            initModule({ location: tp.whitelistFolder, title: "When None Visible", storeAs: "enableWhenNoneVisible", tooltip: "Still targets non-whitelisted players if no whitelisted player is a valid target", bindLocation: tp.listsTab.pages[1], });
-            initModule({ location: tp.whitelistFolder, title: "WESP", storeAs: "enableWhitelistTracers", tooltip: "A special behavior will appear to whitelisted ESP people", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
-            initModule({ location: tp.whitelistFolder, title: "WESPType", storeAs: "whitelistESPType", tooltip: "Make their ESP line a special color, or exclude", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Only Include", value: "onlyinclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "onlyinclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true]], });
-            initModule({ location: tp.whitelistFolder, title: "WHighlight", storeAs: "whitelistColor", tooltip: "The color to highlight whitelisted players in", defaultValue: "#e80aac", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true], ["whitelistESPType", "highlight"]], });
+                initModule({ location: tp.whitelistFolder, title: "WAimbot", storeAs: "enableWhitelistAimbot", tooltip: "Only will aimbot on the specified whitelist player(s). if the player(s) are all dead, you will target nothing", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.whitelistFolder, title: "When None Visible", storeAs: "enableWhenNoneVisible", tooltip: "Still targets non-whitelisted players if no whitelisted player is a valid target", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.whitelistFolder, title: "WESP", storeAs: "enableWhitelistTracers", tooltip: "A special behavior will appear to whitelisted ESP people", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.whitelistFolder, title: "WESPType", storeAs: "whitelistESPType", tooltip: "Make their ESP line a special color, or exclude", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Only Include", value: "onlyinclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "onlyinclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true]], });
+                initModule({ location: tp.whitelistFolder, title: "WHighlight", storeAs: "whitelistColor", tooltip: "The color to highlight whitelisted players in", defaultValue: "#e80aac", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableWhitelistTracers", true], ["whitelistESPType", "highlight"]], });
             tp.listsTab.pages[0].addSeparator();
             initModule({ location: tp.listsTab.pages[0], title: "Blacklist", storeAs: "blacklist", tooltip: "A list of names to use the below configuration. Separate with commas", defaultValue: "User-1, User-2", });
             initFolder({ location: tp.listsTab.pages[0], title: "Blacklist (Exclude) Options", storeAs: "blacklistFolder", });
-            initModule({ location: tp.blacklistFolder, title: "BAimbot", storeAs: "enableBlacklistAimbot", tooltip: "Never will aimbot on the specified whitelist player(s)", bindLocation: tp.listsTab.pages[1], });
-            initModule({ location: tp.blacklistFolder, title: "BESP", storeAs: "enableBlacklistTracers", tooltip: "A special behavior will appear to blacklisted ESP people", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
-            initModule({ location: tp.blacklistFolder, title: "BESPType", storeAs: "blacklistESPType", tooltip: "what", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Just Exclude", value: "justexclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "justexclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true]], });
-            initModule({ location: tp.blacklistFolder, title: "BHighlight", storeAs: "blacklistColor", tooltip: "Color to use for blacklisted highlighting", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true], ["blacklistESPType", "highlight"]], });
-            //AUTOMATION MODULES
-            initFolder({ location: tp.mainPanel, title: "Automation", storeAs: "automationFolder", });
-            initTabs({ location: tp.automationFolder, storeAs: "automationTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
+                initModule({ location: tp.blacklistFolder, title: "BAimbot", storeAs: "enableBlacklistAimbot", tooltip: "Never will aimbot on the specified whitelist player(s)", bindLocation: tp.listsTab.pages[1], });
+                initModule({ location: tp.blacklistFolder, title: "BESP", storeAs: "enableBlacklistTracers", tooltip: "A special behavior will appear to blacklisted ESP people", bindLocation: tp.listsTab.pages[1], disableConditions: [["tracers", false], ["playerESP", false]], });
+                initModule({ location: tp.blacklistFolder, title: "BESPType", storeAs: "blacklistESPType", tooltip: "what", bindLocation: tp.listsTab.pages[1], dropdown: [{ text: "Just Exclude", value: "justexclude" }, { text: "Highlight", value: "highlight" },], defaultValue: "justexclude", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true]], });
+                initModule({ location: tp.blacklistFolder, title: "BHighlight", storeAs: "blacklistColor", tooltip: "Color to use for blacklisted highlighting", defaultValue: "#00ff00", disableConditions: [["tracers", false], ["playerESP", false]], showConditions: [["enableBlacklistTracers", true], ["blacklistESPType", "highlight"]], });
+        //AUTOMATION MODULES
+        initFolder({ location: tp.mainPanel, title: "Automation", storeAs: "automationFolder", });
+        initTabs({ location: tp.automationFolder, storeAs: "automationTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
             initModule({
                 location: tp.automationTab.pages[0], title: "Flood Report", storeAs: "floodReport", tooltip: "Mass reports everyone. o7, comrade", bindLocation: tp.automationTab.pages[1], button: "Spam Now!", clickFunction: function () {
                     createPopup("Thank you for your efforts comrade! o7");
@@ -1632,57 +1587,49 @@ sniping and someone sneaks up on you
             initModule({ location: tp.automationTab.pages[0], title: "AutoGrenade", storeAs: "autoGrenade", tooltip: "Automatically grenades w/ a delay", bindLocation: tp.automationTab.pages[1], });
             tp.automationTab.pages[0].addSeparator();
             initFolder({ location: tp.automationTab.pages[0], title: "Auto Join Options", storeAs: "autoJoinFolder", });
-            initModule({ location: tp.autoJoinFolder, title: "Auto Join", storeAs: "autoJoin", tooltip: "Automatically joins a game", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.autoJoinFolder, title: "Join Code", storeAs: "joinCode", tooltip: "The gamecode used by AutoJoin", defaultValue: "CODE", enableConditions: [["autoJoin", true]], });
-            initModule({ location: tp.autoJoinFolder, title: "Get Code", storeAs: "getCode", tooltip: "Get the current gamecode for the autoJoin code field, uses last code you were in if in menu", button: "Retrieve", clickFunction: function () { change("joinCode", GAMECODE) }, enableConditions: [["autoJoin", true]], });
+                initModule({ location: tp.autoJoinFolder, title: "Auto Join", storeAs: "autoJoin", tooltip: "Automatically joins a game", bindLocation: tp.automationTab.pages[1], });
+                initModule({ location: tp.autoJoinFolder, title: "Join Code", storeAs: "joinCode", tooltip: "The gamecode used by AutoJoin", defaultValue: "CODE", enableConditions: [["autoJoin", true]], });
+                initModule({ location: tp.autoJoinFolder, title: "Get Code", storeAs: "getCode", tooltip: "Get the current gamecode for the autoJoin code field, uses last code you were in if in menu", button: "Retrieve", clickFunction: function () { change("joinCode", GAMECODE) }, enableConditions: [["autoJoin", true]], });
             initFolder({ location: tp.automationTab.pages[0], title: "Auto Name Options", storeAs: "autoNamesFolder", });
-            initModule({ location: tp.autoNamesFolder, title: "Use Name", storeAs: "useCustomName", tooltip: "Automaticaly names yourself", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.autoNamesFolder, title: "New Name", storeAs: "usernameAutoJoin", tooltip: "The name used by useCustomName", defaultValue: "ЅtateFarmer", enableConditions: [["useCustomName", true]], });
-            //the name usernameAutoJoin is only kept for compatability
-            initModule({
-                location: tp.autoNamesFolder, title: "Copy Name", storeAs: "copyName", button: "Steal Name", enableConditions: [["useCustomName", true]], tooltip: "Steals a random lobby player's name", bindLocation: tp.automationTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.autoNamesFolder, title: "Use Name", storeAs: "useCustomName", tooltip: "Automaticaly names yourself", bindLocation: tp.automationTab.pages[1], });
+                initModule({ location: tp.autoNamesFolder, title: "New Name", storeAs: "usernameAutoJoin", tooltip: "The name used by useCustomName", defaultValue: "ЅtateFarmer", enableConditions: [["useCustomName", true]], });
+                //the name usernameAutoJoin is only kept for compatability
+                initModule({ location: tp.autoNamesFolder, title: "Copy Name", storeAs: "copyName", button: "Steal Name", enableConditions: [["useCustomName", true]], tooltip: "Steals a random lobby player's name", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
                     const copiedName = retrieveCopiedName();
-                    log("Retrieved copied name:", copiedName);
-                    change("usernameAutoJoin", (copiedName || "ЅtateFarmer"));
-                },
-            });
-            initModule({
-                location: tp.autoNamesFolder, title: "Random Name", storeAs: "randomName", button: "Randomise Name", enableConditions: [["useCustomName", true]], tooltip: "Gets a random shell shockers default sounding name", bindLocation: tp.automationTab.pages[1], clickFunction: function () {
+                    log("Retrieved copied name:",copiedName);
+                    change("usernameAutoJoin",(copiedName||"ЅtateFarmer"));
+                },});
+                initModule({ location: tp.autoNamesFolder, title: "Random Name", storeAs: "randomName", button: "Randomise Name", enableConditions: [["useCustomName", true]], tooltip: "Gets a random shell shockers default sounding name", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
                     const randomisedName = unsafeWindow.extern.generateRandomName();
-                    change("usernameAutoJoin", (randomisedName || "ЅtateFarmer"));
-                },
-            });
+                    change("usernameAutoJoin",(randomisedName||"ЅtateFarmer"));
+                },});
             tp.automationTab.pages[0].addSeparator();
             initModule({ location: tp.automationTab.pages[0], title: "AutoRespawn", storeAs: "autoRespawn", tooltip: "Automatically respawn", bindLocation: tp.automationTab.pages[1], });
             initModule({ location: tp.automationTab.pages[0], title: "Auto Team", storeAs: "autoTeam", tooltip: "Automatically picks a team", bindLocation: tp.automationTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "Red Team", value: "red" }, { text: "Blue Team", value: "blue" }, { text: "Random Team", value: "random" }], defaultValue: "disabled" });
             tp.automationTab.pages[0].addSeparator();
             initFolder({ location: tp.automationTab.pages[0], title: "Game Blacklist Settings", storeAs: "gameBlacklistFolder", });//Game Blacklist Folder
-            initModule({ location: tp.gameBlacklistFolder, title: "Blacklist On", storeAs: "gameBlacklist", tooltip: "Prevents you from joining specific games", bindLocation: tp.automationTab.pages[1], });
-            initModule({ location: tp.gameBlacklistFolder, title: "Codes:", storeAs: "gameBlacklistCodes", tooltip: "The game list used by GameBlacklist, seperated with commas", defaultValue: "", });
-            initModule({
-                location: tp.gameBlacklistFolder, title: "Get BL Code", storeAs: "getCodeBlacklist", button: "Retrieve", tooltip: "Get the current gamecode for the GameBlacklist code field, uses last code you were in if in menu", bindLocation: tp.automationTab.pages[1], clickFunction: function () {
-                    if (GAMECODE != undefined && GAMECODE != null) {
-                        if (extract("gameBlacklistCodes") != "" && extract("gameBlacklistCodes") != undefined) { //does the list exist yet?
-                            let cds = extract("gameBlacklistCodes").split(","); //get the codes as an array
-                            if (cds.includes(GAMECODE)) { //the code is already in the list!
-                                createPopup("Gamecode already in list!"); //notify user that we aren't adding the code'
-                                return; //no need to add code to list, so gtfo
-                            }
-                        }
-                        extract("gameBlacklistCodes") != undefined ? change("gameBlacklistCodes", extract("gameBlacklistCodes") + GAMECODE + ",") : change("gameBlacklistCodes", GAMECODE + ",");
+                initModule({ location: tp.gameBlacklistFolder, title: "Blacklist On", storeAs: "gameBlacklist", tooltip: "Prevents you from joining specific games", bindLocation: tp.automationTab.pages[1], });
+                initModule({ location: tp.gameBlacklistFolder, title: "Codes:", storeAs: "gameBlacklistCodes", tooltip: "The game list used by GameBlacklist, seperated with commas", defaultValue: "", });
+                initModule({ location: tp.gameBlacklistFolder, title: "Get BL Code", storeAs: "getCodeBlacklist", button: "Retrieve", tooltip: "Get the current gamecode for the GameBlacklist code field, uses last code you were in if in menu", bindLocation: tp.automationTab.pages[1], clickFunction: function(){
+                    if (GAMECODE != undefined && GAMECODE != null){
+                      if (extract("gameBlacklistCodes") != "" && extract("gameBlacklistCodes") != undefined) { //does the list exist yet?
+                          let cds = extract("gameBlacklistCodes").split(","); //get the codes as an array
+                          if(cds.includes(GAMECODE)){ //the code is already in the list!
+                            createPopup("Gamecode already in list!"); //notify user that we aren't adding the code'
+                            return; //no need to add code to list, so gtfo
+                          }
+                      }
+                        extract("gameBlacklistCodes") != undefined ? change("gameBlacklistCodes", extract("gameBlacklistCodes")+GAMECODE+",") : change("gameBlacklistCodes", GAMECODE+",");
                     } else {
                         createPopup("Join a game first");
                     };
-                },
-            });
-            initModule({
-                location: tp.gameBlacklistFolder, title: "Clear BL Codes", storeAs: "clearCodeBlacklist", button: "Clear", tooltip: "Empties the GameBlacklist code list", bindLocation: tp.automationTab.pages[1], clickFunction: function () { //capitalise PLS
-                    //not a big fan of this "logic in init" thing, but it's basically the norm now + the funcs are really designed to be used this way so yh :( (Seq rant)
-                    if (extract("gameBlacklistCodes") != undefined) //do we have codes yet? Otherwise the log is either gonna be pointless or error...
-                        log("Clearing BL codes, cleared list: " + extract("gameBlacklistCodes")); //wouldn't be needed but allows for retrival of codes on accidental/partial deletion, and one more line of log can't hurt too much, can it?
-                    change("gameBlacklistCodes", ""); //just set the blacklist to an empty String
-                },
-            });
+                },});
+                initModule({ location: tp.gameBlacklistFolder, title: "Clear BL Codes", storeAs: "clearCodeBlacklist", button: "Clear", tooltip: "Empties the GameBlacklist code list", bindLocation: tp.automationTab.pages[1], clickFunction: function(){ //capitalise PLS
+                  //not a big fan of this "logic in init" thing, but it's basically the norm now + the funcs are really designed to be used this way so yh :( (Seq rant)
+                  if(extract("gameBlacklistCodes") != undefined) //do we have codes yet? Otherwise the log is either gonna be pointless or error...
+                    log("Clearing BL codes, cleared list: " +extract("gameBlacklistCodes")); //wouldn't be needed but allows for retrival of codes on accidental/partial deletion, and one more line of log can't hurt too much, can it?
+                  change("gameBlacklistCodes", ""); //just set the blacklist to an empty String
+                },});
             tp.automationTab.pages[0].addSeparator();
             initModule({ location: tp.automationTab.pages[0], title: "LeaveGame", storeAs: "leaveGame", button: "Unjoin Game", tooltip: "Leave to the menu", bindLocation: tp.automationTab.pages[1], clickFunction: function () { unsafeWindow.vueApp.onLeaveGameConfirm() }, });
             initModule({ location: tp.automationTab.pages[0], title: "LeaveEmpty", storeAs: "leaveEmpty", tooltip: "Leaves empty games", bindLocation: tp.automationTab.pages[1], });
@@ -1701,97 +1648,86 @@ sniping and someone sneaks up on you
         initTabs({ location: tp.bottingFolder, storeAs: "bottingTab" }, [
             {
                 title: "WIP", content:
-                    `Sorry! No guide yet!
+`Sorry! No guide yet!
 But check out the GitHub guide.`},
         ]);
-        initModule({
-            location: tp.bottingTab.pages[0], title: "Show Panel", storeAs: "showBotPanel", tooltip: "Show the bot panel", bindLocation: tp.bottingTab.pages[1], button: "Show Panel", defaultBind: "J", clickFunction: () => {
+            initModule({ location: tp.bottingTab.pages[0], title: "Show Panel", storeAs: "showBotPanel", tooltip: "Show the bot panel", bindLocation: tp.bottingTab.pages[1], button: "Show Panel", defaultBind: "J", clickFunction: () => {
                 tp.botPanel.hidden = !tp.botPanel.hidden;
-            }
-        });
-        tp.bottingTab.pages[0].addSeparator();
-        initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", tooltip: "Click for infos on how to get started and free candy", button: "Link", clickFunction: function () { GM_openInTab(bottingGuideURL, { active: true }) }, });
+            }});
+            tp.bottingTab.pages[0].addSeparator();
+            initModule({ location: tp.bottingTab.pages[0], title: "How To?", storeAs: "bottingGuide", tooltip: "Click for infos on how to get started and free candy", button: "Link", clickFunction: function () { GM_openInTab(bottingGuideURL, { active: true }) }, });
         if (allowAccess) {
-            //THEMING MODULES
-            initFolder({ location: tp.mainPanel, title: "Theming", storeAs: "themingFolder", });
-            initTabs({ location: tp.themingFolder, storeAs: "themingTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
-            initModule({
-                location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "Allows you to switch out Shell's default skybox", bindLocation: tp.themingTab.pages[1], dropdown: loadedSkyboxes, changeFunction: (newSkybox) => {
-                    if (!unsafeWindow[skyboxName]) return;
-                    unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = 5; //L.BABYLON.Texture.SKYBOX_MODE;
-                }
-            });
+        //THEMING MODULES
+        initFolder({ location: tp.mainPanel, title: "Theming", storeAs: "themingFolder", });
+        initTabs({ location: tp.themingFolder, storeAs: "themingTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
+            initModule({ location: tp.themingTab.pages[0], title: "Skybox", storeAs: "skybox", tooltip: "Allows you to switch out Shell's default skybox", bindLocation: tp.themingTab.pages[1], dropdown: loadedSkyboxes, changeFunction: (newSkybox) => {
+                if (!unsafeWindow[skyboxName]) return;
+                unsafeWindow[skyboxName].material.reflectionTexture.coordinatesMode = 5; //L.BABYLON.Texture.SKYBOX_MODE;
+            }});
             initModule({ location: tp.themingTab.pages[0], title: "Randomize Skybox", storeAs: "randomSkyBox", tooltip: "Switches the skybox to a random one", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Switch Interval", storeAs: "randomSkyBoxInterval", tooltip: "The interval after which the skybox is switched, given that randomSkyBox is enabled. In minutes", slider: { min: 1, max: 10, step: 0.1 }, defaultValue: 3, });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Legacy Models", storeAs: "legacyModels", tooltip: "Switches to the old models", bindLocation: tp.themingTab.pages[1], });
-            initModule({
-                location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", tooltip: "Adds a color tint to the game", bindLocation: tp.themingTab.pages[1], dropdown: [
-                    { text: "Default", value: 2 },
-                    { text: "Blue", value: 3 },
-                    { text: "Mexico", value: 4 },
-                ],
-            });
-            initModule({
-                location: tp.themingTab.pages[0], title: "Gun Position", storeAs: "gunPosition", tooltip: "Changes the position of your player's gun", bindLocation: tp.themingTab.pages[1], dropdown: [
-                    { text: "Right", value: "right" },
-                    { text: "Left", value: "left" },
-                    { text: "Hidden", value: "hidden" },
-                ],
-            });
+            initModule({ location: tp.themingTab.pages[0], title: "Game Filter", storeAs: "filter", tooltip: "Adds a color tint to the game", bindLocation: tp.themingTab.pages[1], dropdown: [
+                {text: "Default", value: 2},
+                {text: "Blue", value: 3},
+                {text: "Mexico", value: 4},
+            ],});
+            initModule({ location: tp.themingTab.pages[0], title: "Gun Position", storeAs: "gunPosition", tooltip: "Changes the position of your player's gun", bindLocation: tp.themingTab.pages[1], dropdown: [
+                {text: "Right", value: "right"},
+                {text: "Left", value: "left"},
+                {text: "Hidden", value: "hidden"},
+            ],});
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Enable Bob Modifier", storeAs: "bobModifierEnabled", tooltip: "Enable/disable setting the bob effect", bindLocation: tp.themingTab.pages[1], });
             initFolder({ location: tp.themingTab.pages[0], title: "Bob Modifier Settings", storeAs: "bobFolder", });
-            initModule({ location: tp.bobFolder, title: "Bobbing Value", storeAs: "bobModifier", tooltip: "Set to 0 to disable. Mess with other numbers for funny effects.", slider: { min: 0, max: 99, step: 0.01 }, defaultValue: 0, });
-            initModule({ location: tp.bobFolder, title: "Only When Still", storeAs: "bobModifierWhenStill", tooltip: "Disables while you're still.", bindLocation: tp.themingTab.pages[1], });
+                initModule({ location: tp.bobFolder, title: "Bobbing Value", storeAs: "bobModifier", tooltip: "Set to 0 to disable. Mess with other numbers for funny effects.", slider: { min: 0, max: 99, step: 0.01 }, defaultValue: 0, });
+                initModule({ location: tp.bobFolder, title: "Only When Still", storeAs: "bobModifierWhenStill", tooltip: "Disables while you're still.", bindLocation: tp.themingTab.pages[1], });
             tp.themingTab.pages[0].addSeparator();
             initFolder({ location: tp.themingTab.pages[0], title: "Audio Settings", storeAs: "audioFolder", });
-            initModule({ location: tp.audioFolder, title: "Mute Game", storeAs: "muteGame", tooltip: "Mute the game?", bindLocation: tp.themingTab.pages[1], });
-            initModule({ location: tp.audioFolder, title: "DistanMult", storeAs: "distanceMult", tooltip: "Makes the distance when playing sfx change", slider: { min: 0.01, max: 2, step: 0.01 }, defaultValue: 1, });
-            tp.audioFolder.addSeparator();
-            initModule({ location: tp.audioFolder, title: "CustomSFX (1st)", storeAs: "customSFX1", tooltip: "Select a custom sound pack. Changes in-game sounds. Three pack slots available at once", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
-            initModule({ location: tp.audioFolder, title: "CustomSFX (2nd)", storeAs: "customSFX2", tooltip: "Select a custom sound pack. Changes in-game sounds. Three pack slots available at once", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
-            initModule({ location: tp.audioFolder, title: "CustomSFX (3rd)", storeAs: "customSFX3", tooltip: "Select a custom sound pack. Changes in-game sounds. Three pack slots available at once", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
+                initModule({ location: tp.audioFolder, title: "Mute Game", storeAs: "muteGame", tooltip: "Mute the game?", bindLocation: tp.themingTab.pages[1], });
+                initModule({ location: tp.audioFolder, title: "DistanMult", storeAs: "distanceMult", tooltip: "Makes the distance when playing sfx change", slider: { min: 0.01, max: 2, step: 0.01 }, defaultValue: 1, });
+                tp.audioFolder.addSeparator();
+                initModule({ location: tp.audioFolder, title: "CustomSFX (1st)", storeAs: "customSFX1", tooltip: "Select a custom sound pack. Changes in-game sounds. Three pack slots available at once", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
+                initModule({ location: tp.audioFolder, title: "CustomSFX (2nd)", storeAs: "customSFX2", tooltip: "Select a custom sound pack. Changes in-game sounds. Three pack slots available at once", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
+                initModule({ location: tp.audioFolder, title: "CustomSFX (3rd)", storeAs: "customSFX3", tooltip: "Select a custom sound pack. Changes in-game sounds. Three pack slots available at once", bindLocation: tp.themingTab.pages[1], enableConditions: [["muteGame", false]], dropdown: JSON.parse(JSON.stringify(retrievedSFX)), });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Replace Logo", storeAs: "replaceLogo", tooltip: "Replaces shell shockers' BORING logo with the BEAUTIFUL StateFarm logo", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Animate Title", storeAs: "titleAnimation", tooltip: "Makes the page title look cool", bindLocation: tp.themingTab.pages[1], });
-            initModule({
-                location: tp.themingTab.pages[0], title: "Client Theme", storeAs: "themeType", tooltip: "Controls the client's UI theme", bindLocation: tp.themingTab.pages[1], dropdown: [
-                    { text: "Default", value: "defaultTheme" },
-                    { text: "Iceberg", value: "icebergTheme" },
-                    { text: "Jet Black", value: "jetblackTheme" },
-                    { text: "Light", value: "lightTheme" },
-                    { text: "Retro", value: "retroTheme" },
-                    { text: "Translucent", value: "translucentTheme" },
-                    { text: "StateFarmer", value: "statefarmerTheme" },
-                    { text: "Blurple", value: "blurpleTheme" },
-                    { text: "ShellFarm", value: "shellFarmTheme" },
-                ], defaultValue: "defaultTheme", changeFunction: function (value) {
-                    applyTheme(value.value);
-                }
-            });
+            initModule({ location: tp.themingTab.pages[0], title: "Client Theme", storeAs: "themeType", tooltip: "Controls the client's UI theme", bindLocation: tp.themingTab.pages[1], dropdown: [
+                {text: "Default", value: "defaultTheme"},
+                {text: "Iceberg", value: "icebergTheme"},
+                {text: "Jet Black", value: "jetblackTheme"},
+                {text: "Light", value: "lightTheme"},
+                {text: "Retro", value: "retroTheme"},
+                {text: "Translucent", value: "translucentTheme"},
+                {text: "StateFarmer", value: "statefarmerTheme"},
+                {text: "Blurple", value: "blurpleTheme"},
+                {text: "ShellFarm", value: "shellFarmTheme"},
+            ], defaultValue: "defaultTheme", changeFunction: function(value) {
+                applyTheme(value.value);
+            }});
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "Enable Party Lights", storeAs: "partyLightsEnabled", tooltip: "🥳🥳 Let the party begin 🎉🎉", bindLocation: tp.themingTab.pages[1], });
             initModule({ location: tp.themingTab.pages[0], title: "Party Lights Intensity", storeAs: "partyLightsIntensity", tooltip: "Intensity of the party 🥳", slider: { min: 0.01, max: 20, step: 0.01 }, defaultValue: 0.5, });
             tp.themingTab.pages[0].addSeparator();
             initModule({ location: tp.themingTab.pages[0], title: "World Flattening", storeAs: "worldFlattening", tooltip: "Make the world F-L-A-T", slider: { min: 0.05, max: 10, step: 0.05 }, defaultValue: 1, });
-            //ACCOUNT MODULES
-            initFolder({ location: tp.mainPanel, title: "Accounts", storeAs: "accountsFolder", });
-            initTabs({ location: tp.accountsFolder, storeAs: "accountsTab" }, [
-                {
-                    title: "Basics", content:
-                        `This is the accounts tab. Here you will find
+        //ACCOUNT MODULES
+        initFolder({ location: tp.mainPanel, title: "Accounts", storeAs: "accountsFolder", });
+        initTabs({ location: tp.accountsFolder, storeAs: "accountsTab" }, [
+            {
+                title: "Basics", content:
+`This is the accounts tab. Here you will find
 options relating to managing your thousands of
 shell accounts and options that will enable you
 to alt like a pro.`},
-                {
-                    title: "Login DB", content:
-                        `The Login DB allows you to alt with ease. Put
+            {
+                title: "Login DB", content:
+`The Login DB allows you to alt with ease. Put
 simply, it is just a list of EmailPass combos.
 It is simpler than AccountRecords, but one does
 not replace the other. Login DB is stored
@@ -1809,9 +1745,9 @@ via the use of other userscripts not authorised
 by the StateFarm developers. This DB is not
 exposed to the Shell Shockers game (unless you
 have enabled debug mode).`},
-                {
-                    title: "AccRecord", content:
-                        `The AccountRecords database is similar, but
+            {
+                title: "AccRecord", content:
+`The AccountRecords database is similar, but
 different to the Login DB. Whilst the Login DB
 serves to allow you to quickly switch to a new
 account, AccountRecords saves information
@@ -1841,11 +1777,10 @@ userscripts not authorised by the StateFarm
 developers. This DB is not exposed to the
 Shell Shockers game (unless you have enabled
 debug mode).`},
-            ]);
+        ]);
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Login (Basic)", storeAs: "loginFolder", });
-            initModule({ location: tp.loginFolder, title: 'Email:Pass', storeAs: 'loginEmailPass', tooltip: "Field for loginLogin", defaultValue: "ex@gmail.com:passwd" });
-            initModule({
-                location: tp.loginFolder, title: 'Login Account', storeAs: 'loginLogin', tooltip: "Log into an account using email:pass without using shell's UI", button: 'LOGIN', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginFolder, title: 'Email:Pass', storeAs: 'loginEmailPass', tooltip: "Field for loginLogin", defaultValue: "ex@gmail.com:passwd" });
+                initModule({ location: tp.loginFolder, title: 'Login Account', storeAs: 'loginLogin', tooltip: "Log into an account using email:pass without using shell's UI", button: 'LOGIN', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let emailPass = extract("loginEmailPass");
                     if (emailPass.includes(":")) {
                         loginOrCreateWithEmailPass(emailPass);
@@ -1855,16 +1790,14 @@ debug mode).`},
                             loginOrCreateWithEmailPass(emailPass);
                         }; //else fuck you. im not doing anything with that.
                     };
-                }
-            });
+                } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Login (Login Database)", storeAs: "loginDatabaseFolder", });
-            initModule({
-                location: tp.loginDatabaseFolder, title: 'Login Next Account', storeAs: 'loginDatabaseLogin', button: 'LOGIN', tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.loginDatabaseFolder, title: 'Login Next Account', storeAs: 'loginDatabaseLogin', button: 'LOGIN', tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                     let loginDBlength = loginDB.length;
                     if (loginDBlength > 0) {
-                        let index = extract("loginDatabaseSelection") == "inorder" ? 0 : Math.ceil((Math.random() * 0.75) * (loginDBlength - 1));
+                        let index = extract("loginDatabaseSelection") == "inorder" ? 0 : Math.ceil((Math.random()*0.75)*(loginDBlength-1));
                         log(`selecting index ${index}, this is out of ${loginDBlength} entries.`);
                         let [emailPass] = loginDB.splice(index, 1); //delete and retrieve
                         loginDB.push(emailPass);
@@ -1875,19 +1808,15 @@ debug mode).`},
                     } else {
                         createPopup("LoginDB is empty!", "error");
                     };
-                }
-            });
-            initModule({ location: tp.loginDatabaseFolder, title: "Selection Type", storeAs: "loginDatabaseSelection", tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "In Order", value: "inorder" }, { text: "Random", value: "random" }], defaultValue: "inorder" });
-            initModule({ location: tp.loginDatabaseFolder, title: "Auto Login", storeAs: "autoLogin", tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled" });
-            tp.loginDatabaseFolder.addSeparator();
-            initModule({
-                location: tp.loginDatabaseFolder, title: 'Export DB(JSON)', storeAs: 'loginDatabaseExport', tooltip: "Tools for managing accounts in a Database", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.loginDatabaseFolder, title: "Selection Type", storeAs: "loginDatabaseSelection", tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "In Order", value: "inorder" }, { text: "Random", value: "random" }], defaultValue: "inorder" });
+                initModule({ location: tp.loginDatabaseFolder, title: "Auto Login", storeAs: "autoLogin", tooltip: "Tools for managing accounts in a Database", bindLocation: tp.accountsTab.pages[1], dropdown: [{ text: "Disabled", value: "disabled" }, { text: "When No Account", value: "noaccount" }, { text: "Always", value: "always" }], defaultValue: "disabled" });
+                tp.loginDatabaseFolder.addSeparator();
+                initModule({ location: tp.loginDatabaseFolder, title: 'Export DB(JSON)', storeAs: 'loginDatabaseExport', tooltip: "Tools for managing accounts in a Database", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     GM_setClipboard(JSON.stringify(GM_getValue("StateFarm_LoginDB") || []), "text", () => log("Clipboard set!"));
                     createPopup("Login DB copied to clipboard...");
-                }
-            });
-            initModule({
-                location: tp.loginDatabaseFolder, title: 'Import Into LoginDB', storeAs: 'loginDatabaseExport', tooltip: "Tools for managing accounts in a Database", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.loginDatabaseFolder, title: 'Import Into LoginDB', storeAs: 'loginDatabaseExport', tooltip: "Tools for managing accounts in a Database", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`Input data you would like to add to your LoginDB. This will NOT replace your current data. All data added here will be put at the end of the queue. Also make sure that this data goes here and not into the AccountRecords DB.`, 'Reminder: JSON format!');
                     try {
                         let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
@@ -1900,10 +1829,8 @@ debug mode).`},
                     } catch {
                         createPopup("Failed! Check the formatting.", "error");
                     };
-                }
-            });
-            initModule({
-                location: tp.loginDatabaseFolder, title: 'ImportFromRecords', storeAs: 'loginDatabaseImportRecords', tooltip: "Tools for managing accounts in a Database", button: 'APPEND', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.loginDatabaseFolder, title: 'ImportFromRecords', storeAs: 'loginDatabaseImportRecords', tooltip: "Tools for managing accounts in a Database", button: 'APPEND', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("This action will import any Email:Pass combos you have in AccountRecords. Make sure you want to do this, as this will potentially add a lot of new records. Type 'ok' to proceed. This cannot be reversed, export first to be safe. Note: all the new records are added to the end of the queue.") === 'ok') {
                         let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
                         let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
@@ -1916,41 +1843,31 @@ debug mode).`},
                         GM_setValue("StateFarm_LoginDB", loginDB);
                         createPopup("Appended from AccountDetails!", "success");
                     };
-                }
-            });
-            initModule({
-                location: tp.loginDatabaseFolder, title: 'Delete LoginDB', storeAs: 'loginDatabaseDelete', tooltip: "Tools for managing accounts in a Database", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.loginDatabaseFolder, title: 'Delete LoginDB', storeAs: 'loginDatabaseDelete', tooltip: "Tools for managing accounts in a Database", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("WARNING! This is a destructive action! Type 'ok' if you are really sure you want to delete your LoginDB! This cannot be reversed, export first to be safe.") === 'ok') {
                         GM_setValue("StateFarm_LoginDB", []); //o7 data
                     };
-                }
-            });
-            initModule({
-                location: tp.loginDatabaseFolder, title: 'LoginDB Info', storeAs: 'loginDatabaseInfo', tooltip: "Tools for managing accounts in a Database", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.loginDatabaseFolder, title: 'LoginDB Info', storeAs: 'loginDatabaseInfo', tooltip: "Tools for managing accounts in a Database", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let loginDB = GM_getValue("StateFarm_LoginDB") || []; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other. (yes this needed to be said again)
                     alert(`You currently have ${loginDB.length} accounts in LoginDB. For info on what this is, check the guide tab.`);
-                }
-            });
+                } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (Basic)", storeAs: "generatorFolder", });
-            initModule({ location: tp.generatorFolder, title: 'Gmail (before @)', storeAs: 'accountGmail', tooltip: "The gmail prefix", defaultValue: "example (NO @gmail.com)" });
-            initModule({ location: tp.generatorFolder, title: 'Password to use', storeAs: 'accountPass', tooltip: "The account's password", defaultValue: "password69" });
-            initModule({
-                location: tp.generatorFolder, title: 'Create (Basic)', storeAs: 'accountCreate', tooltip: "Basic Gmail account creation", button: 'CREATE', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
-                    loginOrCreateWithEmailPass(extract("accountGmail") + "+" + getScrambled() + "@gmail.com:" + extract("accountPass"));
-                }
-            });
+                initModule({ location: tp.generatorFolder, title: 'Gmail (before @)', storeAs: 'accountGmail', tooltip: "The gmail prefix", defaultValue: "example (NO @gmail.com)" });
+                initModule({ location: tp.generatorFolder, title: 'Password to use', storeAs: 'accountPass', tooltip: "The account's password", defaultValue: "password69" });
+                initModule({ location: tp.generatorFolder, title: 'Create (Basic)', storeAs: 'accountCreate', tooltip: "Basic Gmail account creation", button: 'CREATE', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                    loginOrCreateWithEmailPass(extract("accountGmail")+"+"+getScrambled()+"@gmail.com:"+extract("accountPass"));
+                } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Records Database", storeAs: "accountRecordsFolder", });
-            initModule({ location: tp.accountRecordsFolder, title: "Disable Logging", storeAs: "accountRecordsLogging", tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", bindLocation: tp.accountsTab.pages[1], });
-            initModule({
-                location: tp.accountRecordsFolder, title: 'Export DB (JSON)', storeAs: 'accountRecordsExport', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                initModule({ location: tp.accountRecordsFolder, title: "Disable Logging", storeAs: "accountRecordsLogging", tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", bindLocation: tp.accountsTab.pages[1], });
+                initModule({ location: tp.accountRecordsFolder, title: 'Export DB (JSON)', storeAs: 'accountRecordsExport', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'EXPORT (COPY)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     GM_setClipboard(JSON.stringify(GM_getValue("StateFarm_AccountRecords") || {}), "text", () => log("Clipboard set!"));
                     createPopup("AccountRecords DB copied to clipboard...");
-                }
-            });
-            initModule({
-                location: tp.accountRecordsFolder, title: 'Import Into DB', storeAs: 'accountRecordsImport', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.accountRecordsFolder, title: 'Import Into DB', storeAs: 'accountRecordsImport', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'APPEND (PASTE)', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`Input data you would like to add to your AccountRecords DB. This will NOT replace your current data. All data added here either be added or replace existing records. Also make sure that this data goes here and not into the LoginDB.`, 'Reminder: JSON format!');
                     try {
                         let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
@@ -1963,17 +1880,13 @@ debug mode).`},
                     } catch {
                         createPopup("Failed! Check the formatting.", "error");
                     };
-                }
-            });
-            initModule({
-                location: tp.accountRecordsFolder, title: 'Delete DB', storeAs: 'accountRecordsDelete', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.accountRecordsFolder, title: 'Delete DB', storeAs: 'accountRecordsDelete', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'DELETE!', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     if (prompt("WARNING! This is a destructive action! Type 'ok' if you are really sure you want to delete your AccountRecords DB! This cannot be reversed, export first to be safe.") === 'ok') {
                         GM_setValue("StateFarm_AccountRecords", {}); //o7 data
                     };
-                }
-            });
-            initModule({
-                location: tp.accountRecordsFolder, title: 'View Info', storeAs: 'accountRecordsInfo', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
+                } });
+                initModule({ location: tp.accountRecordsFolder, title: 'View Info', storeAs: 'accountRecordsInfo', tooltip: "Account Records Database options. Only needed when dealing with a lot of accounts", button: 'INFO', bindLocation: tp.accountsTab.pages[1], clickFunction: function () {
                     let userInput = prompt(`This will output some information relating to what information you have in your AccountRecords DB.\nParameters: Enter 1 to only print Email:Pass list of those with items, enter 2 for those with no items.`, '');
                     let accountRecords = GM_getValue("StateFarm_AccountRecords") || {}; //why declare this so many times? the DBs need to be constantly rechecked, as other clients may have modified. we wouldnt want to be overwriting each other.
                     let tierCache = GM_getValue("StateFarm_TierCache") || {};
@@ -1986,11 +1899,11 @@ debug mode).`},
                     Object.entries(accountRecords).forEach(([key, account]) => {
                         if (account) {
                             let countedAccount = false; accountCount++;
-                            let inventoryList = [];
-                            account.inventory.forEach(item => { inventoryList.push(item.name) });
+                            let inventoryList=[];
+                            account.inventory.forEach(item=>{inventoryList.push(item.name)});
                             if (inventoryList) {
                                 for (let item of inventoryList) {
-                                    if (!countedAccount) { countedAccount = true; accountWithItemsCount++ };
+                                    if (!countedAccount) {countedAccount = true; accountWithItemsCount++};
                                     if (tierCache[item]) {
                                         item = `${item} [T${tierCache[item]}]`;
                                     };
@@ -2033,27 +1946,24 @@ debug mode).`},
                     log(JSON.stringify(emailPassList));
                     log('%c' + ' '.repeat(500), 'background: white; color: white; font-size: 50px;');
                     alert(`Results:\nAccounts Total: ${accountCount}; With Items: ${accountWithItemsCount}\nItem Count: ${itemCountTotal}\nOther info has been pasted into console.`);
-                }
-            });
+                } });
             tp.accountsTab.pages[0].addSeparator();
             initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (Factory)", storeAs: "factoryFolder", });
-            initModule({ location: tp.factoryFolder, title: 'Factory Key', storeAs: 'factoryKey', tooltip: "Factory access token (for the lucky few)", defaultValue: "" });
-            initModule({ location: tp.factoryFolder, title: 'Factory Gen', storeAs: 'factoryGen', tooltip: "Get an account from the Factory database", button: 'Generate!', clickFunction: () => F.runFactory(), bindLocation: tp.accountsTab.pages[1] });
+                initModule({ location: tp.factoryFolder, title: 'Factory Key', storeAs: 'factoryKey', tooltip: "Factory access token (for the lucky few)", defaultValue: "" });
+                initModule({ location: tp.factoryFolder, title: 'Factory Gen', storeAs: 'factoryGen', tooltip: "Get an account from the Factory database", button: 'Generate!', clickFunction: () => F.runFactory(), bindLocation: tp.accountsTab.pages[1] });
             tp.accountsTab.pages[0].addSeparator();
             initModule({ location: tp.accountsTab.pages[0], title: 'Email Verified Gen', storeAs: 'kilnGen', tooltip: 'Instantly generates an email-verified account to chat with using the Kiln project', button: 'Generate!', clickFunction: () => F.runKiln(), bindLocation: tp.accountsTab.pages[1] })
             tp.accountsTab.pages[0].addSeparator();
-            //MISC MODULES
-            initFolder({ location: tp.mainPanel, title: "Misc", storeAs: "miscFolder", });
-            initTabs({ location: tp.miscFolder, storeAs: "miscTab" }, [
-                {
-                    title: "WIP", content:
-                        `Sorry! No guide yet!`
-                },
-            ]);
+        //MISC MODULES
+        initFolder({ location: tp.mainPanel, title: "Misc", storeAs: "miscFolder", });
+        initTabs({ location: tp.miscFolder, storeAs: "miscTab" }, [
+            {
+                title: "WIP", content:
+`Sorry! No guide yet!`},
+        ]);
             //move this stuff to top bc its more important
             initFolder({ location: tp.miscTab.pages[0], title: "Ban Evasion Options", storeAs: "banFolder", });
-            initModule({
-                location: tp.banFolder, title: "Unban", storeAs: "unban", tooltip: "Unbans you by signing out. You will lose skins if you're not signed in.", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function () {
+                initModule({ location: tp.banFolder, title: "Unban", storeAs: "unban", tooltip: "Unbans you by signing out. You will lose skins if you're not signed in.", bindLocation: tp.miscTab.pages[1], button: "UNBAN NOW", clickFunction: function(){
                     if (GM_getValue('StateFarm_Unbanned')) unban();
                     else if (prompt("By proceeding, you will be signed out. If you don't have an account, your stats will be lost.\nEnter 'ok' to confirm this.\nThis popup will not be shown again for future unbans.") === 'ok') {
                         GM_setValue('StateFarm_Unbanned', 'true');
@@ -2061,78 +1971,63 @@ debug mode).`},
                     } else {
                         alert('You did not entire "ok", so the unban was cancelled.');
                     };
-                },
-            });
-            initModule({ location: tp.banFolder, title: "Auto Unban", storeAs: "autoUnban", tooltip: "Automatically detects bans & unbans in above fashion", bindLocation: tp.miscTab.pages[1], });
-            initModule({
-                location: tp.banFolder, title: "New Proxy", storeAs: "newProxy", tooltip: "Switches to a new shell shockers link. SF config won't be transferred", bindLocation: tp.miscTab.pages[1], button: "NEW PROXY", clickFunction: function () {
-                    const userConfirmed = confirm("Switching to a proxy URL. By proceeding, you will enter another URL for Shell Shockers but your data doesn't get transferred.");
+                },});
+                initModule({ location: tp.banFolder, title: "Auto Unban", storeAs: "autoUnban", tooltip: "Automatically detects bans & unbans in above fashion", bindLocation: tp.miscTab.pages[1],});
+                initModule({ location: tp.banFolder, title: "New Proxy", storeAs: "newProxy", tooltip: "Switches to a new shell shockers link. SF config won't be transferred", bindLocation: tp.miscTab.pages[1], button: "NEW PROXY", clickFunction: function(){
+                    const userConfirmed=confirm("Switching to a proxy URL. By proceeding, you will enter another URL for Shell Shockers but your data doesn't get transferred.");
                     if (userConfirmed) {
                         newProxy();
                     };
-                },
-            });
-            initModule({
-                location: tp.banFolder, title: "Reload Page", storeAs: "reload", tooltip: "Reloads the page", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function () {
+                },});
+                initModule({ location: tp.banFolder, title: "Reload Page", storeAs: "reload", tooltip: "Reloads the page", bindLocation: tp.miscTab.pages[1], button: "RELOAD NOW", clickFunction: function(){
                     reloadPage();
-                },
-            });
+                },});
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "AntiAFK", storeAs: "antiAFK", tooltip: "Bypasses AFK kicks", bindLocation: tp.miscTab.pages[1], });
             initModule({ location: tp.miscTab.pages[0], title: "Quick Respawn", storeAs: "quickRespawn", tooltip: "Respawns quicker than usual", bindLocation: tp.miscTab.pages[1], });
-            initModule({
-                location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", tooltip: "Despawns, similar to the Esc key, but you can move while despawning, not that you cannot deal damage while sneaky despawning", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function () {
-                    if (!(unsafeWindow.extern.gamePaused || sneakyDespawning)) {
-                        sneakyDespawning = true;
-                        ss.PAUSE(); createPopup("SneakyDespawn: 3 seconds.");
+            initModule({ location: tp.miscTab.pages[0], title: "Sneaky Despawn", storeAs: "sneakyDespawn", tooltip: "Despawns, similar to the Esc key, but you can move while despawning, not that you cannot deal damage while sneaky despawning", bindLocation: tp.miscTab.pages[1], button: "Despawn... soon!", defaultBind: "Backquote", clickFunction: function(){
+                if (!(unsafeWindow.extern.gamePaused || sneakyDespawning)) {
+                    sneakyDespawning = true;
+                    ss.PAUSE(); createPopup("SneakyDespawn: 3 seconds.");
+                    setTimeout(() => { createPopup("SneakyDespawn: 2 seconds.");
+                    }, 1e3);
+                    setTimeout(() => { createPopup("SneakyDespawn: 1 second.");
+                    }, 2e3);
+                    setTimeout(() => { createPopup("SneakyDespawn: Now despawning!");
+                        document.exitPointerLock(); document.onpointerlockchange();
                         setTimeout(() => {
-                            createPopup("SneakyDespawn: 2 seconds.");
-                        }, 1e3);
-                        setTimeout(() => {
-                            createPopup("SneakyDespawn: 1 second.");
-                        }, 2e3);
-                        setTimeout(() => {
-                            createPopup("SneakyDespawn: Now despawning!");
-                            document.exitPointerLock(); document.onpointerlockchange();
-                            setTimeout(() => {
-                                sneakyDespawning = false;
-                            }, 200);
-                        }, 3e3);
-                    };
-                },
-            });
+                            sneakyDespawning = false;
+                        }, 200);
+                    }, 3e3);
+                };
+            },});
             initModule({ location: tp.miscTab.pages[0], title: "InstantSpectate", storeAs: "instantSpectate", tooltip: "Don't wait around for the spectate button to appear", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
             initFolder({ location: tp.miscTab.pages[0], title: "StateFarm UI Options", storeAs: "sfcUIFolder", });
-            initModule({ location: tp.sfcUIFolder, title: "StateFarm Updates", storeAs: "statefarmUpdates", tooltip: "Shows a element at the home screen about statefarm's update history, notifies you when update is available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.sfcUIFolder, title: "Replace Feeds", storeAs: "replaceFeeds", tooltip: "Replaces the game menu's news and videos feed with content by the StateFarm dev team", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
-            initModule({ location: tp.sfcUIFolder, title: "Custom Badges", storeAs: "customBadges", tooltip: "Enables custom StateFarm badges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+                initModule({ location: tp.sfcUIFolder, title: "StateFarm Updates", storeAs: "statefarmUpdates", tooltip: "Shows a element at the home screen about statefarm's update history, notifies you when update is available", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+                initModule({ location: tp.sfcUIFolder, title: "Replace Feeds", storeAs: "replaceFeeds", tooltip: "Replaces the game menu's news and videos feed with content by the StateFarm dev team", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
+                initModule({ location: tp.sfcUIFolder, title: "Custom Badges", storeAs: "customBadges", tooltip: "Enables custom StateFarm badges", bindLocation: tp.miscTab.pages[1], defaultValue: true, });
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "Unlock Skins (View Only)", storeAs: "unlockSkins", tooltip: "Unlocks all skins in locally (other players will not see these)", bindLocation: tp.miscTab.pages[1], });
-            initModule({
-                location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", tooltip: "Unlocks the real bros grenade skin to your account", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function () {
-                    unsafeWindow.extern.giveBasketBrosReward();
-                },
-            });
+            initModule({ location: tp.miscTab.pages[0], title: "Unlock Bros Grenade", storeAs: "brosGrenade", tooltip: "Unlocks the real bros grenade skin to your account", bindLocation: tp.miscTab.pages[1], button: "Unlock, real.", clickFunction: function(){
+                unsafeWindow.extern.giveBasketBrosReward();
+            },});
             initModule({ location: tp.miscTab.pages[0], title: "Admin Spoof", storeAs: "adminSpoof", tooltip: "Shows admin options such as BOOT and BAN in games. No ACTUAL functionality", bindLocation: tp.miscTab.pages[1], });
             tp.miscTab.pages[0].addSeparator();
-            initModule({
-                location: tp.miscTab.pages[0], title: "Switch Focus", storeAs: "unfocus", tooltip: "Controls the focus of the game. Allows for tabbing out without despawning", bindLocation: tp.miscTab.pages[1], button: "FOCUS/UNFOCUS", defaultBind: "P", clickFunction: function () {
-                    if (document.pointerLockElement !== null) { //currently locked
-                        noPointerPause = true; unsafeWindow.document.exitPointerLock();
-                    } else if (noPointerPause) { //already unlocked?
-                        noPointerPause = false;
-                        unsafeWindow.canvas.requestPointerLock();
-                    };
-                },
-            });
+            initModule({ location: tp.miscTab.pages[0], title: "Switch Focus", storeAs: "unfocus", tooltip: "Controls the focus of the game. Allows for tabbing out without despawning", bindLocation: tp.miscTab.pages[1], button: "FOCUS/UNFOCUS", defaultBind: "P", clickFunction: function(){
+                if (document.pointerLockElement !== null) { //currently locked
+                    noPointerPause=true; unsafeWindow.document.exitPointerLock();
+                } else if (noPointerPause) { //already unlocked?
+                    noPointerPause=false;
+                    unsafeWindow.canvas.requestPointerLock();
+                };
+            },});
             tp.miscTab.pages[0].addSeparator();
             initFolder({ location: tp.miscTab.pages[0], title: "Chicken Winner Options", storeAs: "chwFolder", });
-            initModule({
-                location: tp.chwFolder, title: "FastChickenWinner", storeAs: "chickenWinner", tooltip: "Instantly plays the chick'n winner minigame", bindLocation: tp.miscTab.pages[1], button: "Force Play", clickFunction: function () {
+                initModule({ location: tp.chwFolder, title: "FastChickenWinner", storeAs: "chickenWinner", tooltip: "Instantly plays the chick'n winner minigame", bindLocation: tp.miscTab.pages[1], button: "Force Play", clickFunction: function(){
                     unsafeWindow.extern.chwTryPlay();
                     const eggElement = document.getElementById("eggOne");
-                    eggElement.click(); eggElement.click(); eggElement.click(); eggElement.click(); eggElement.click(); eggElement.click(); eggElement.click(); eggElement.click(); eggElement.click();
+                    eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();eggElement.click();
                     let chicknWinnerElementLoaded = false;
                     const checkInterval = setInterval(() => {
                         const chicknWinnerElement = document.getElementById('chicknWinner');
@@ -2150,226 +2045,205 @@ debug mode).`},
                             };
                         };
                     }, 100);
-                },
-            });
-            initModule({ location: tp.chwFolder, title: "AutoChickenWinner", storeAs: "autoChickenWinner", tooltip: "Automatically plays the chick'n winner minigame when cooldowns are over", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.chwFolder, title: "Chw Info Notifications", storeAs: "chickenWinnerNotifs", tooltip: "Alerts you of the tier of what you just earned and other infos.", bindLocation: tp.miscTab.pages[1], });
+                },});
+                initModule({ location: tp.chwFolder, title: "AutoChickenWinner", storeAs: "autoChickenWinner", tooltip: "Automatically plays the chick'n winner minigame when cooldowns are over", bindLocation: tp.miscTab.pages[1],});
+                initModule({ location: tp.chwFolder, title: "Chw Info Notifications", storeAs: "chickenWinnerNotifs", tooltip: "Alerts you of the tier of what you just earned and other infos.", bindLocation: tp.miscTab.pages[1],});
             tp.miscTab.pages[0].addSeparator();
-            initModule({
-                location: tp.miscTab.pages[0], title: "Get Game History", storeAs: "getGameHistory", tooltip: "Displays a list of the last few lobbies you were in", bindLocation: tp.miscTab.pages[1], button: "get", clickFunction: function () {
-                    let games = GM_getValue("StateFarm_GameHistory");
-                    //alert(GM_getValue("StateFarm_GameHistory"));
-                    if (!games) {
-                        alert("no history!");
-                        return;
-                    }
-                    games = JSON.parse(games);
-                    let gString = "";
-                    games.forEach(g => {
-                        gString += g.code;
-                        if (g.amount > 1) gString += ` (${g.amount})`;
-                        gString += ": ";
-                        gString += g.string; //omggggg
+            initModule({ location: tp.miscTab.pages[0], title: "Get Game History", storeAs: "getGameHistory", tooltip: "Displays a list of the last few lobbies you were in", bindLocation: tp.miscTab.pages[1], button: "get", clickFunction: function(){
+              let games = GM_getValue("StateFarm_GameHistory");
+              //alert(GM_getValue("StateFarm_GameHistory"));
+              if(!games) {
+              alert("no history!");
+                return;
+              }
+              games = JSON.parse(games);
+              let gString = "";
+              games.forEach(g => {
+                gString+= g.code;
+                if(g.amount>1) gString += ` (${g.amount})`;
+                gString+= ": ";
+                gString+= g.string; //omggggg
 
-                        gString += ` (left at ${new Date(g.time).toLocaleString()} via ${g.closeCode} ${g.message})`
+                gString+= ` (left at ${new Date(g.time).toLocaleString()} via ${g.closeCode} ${g.message})`
 
-                        gString += "\n";
-                    });
-                    console.log(gString); //debated using log(), but this is a direct user input so yhhhhhhhh
-                    gString += "\na copy of this list has been dumped into the console, if you wish to copy a code.";
-                    alert(gString);
-                },
-            });
-            initModule({
-                location: tp.miscTab.pages[0], title: "Clear Game History", storeAs: "clearGameHistory", tooltip: "Clear your stored game history", bindLocation: tp.miscTab.pages[1], button: "clear", clickFunction: function () {
-                    if (!GM_getValue("StateFarm_GameHistory")) return;
-                    log("deleting game history: " + GM_getValue("StateFarm_GameHistory"));
-                    GM_deleteValue("StateFarm_GameHistory");
-                    createPopup("game history deleted!");
-                },
-            });
+                gString += "\n";
+              });
+              console.log(gString); //debated using log(), but this is a direct user input so yhhhhhhhh
+              gString+="\na copy of this list has been dumped into the console, if you wish to copy a code.";
+              alert(gString);
+            },});
+            initModule({ location: tp.miscTab.pages[0], title: "Clear Game History", storeAs: "clearGameHistory", tooltip: "Clear your stored game history", bindLocation: tp.miscTab.pages[1], button: "clear", clickFunction: function(){
+              if(!GM_getValue("StateFarm_GameHistory")) return;
+              log("deleting game history: " + GM_getValue("StateFarm_GameHistory"));
+              GM_deleteValue("StateFarm_GameHistory");
+              createPopup("game history deleted!");
+            },});
             initModule({ location: tp.miscTab.pages[0], title: "Custom Macro", storeAs: "customMacro", tooltip: "The JavaScript macro executed via executeMacro", defaultValue: "log('cool');" });
-            initModule({
-                location: tp.miscTab.pages[0], title: "Execute Macro", storeAs: "executeMacro", tooltip: "Allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.", bindLocation: tp.miscTab.pages[1], button: "EXECUTE", clickFunction: function () {
-                    //use at your own risk, i guess. but is this really any more dangerous than pasting something into console? not really.
-                    (async () => {
-                        try {
-                            log(extract("customMacro"));
-                            // stay safe out there. this runs in the **userscript** environment. make sure to use unsafeWindow for whatever reason you may need the window object.
-                            await eval(extract("customMacro")); // eslint-disable-line
-                        } catch (error) {
-                            console.error("Error executing code:", error);
-                        }
-                    })();
-                },
-            }); //but yes, as you can see "macros" are just scripts you can execute for whatever purposes you need. reminds me of userscripts...
-            initModule({ location: tp.miscTab.pages[0], title: "Do At Startup", storeAs: "autoMacro", tooltip: "Executes the entered macro at client startup", bindLocation: tp.miscTab.pages[1], });
+            initModule({ location: tp.miscTab.pages[0], title: "Execute Macro", storeAs: "executeMacro", tooltip: "Allows for JS code to be executed from the client itself. Runs in userscript environment, so use unsafeWindow etc.", bindLocation: tp.miscTab.pages[1], button: "EXECUTE", clickFunction: function(){
+                //use at your own risk, i guess. but is this really any more dangerous than pasting something into console? not really.
+                (async () => {
+                    try {
+                        log(extract("customMacro"));
+                        // stay safe out there. this runs in the **userscript** environment. make sure to use unsafeWindow for whatever reason you may need the window object.
+                        await eval(extract("customMacro")); // eslint-disable-line
+                    } catch (error) {
+                        console.error("Error executing code:", error);
+                    }
+                })();
+            },}); //but yes, as you can see "macros" are just scripts you can execute for whatever purposes you need. reminds me of userscripts...
+            initModule({ location: tp.miscTab.pages[0], title: "Do At Startup", storeAs: "autoMacro", tooltip: "Executes the entered macro at client startup", bindLocation: tp.miscTab.pages[1],});
             tp.miscTab.pages[0].addSeparator();
-            initModule({
-                location: tp.miscTab.pages[0], title: "[WIP]RandomPath", storeAs: "randomPath", tooltip: "Forces a new random path (pathfinding currently disabled)", bindLocation: tp.miscTab.pages[1], button: "Random Path", clickFunction: function () {
-                    findNewPath = true;
-                },
-            });
+            initModule({ location: tp.miscTab.pages[0], title: "[WIP]RandomPath", storeAs: "randomPath", tooltip: "Forces a new random path (pathfinding currently disabled)", bindLocation: tp.miscTab.pages[1], button: "Random Path", clickFunction: function(){
+                findNewPath = true;
+            },});
             findNewPath = false;
             tp.miscTab.pages[0].addSeparator();
             initModule({ location: tp.miscTab.pages[0], title: "SilentRoll", storeAs: "silentRoll", tooltip: "Rolls around without showing it client sided", bindLocation: tp.miscTab.pages[1], });
             initFolder({ location: tp.miscTab.pages[0], title: "Seizure Options", storeAs: "seizureFolder", });
-            initModule({ location: tp.seizureFolder, title: "SeizureX", storeAs: "enableSeizureX", tooltip: "Rotates the player by the specified amount around the y-axis (yaw)", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.seizureFolder, title: "X Amount", storeAs: "amountSeizureX", tooltip: "Amount to roll", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
-            initModule({ location: tp.seizureFolder, title: "SeizureY", storeAs: "enableSeizureY", tooltip: "Rotates the player by the specified amount around the x-axis (pitch)", bindLocation: tp.miscTab.pages[1], });
-            initModule({ location: tp.seizureFolder, title: "Y Amount", storeAs: "amountSeizureY", tooltip: "Amount to roll", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
+                initModule({ location: tp.seizureFolder, title: "SeizureX", storeAs: "enableSeizureX", tooltip: "Rotates the player by the specified amount around the y-axis (yaw)", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.seizureFolder, title: "X Amount", storeAs: "amountSeizureX", tooltip: "Amount to roll", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
+                initModule({ location: tp.seizureFolder, title: "SeizureY", storeAs: "enableSeizureY", tooltip: "Rotates the player by the specified amount around the x-axis (pitch)", bindLocation: tp.miscTab.pages[1], });
+                initModule({ location: tp.seizureFolder, title: "Y Amount", storeAs: "amountSeizureY", tooltip: "Amount to roll", slider: { min: -6.283185307179586, max: 6.283185307179586, step: Math.PI / 280 }, defaultValue: 2, });
         };
         //CLIENT MODULES
         initFolder({ location: tp.mainPanel, title: "Client & About", storeAs: "clientFolder", });
         initTabs({ location: tp.clientFolder, storeAs: "clientTab" }, [
             {
                 title: "WIP", content:
-                    `Sorry! No guide yet!`
-            },
+`Sorry! No guide yet!`},
         ]);
-        initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", tooltip: "What to try if varData loading fails", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "loadLatest", });
-        initModule({ location: tp.clientTab.pages[0], title: "Fallback Behavior", storeAs: "vardataType", tooltip: "When to use fallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "always", });
-        initModule({ location: tp.clientTab.pages[0], title: "Custom VarData", storeAs: "vardataCustom", tooltip: "Uses the entered varData", defaultValue: "{}", enableConditions: [["vardataFallback", "loadCustom"]] });
-        tp.clientTab.pages[0].addSeparator();
-        initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", tooltip: "Hides the big StateFarm menu. default key to do this is H", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
-        initModule({ location: tp.clientTab.pages[0], title: "Hide at Startup", storeAs: "hideAtStartup", tooltip: "Hides the StateFarm menu by default", bindLocation: tp.clientTab.pages[1], defaultValue: false, });
-        initModule({ location: tp.clientTab.pages[0], title: "No Console Logs", storeAs: "consoleLogs", tooltip: "Blocks the client frome sending messages to the browser console", bindLocation: tp.clientTab.pages[1], defaultValue: false, });
-        initModule({ location: tp.clientTab.pages[0], title: "Pop-ups", storeAs: "popups", tooltip: "Disables/enables bottom-left corner popups of configs changed & notifications", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
-        initModule({ location: tp.clientTab.pages[0], title: "Tooltips", storeAs: "tooltips", tooltip: "Controls whether you want to see tooltips (the box displaying this very message!) (I'm just an innocent tooltip! I did nothing! Let me live! Don't disable me :( )", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
-        tp.clientTab.pages[0].addSeparator();
-        initModule({ location: tp.clientTab.pages[0], title: "Panic", storeAs: "panic", tooltip: "Allows you to quickly exit to a set URL. great for hacking in class", bindLocation: tp.clientTab.pages[1], button: "EXIT!", clickFunction: function () { if (extract("enablePanic")) { unsafeWindow.location.replace(extract("panicURL")) } }, defaultBind: "X", enableConditions: [["enablePanic", true]], });
-        initFolder({ location: tp.clientTab.pages[0], title: "Panic Options", storeAs: "panicFolder", });
-        initModule({ location: tp.panicFolder, title: "Enable", storeAs: "enablePanic", tooltip: "Enable evacuation", bindLocation: tp.clientTab.pages[1], defaultValue: false, });
-        initModule({ location: tp.panicFolder, title: "Set URL", storeAs: "panicURL", tooltip: "What url to evacuate to", defaultValue: "https://classroom.google.com/", enableConditions: [["enablePanic", true]], });
-        tp.clientTab.pages[0].addSeparator();
-        let presetList = [];
-        Object.entries(inbuiltPresets).forEach(([key, value]) => {//Get all presets from inbuilt presets var
-            let options = {};
-            options.text = key;//not the best way to add things to a dictionary, but the only way i could get to work
-            options.value = key; // idiot could've not violated eslint smfh
-            presetList.push(options);
-        });
-        //PRESETS: OakSwingZZZ 😎
-        initFolder({ location: tp.clientTab.pages[0], title: "Presets", storeAs: "presetFolder", });
-        initModule({ location: tp.presetFolder, title: "Preset List", storeAs: "selectedPreset", tooltip: "A set of predefined configs made by the StateFarm developers", defaultValue: "onlypuppy7's Config", bindLocation: tp.clientTab.pages[1], dropdown: presetList, });
-        initModule({
-            location: tp.presetFolder, title: "Apply", storeAs: "applyPreset", tooltip: "Apply the preset selected in the comboBox above", button: "Apply Preset", clickFunction: function () {
-                const userConfirmed = confirm("Are you sure you want to continue? This will replace most of your current config.");
-                if (userConfirmed) { applySettings(inbuiltPresets[extract("selectedPreset")], true); };
-            },
-        });
-        tp.presetFolder.addSeparator();
-        initModule({
-            location: tp.presetFolder, title: "Save", storeAs: "savePreset", tooltip: "Saves your current settings as a preset", button: "Save As Preset", clickFunction: function () {
-                // log("Config Main: ", configMain);
-                let saveString = '';
-                const addParam = function (module, setTo) { saveString = saveString + module + ">" + JSON.stringify(setTo) + "<" };
-                Object.entries(configMain).forEach(([key, value]) => {
-                    log(key, value);
-                    if (typeof (value) == 'string') {
-                        try {
-                            let dropdown = extractAsDropdownInt(key)
-                            value = dropdown;
-                        } catch (error) {
-                            //dont care lmaoooo
-                        };
-                    };
-                    if (!presetIgnore.includes(key)) {
-                        addParam(key, value);
-                    }
+            initModule({ location: tp.clientTab.pages[0], title: "VarData Fallback", storeAs: "vardataFallback", tooltip: "What to try if varData loading fails", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "None", value: "none" }, { text: "Load Latest (online)", value: "loadLatest" }, { text: "Load Cached (current hash)", value: "loadCached" }, { text: "Load Cached (latest cache)", value: "loadRecent" }, { text: "Custom String", value: "loadCustom" }], defaultValue: "loadLatest", });
+            initModule({ location: tp.clientTab.pages[0], title: "Fallback Behavior", storeAs: "vardataType", tooltip: "When to use fallback", bindLocation: tp.clientTab.pages[1], dropdown: [{ text: "Never", value: "never" }, { text: "Just This Once", value: "justOnce" }, { text: "Until Next Hash", value: "nextHash" }, { text: "Always", value: "always" }], defaultValue: "always", });
+            initModule({ location: tp.clientTab.pages[0], title: "Custom VarData", storeAs: "vardataCustom", tooltip: "Uses the entered varData", defaultValue: "{}", enableConditions: [["vardataFallback", "loadCustom"]] });
+            tp.clientTab.pages[0].addSeparator();
+            initModule({ location: tp.clientTab.pages[0], title: "Hide GUI", storeAs: "hide", tooltip: "Hides the big StateFarm menu. default key to do this is H", bindLocation: tp.clientTab.pages[1], button: "Hide!", clickFunction: function () { tp.mainPanel.hidden = !tp.mainPanel.hidden }, defaultBind: "H", });
+            initModule({ location: tp.clientTab.pages[0], title: "Hide at Startup", storeAs: "hideAtStartup", tooltip: "Hides the StateFarm menu by default", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
+            initModule({ location: tp.clientTab.pages[0], title: "No Console Logs", storeAs: "consoleLogs", tooltip: "Blocks the client frome sending messages to the browser console", bindLocation: tp.clientTab.pages[1], defaultValue: false,});
+            initModule({ location: tp.clientTab.pages[0], title: "Pop-ups", storeAs: "popups", tooltip: "Disables/enables bottom-left corner popups of configs changed & notifications", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
+            initModule({ location: tp.clientTab.pages[0], title: "Tooltips", storeAs: "tooltips", tooltip: "Controls whether you want to see tooltips (the box displaying this very message!) (I'm just an innocent tooltip! I did nothing! Let me live! Don't disable me :( )", bindLocation: tp.clientTab.pages[1], defaultValue: true, });
+            tp.clientTab.pages[0].addSeparator();
+            initModule({ location: tp.clientTab.pages[0], title: "Panic", storeAs: "panic", tooltip: "Allows you to quickly exit to a set URL. great for hacking in class", bindLocation: tp.clientTab.pages[1], button: "EXIT!", clickFunction: function () { if (extract("enablePanic")) { unsafeWindow.location.replace(extract("panicURL")) } }, defaultBind: "X", enableConditions: [["enablePanic", true]], });
+            initFolder({ location: tp.clientTab.pages[0], title: "Panic Options", storeAs: "panicFolder", });
+                initModule({ location: tp.panicFolder, title: "Enable", storeAs: "enablePanic", tooltip: "Enable evacuation", bindLocation: tp.clientTab.pages[1], defaultValue: false, });
+                initModule({ location: tp.panicFolder, title: "Set URL", storeAs: "panicURL", tooltip: "What url to evacuate to", defaultValue: "https://classroom.google.com/", enableConditions: [["enablePanic", true]], });
+            tp.clientTab.pages[0].addSeparator();
+            let presetList = [];
+            Object.entries(inbuiltPresets).forEach(([key, value]) => {//Get all presets from inbuilt presets var
+                let options = {};
+                options.text = key;//not the best way to add things to a dictionary, but the only way i could get to work
+                options.value = key; // idiot could've not violated eslint smfh
+                presetList.push(options);
+            });
+            //PRESETS: OakSwingZZZ 😎
+            initFolder({ location: tp.clientTab.pages[0], title: "Presets", storeAs: "presetFolder",});
+                initModule({ location: tp.presetFolder, title: "Preset List", storeAs: "selectedPreset", tooltip: "A set of predefined configs made by the StateFarm developers", defaultValue: "onlypuppy7's Config", bindLocation: tp.clientTab.pages[1], dropdown: presetList, });
+                initModule({ location: tp.presetFolder, title: "Apply", storeAs: "applyPreset", tooltip: "Apply the preset selected in the comboBox above", button: "Apply Preset", clickFunction: function () {
+                    const userConfirmed = confirm( "Are you sure you want to continue? This will replace most of your current config." );
+                        if (userConfirmed) { applySettings(inbuiltPresets[extract("selectedPreset")], true); };
+                    },
                 });
-                saveString = saveString.substring(0, saveString.length - 1);
-                let presetName = prompt("Name of preset:"); // asks user for name of preset
-                if (presetName == "" || presetName == null) {
-                    log("User cancelled save");
-                } else {
-                    let result = saveUserPreset(presetName, saveString);//saves user preset
-                    addUserPresets(loadUserPresets()); //updates inbuiltPresets to include
-                    log("Saved Preset: ", saveString);
-                    log("User Preset Result: ", result);
-                };
-                log("InbuiltPrests:");
-                log(inbuiltPresets);
-                initMenu(false); //Reloads menu to add to dropdown list
-            },
-        });
-        initModule({
-            location: tp.presetFolder, title: "Delete", storeAs: "deletePreset", tooltip: "Deletes a preset", button: "Remove Preset", clickFunction: function () { // Function won't do anything if they select a preset that was loaded in the gamecode
-                let currUserPresets = loadUserPresets(); //gets current presets from storage
-                delete currUserPresets[extract("selectedPreset")];//deletes
-                delete inbuiltPresets[extract("selectedPreset")];//deletes
-                save(presetStorageLocation, currUserPresets); // saves cnages to file.
-                log("Current User Presets: ", currUserPresets);
-                initMenu(false); //reloads menu
-            },
-        });
-        tp.presetFolder.addSeparator();
-        initModule({
-            location: tp.presetFolder, title: "Import", storeAs: "importPreset", tooltip: "Imports a custom preset", button: "Import Preset", clickFunction: function () {
-                let preset = prompt("Paste preset here:"); // asks user to paste preset
-                if (preset == "" || preset == null) {
-                    log("User cancelled save");
-                } else {
-                    const pattern = /([a-zA-Z]*>[^<]*<)+[a-zA-Z]*>[^<]*/;
-                    if (pattern.test(preset)) {
-                        let presetName = prompt("Name of preset:"); // asks user for name of preset
-                        if (presetName == "" || presetName == null) {
-                            log("User cancelled save");
-                        } else {
-                            let result = saveUserPreset(presetName, preset);//saves user preset
-                            addUserPresets(loadUserPresets()); //updates inbuiltPresets to include
-                            log("Saved Preset: ", preset);
-                            log("User Preset Result: ", result);
+                tp.presetFolder.addSeparator();
+                initModule({ location: tp.presetFolder, title: "Save", storeAs: "savePreset", tooltip: "Saves your current settings as a preset", button: "Save As Preset", clickFunction: function () {
+                    // log("Config Main: ", configMain);
+                    let saveString = '';
+                    const addParam = function(module,setTo) {saveString=saveString+module+">"+JSON.stringify(setTo)+"<"};
+                    Object.entries(configMain).forEach(([key, value]) => {
+                        log(key, value);
+                        if (typeof(value) == 'string') {
+                            try {
+                                let dropdown = extractAsDropdownInt(key)
+                                value = dropdown;
+                            } catch (error) {
+                                //dont care lmaoooo
+                            };
+                        };
+                        if (!presetIgnore.includes(key)){
+                            addParam(key, value);
                         }
+                    });
+                    saveString = saveString.substring(0, saveString.length - 1);
+                    let presetName = prompt("Name of preset:"); // asks user for name of preset
+                    if (presetName == "" || presetName == null) {
+                        log("User cancelled save");
                     } else {
-                        alert("Not A Valid Preset!");
-                        log("Preset Not Valid");
+                        let result = saveUserPreset(presetName, saveString);//saves user preset
+                        addUserPresets(loadUserPresets()); //updates inbuiltPresets to include
+                        log("Saved Preset: ", saveString);
+                        log("User Preset Result: ", result);
                     };
-                    initMenu(false);
-                };
-            },
-        });
-        initModule({
-            location: tp.presetFolder, title: "Export", storeAs: "exportPreset", tooltip: "Copies your current preset to the clipboard", button: "Copy To Clipboard", clickFunction: function () {
-                let saveString = '';
-                const addParam = function (module, setTo) { saveString = saveString + module + ">" + JSON.stringify(setTo) + "<" };
-                Object.entries(configMain).forEach(([key, value]) => {
-                    log(key, value);
-                    if (typeof (value) == 'string') {
-                        try {
-                            let dropdown = extractAsDropdownInt(key)
-                            value = dropdown;
-                        } catch (error) {
-                            //dont care lmaoooo
+                    log("InbuiltPrests:");
+                    log(inbuiltPresets);
+                    initMenu(false); //Reloads menu to add to dropdown list
+                },});
+                initModule({ location: tp.presetFolder, title: "Delete", storeAs: "deletePreset", tooltip: "Deletes a preset", button: "Remove Preset", clickFunction: function () { // Function won't do anything if they select a preset that was loaded in the gamecode
+                    let currUserPresets = loadUserPresets(); //gets current presets from storage
+                    delete currUserPresets[extract("selectedPreset")];//deletes
+                    delete inbuiltPresets[extract("selectedPreset")];//deletes
+                    save(presetStorageLocation, currUserPresets); // saves cnages to file.
+                    log("Current User Presets: ",currUserPresets);
+                    initMenu(false); //reloads menu
+                },});
+                tp.presetFolder.addSeparator();
+                initModule({ location: tp.presetFolder, title: "Import", storeAs: "importPreset", tooltip: "Imports a custom preset", button: "Import Preset", clickFunction: function () {
+                    let preset = prompt("Paste preset here:"); // asks user to paste preset
+                    if (preset == "" || preset == null) {
+                        log("User cancelled save");
+                    } else {
+                        const pattern = /([a-zA-Z]*>[^<]*<)+[a-zA-Z]*>[^<]*/;
+                        if (pattern.test(preset)){
+                            let presetName = prompt("Name of preset:"); // asks user for name of preset
+                            if (presetName == "" || presetName == null) {
+                                log("User cancelled save");
+                            } else {
+                                let result = saveUserPreset(presetName, preset);//saves user preset
+                                addUserPresets(loadUserPresets()); //updates inbuiltPresets to include
+                                log("Saved Preset: ", preset);
+                                log("User Preset Result: ", result);
+                            }
+                        } else {
+                            alert("Not A Valid Preset!");
+                            log("Preset Not Valid");
                         };
+                        initMenu(false);
                     };
-                    if (!presetIgnore.includes(key)) {
-                        addParam(key, value);
-                    }
-                });
-                saveString = saveString.substring(0, saveString.length - 1);
-                GM_setClipboard(saveString, "text", () => log("Clipboard set!"));
-                createPopup("Preset copied to clipboard...");
-            },
-        });
-        tp.clientTab.pages[0].addSeparator();
-        initFolder({ location: tp.clientTab.pages[0], title: "Creator's Links", storeAs: "linksFolder", });
-        initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", tooltip: "The official StateFarm Client Discord server", button: "Link", clickFunction: () => GM_openInTab(discordURL, { active: true }) });
-        initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "The official StateFarm Client GitHub Repository! Check out the devs suffering here", button: "Link", clickFunction: () => GM_openInTab(githubURL, { active: true }) });
-        tp.clientTab.pages[0].addSeparator();
-        initModule({
-            location: tp.clientTab.pages[0], title: "Reset", storeAs: "clear", tooltip: "Powerwashes StateFarm completely", button: "DELETE", clickFunction: function () {
-                const userConfirmed = confirm("Are you sure you want to continue? This will clear all stored module states and keybinds.");
+                },});
+                initModule({ location: tp.presetFolder, title: "Export", storeAs: "exportPreset", tooltip: "Copies your current preset to the clipboard", button: "Copy To Clipboard", clickFunction: function () {
+                    let saveString = '';
+                    const addParam = function(module,setTo) {saveString=saveString+module+">"+JSON.stringify(setTo)+"<"};
+                    Object.entries(configMain).forEach(([key, value]) => {
+                        log(key, value);
+                        if (typeof(value) == 'string') {
+                            try {
+                                let dropdown = extractAsDropdownInt(key)
+                                value = dropdown;
+                            } catch (error) {
+                                //dont care lmaoooo
+                            };
+                        };
+                        if (!presetIgnore.includes(key)){
+                            addParam(key, value);
+                        }
+                    });
+                    saveString = saveString.substring(0, saveString.length - 1);
+                    GM_setClipboard(saveString, "text", () => log("Clipboard set!"));
+                    createPopup("Preset copied to clipboard...");
+                },});
+            tp.clientTab.pages[0].addSeparator();
+            initFolder({ location: tp.clientTab.pages[0], title: "Creator's Links", storeAs: "linksFolder",});
+                initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", tooltip: "The official StateFarm Client Discord server", button: "Link", clickFunction: () => GM_openInTab(discordURL, { active: true }) });
+                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "The official StateFarm Client GitHub Repository! Check out the devs suffering here", button: "Link", clickFunction: () => GM_openInTab(githubURL, { active: true }) });
+            tp.clientTab.pages[0].addSeparator();
+            initModule({ location: tp.clientTab.pages[0], title: "Reset", storeAs: "clear", tooltip: "Powerwashes StateFarm completely", button: "DELETE", clickFunction: function(){
+                const userConfirmed=confirm("Are you sure you want to continue? This will clear all stored module states and keybinds.");
                 if (userConfirmed) {
                     initMenu(true);
                     alert("Reset to defaults.");
                 };
-            },
-        });
-        tp.clientTab.pages[0].addSeparator();
-        initFolder({ location: tp.clientTab.pages[0], title: "Developer Options", storeAs: "devFolder", });
-        initModule({ location: tp.devFolder, title: "Debug", storeAs: "debug", tooltip: "Converts SFC into a development tool.\nExposes globalSS to the window (allowing you to manipulate many game variables directly) and also enables some extra logs.", bindLocation: tp.clientTab.pages[1], });
-        initModule({ location: tp.devFolder, title: "Force Import", storeAs: "forceImport", tooltip: "Forces importing of Babylon instead of making fake babylon. Use only for testing or if fake babylon doesn't work.", bindLocation: tp.clientTab.pages[1], });
+            },});
+            tp.clientTab.pages[0].addSeparator();
+            initFolder({ location: tp.clientTab.pages[0], title: "Developer Options", storeAs: "devFolder",});
+                initModule({ location: tp.devFolder, title: "Debug", storeAs: "debug", tooltip: "Converts SFC into a development tool.\nExposes globalSS to the window (allowing you to manipulate many game variables directly) and also enables some extra logs.", bindLocation: tp.clientTab.pages[1], });
+                initModule({ location: tp.devFolder, title: "Force Import", storeAs: "forceImport", tooltip: "Forces importing of Babylon instead of making fake babylon. Use only for testing or if fake babylon doesn't work.", bindLocation: tp.clientTab.pages[1], });
         tp.mainPanel.addSeparator();
         initModule({ location: tp.mainPanel, title: "Update", storeAs: "update", tooltip: "Go to the client's update page", button: "Link", clickFunction: () => GM_openInTab(downloadURL, { active: true }) });
         initModule({ location: tp.mainPanel, title: "Guide", storeAs: "documentation", tooltip: "A guide with more in-depth information on modules", button: "Link", clickFunction: () => GM_openInTab(featuresGuideURL, { active: true }) });
@@ -2393,7 +2267,7 @@ debug mode).`},
         //DEPLOY STUFF
         initModule({ location: tp.botTabs.pages[0], title: "Bots Amount", storeAs: "numberBots", tooltip: "The number of bots/windows opened", slider: { min: 1, max: 18, step: 1 }, defaultValue: 1, });
         initModule({ location: tp.botTabs.pages[0], title: "Deploy", storeAs: "deployBots", tooltip: "Open the bot's windows. If only one opens, make sure you have popups allowed", button: "START BOTS!", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { deployBots() }, });
-        initModule({ location: tp.botTabs.pages[0], title: "Restart Bots", storeAs: "restartBots", tooltip: "Completely closes and restarts all bot instances", button: "RESTART BOTS", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { broadcastToBots("kill"); setTimeout(function () { deployBots() }, 1000) }, });
+        initModule({ location: tp.botTabs.pages[0], title: "Restart Bots", storeAs: "restartBots", tooltip: "Completely closes and restarts all bot instances", button: "RESTART BOTS", bindLocation: tp.bottingTab.pages[1], clickFunction: function () { broadcastToBots("kill"); setTimeout(function(){deployBots()}, 1000) }, });
         tp.botTabs.pages[0].addSeparator();
         initModule({ location: tp.botTabs.pages[0], title: "Window Width", storeAs: "botWindowWidth", tooltip: "Horizontal size of the bot's windows", slider: { min: 0, max: 10000, step: 1 }, defaultValue: 450, botParam: true, });
         initModule({ location: tp.botTabs.pages[0], title: "Window Height", storeAs: "botWindowHeight", tooltip: "Vertical size of the bot's windows", slider: { min: 0, max: 10000, step: 1 }, defaultValue: 300, botParam: true, });
@@ -2466,7 +2340,7 @@ debug mode).`},
 
         if (!AUTOMATED) {
             try {
-                if (!load("StateFarmConfigMainPanel") || reset === true) {
+                if (!load("StateFarmConfigMainPanel") || reset===true) {
                     saveConfig();
                 } else {
                     log("##############################################")
@@ -2583,7 +2457,7 @@ debug mode).`},
             alert("Bollocks! If you're getting this message, injection probably failed. To solve this, perform CTRL+F5 - this performs a hard reload. If this does not work, contact the developers.");
         };
     };
-    const createPrompt = function (text = "No text set", buttons = [], duration = 5000) {
+    const createPrompt = function(text = "No text set", buttons = [], duration = 5000) {
         unsafeWindow.BAWK.play("kotc_zonespawn");
         // log(arguments);
         const promptElement = document.createElement('div');
@@ -2600,7 +2474,7 @@ debug mode).`},
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.5);
-            animation: msg 0.5s forwards, msg 0.5s reverse forwards ${duration / 1000}s;
+            animation: msg 0.5s forwards, msg 0.5s reverse forwards ${duration/1000}s;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
@@ -2613,7 +2487,7 @@ debug mode).`},
         const buttonContainer = document.createElement('div');
         buttonContainer.setAttribute('style', 'margin-top: 10px; pointer-events: auto; text-align: center;');
 
-        const deleteButton = function () {
+        const deleteButton = function(){
             try {
                 document.body.removeChild(promptElement);
             } catch (error) {
@@ -2622,7 +2496,7 @@ debug mode).`},
         };
 
         buttons = [...buttons,
-        [`Dismiss (${Math.ceil(duration / 1000)}s)`, () => deleteButton()]
+            [`Dismiss (${Math.ceil(duration/1000)}s)`, () => deleteButton()]
         ];
 
         buttons.forEach(([buttonText, buttonFunction]) => {
@@ -2651,7 +2525,7 @@ debug mode).`},
             setTimeout(() => {
                 deleteButton();
             }, 800);
-        }, duration);
+         }, duration);
     };
     const createVarDataOverlay = function () {
         //create vardataOverlay
@@ -2809,39 +2683,39 @@ debug mode).`},
 
         document.body.appendChild(vardataPopup);
 
-        /*
-          //add inputs stuff
-          const input = document.getElementById('vardataInput');
-          const submitButton = document.getElementById('submitVarData');
-  
-          submitButton.addEventListener('click', () => {
-              const inputValue = input.value;
-  
-              const error = function () {
-                  createPopup("Inputted VarData isn't valid.", "error");
-              };
-  
-              try {
-                  let converted = JSON.parse(inputValue);
-                  if (converted.vars && converted.checksum) {
-                      change("vardataCustom", inputValue);
-                      change("vardataFallback", 4);
-                      change("vardataType", 1); //custom isnt consistent enough
-                      closeVardataPopup();
-                  } else {
-                      error();
-                  };
-              } catch (e) {
-                  error();
-              }
-          });
-  
-          input.addEventListener('keypress', (event) => {
-              if (event.key === 'Enter') {
-                  submitButton.click();
-              }
-          });
-          */
+      /*
+        //add inputs stuff
+        const input = document.getElementById('vardataInput');
+        const submitButton = document.getElementById('submitVarData');
+
+        submitButton.addEventListener('click', () => {
+            const inputValue = input.value;
+
+            const error = function () {
+                createPopup("Inputted VarData isn't valid.", "error");
+            };
+
+            try {
+                let converted = JSON.parse(inputValue);
+                if (converted.vars && converted.checksum) {
+                    change("vardataCustom", inputValue);
+                    change("vardataFallback", 4);
+                    change("vardataType", 1); //custom isnt consistent enough
+                    closeVardataPopup();
+                } else {
+                    error();
+                };
+            } catch (e) {
+                error();
+            }
+        });
+
+        input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                submitButton.click();
+            }
+        });
+        */
 
         //fade anims
         setTimeout(() => {
@@ -2902,7 +2776,7 @@ debug mode).`},
         sfChatContainer.style.top = "20px";
         sfChatContainer.style.left = "20px";
         sfChatContainer.style.zIndex = 100000000;
-        if (startHidden) {
+        if (startHidden){
             sfChatContainer.style.display = 'none';
         }
 
@@ -2935,7 +2809,7 @@ debug mode).`},
         }, 1000);
 
         unsafeWindow.addEventListener("message", (e) => {
-            if (typeof e.data == "string") {
+            if (typeof e.data == "string"){
                 if (e.data.startsWith("SFCHAT-UPDATE")) {
                     GM_setValue("SFCHAT-SETTINGS", e.data.replace(/SFCHAT-UPDATE/gm, ""));
                 }
@@ -2945,13 +2819,13 @@ debug mode).`},
                 if (e.data.startsWith("SFCHAT-MESSAGE")) {
                     let stringMessage = e.data.replace(/SFCHAT-MESSAGE/gm, "");
                     let message = JSON.parse(stringMessage);
-                    if (extract("sfChatNotifications") && message.user && message.message && (sfChatContainer.style.display == "none")) {
-                        if (message.message.length <= 50) {
+                    if (extract("sfChatNotifications") && message.user && message.message && (sfChatContainer.style.display == "none")){
+                        if (message.message.length <= 50){
                             createPopup(message.user.name + ": " + message.message);
                         } else {
                             createPopup(message.user.name + ": " + message.message.substring(0, 50) + "...");
                         }
-                        if (extract("sfChatNotificationSound")) {
+                        if (extract("sfChatNotificationSound")){
                             unsafeWindow.BAWK.play("grenade_cellphone");
                         };
                     };
@@ -3708,7 +3582,7 @@ z-index: 999999;
         if (yaw_degrees < 0) yaw_degrees += 360.0; // convert negative to positive angles
         return yaw_degrees;
     };
-    const hslToRgb = function (h, s, l) {
+    const hslToRgb = function(h, s, l) {
         var r, g, b;
         if (s === 0) {
             r = g = b = l;
@@ -3763,9 +3637,9 @@ z-index: 999999;
             const images = document.getElementsByTagName('img');
             let imgURL = replacementLogoURL;
             const month = new Date().getMonth();
-            if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9) imgURL = replacementLogoHalloweenURL;
+            if (replacementLogoHalloweenURL && replacementLogoHalloweenURL !== "" && month == 9)  imgURL = replacementLogoHalloweenURL;
             if (replacementLogoChristmasURL && replacementLogoChristmasURL !== "" && month == 11) imgURL = replacementLogoChristmasURL;
-            if (replacementLogoNewYearsURL && replacementLogoNewYearsURL !== "" && month == 0) imgURL = replacementLogoNewYearsURL;
+            if (replacementLogoNewYearsURL  && replacementLogoNewYearsURL  !== "" && month == 0)  imgURL = replacementLogoNewYearsURL;
 
             for (let i = 0; i < images.length; i++) {
                 const src = images[i].getAttribute('src');
@@ -3922,10 +3796,10 @@ z-index: 999999;
     const isPartialMatch = function (array, searchString) {
         return array.some(item => item !== "" && searchString.toLowerCase().includes(item.toLowerCase()));
     };
-    const findBadgesForUsername = function (username) {
+    const findBadgesForUsername = function(username) {
         let found = [];
         if (badgeList && username) {
-            username = username.toLowerCase().replaceAll("_", "").replaceAll(" ", "");
+            username = username.toLowerCase().replaceAll("_","").replaceAll(" ","");
             for (const [key, userList] of Object.entries(badgeList)) {
                 for (const user of userList) {
                     if (username.includes(user.toLowerCase())) {
@@ -3938,7 +3812,7 @@ z-index: 999999;
     };
 
     const playAudio = function (name, panner, contextName) {
-        contextName = findStringInLists(divertContexts, name) || "OTHER" + randomInt(1, 9)
+        contextName = findStringInLists(divertContexts, name) || "OTHER"+randomInt(1,9)
         let audioContext;
         audioContext = audioContexts[contextName];
         let source = audioContext.createBufferSource();
@@ -4052,7 +3926,7 @@ z-index: 999999;
             newPosition = object.getAbsolutePosition(); //we now use the TN's absolutePosition instead of an own var. It's just cleaner this way imo
             newScene = object.getScene(); //getters, yummy
             newParent = object; //will be the TransformNode stored in player.pred, so we can keep this as parent.
-        } else {
+        }  else {
             newPosition = object.position;
             newScene = object._scene;
             newParent = object;
@@ -4136,9 +4010,9 @@ z-index: 999999;
             };
             */
             /*---fwltv2---*/
-            if (type == "playerESP") {
+            if (type == "playerESP"){
                 //create line. other shit later
-                const l = L.BABYLON.MeshBuilder.CreateLines(getScrambled(), { points: [new L.BABYLON.Vector3(0, 0, 0), new L.BABYLON.Vector3(0, 0, 0)] }, newScene); //empty lines. will be edited l8er
+                const l = L.BABYLON.MeshBuilder.CreateLines(getScrambled(),{points: [new L.BABYLON.Vector3(0, 0, 0),new L.BABYLON.Vector3(0, 0, 0)]}, newScene); //empty lines. will be edited l8er
                 //l[H.renderingGroupId] = 1;
 
                 object.lookDirLine = l;
@@ -4149,48 +4023,48 @@ z-index: 999999;
             object.generatedESP = true;
             ESPArray.push([object, tracerLines, box, object.lookDirLine]); //, target
         };
-        if (object.lookDirLine && (extract("lookTracers") || extract("aimbotTargetMode") === "aimingAt")) { //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
+        if (object.lookDirLine && (extract("lookTracers") || extract("aimbotTargetMode") === "aimingAt")){ //no need to update if module disabled. Raycasts aren't the best thing to run every frame without any use...
             const TRACE_LENGTH_MULTIPLIER = 75; //how long is the trace max?
             const playerEye = object[H.actor].eye; // BABYLON.TransformNode (https://doc.babylonjs.com/typedoc/classes/BABYLON.TransformNode). TN of the "eye", as shell calls it. Basically camera pos.
 
             let conclusion /*:trol:*/ = playerEye.forward.clone(); // BABYLON.Vector3 (https://doc.babylonjs.com/typedoc/classes/BABYLON.Vector3). this vector is NORMALIZED
-            conclusion = conclusion.scale(TRACE_LENGTH_MULTIPLIER); //scale by the multiplier to extend the normalized vector. TODO: make multiplier customizable by USER
-            conclusion = conclusion.add(playerEye.absolutePosition); //add pos so we are relative to eye
+            conclusion= conclusion.scale(TRACE_LENGTH_MULTIPLIER); //scale by the multiplier to extend the normalized vector. TODO: make multiplier customizable by USER
+            conclusion= conclusion.add(playerEye.absolutePosition); //add pos so we are relative to eye
 
             //RAYCAST
             const rayToGround = ss.RAYS[H.rayCollidesWithMap](object[H.actor].eye.absolutePosition, conclusion, ss.RAYS.grenadeCollidesWithCell); //does player look at object, if yes, where?
             const g = playerEye.absolutePosition; //easier access
             // console.log("RAYCAST", g, g.x, g._x)
-            if (rayToGround) {
+            if(rayToGround){
                 object.lookDirLine.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [g.x, g.y, g.z, rayToGround.pick.pickedPoint.x, rayToGround.pick.pickedPoint.y, rayToGround.pick.pickedPoint.z]);
                 //set line to correct points, with the map collision as endpoint
             }
-            if (!rayToGround) {
+            if(!rayToGround){
                 const f = conclusion;//easier acess
                 object.lookDirLine.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [g.x, g.y, g.z, f.x, f.y, f.z]);
                 //set line to correct points, with the max dist scaled dirVec3 as endpoint
             }
             if (object && (object !== ss.MYPLAYER) && object[H.playing] && (object[H.hp] > 0) && ((!ss.MYPLAYER.team) || (object.team !== ss.MYPLAYER.team))) {
-                object.lookLineData = object.lookDirLine.getVerticesData(L.BABYLON.VertexBuffer.PositionKind);//error here only works in teams, fix
+                  object.lookLineData = object.lookDirLine.getVerticesData(L.BABYLON.VertexBuffer.PositionKind);//error here only works in teams, fix
 
             };
             object.lookDirLine.color = new L.BABYLON.Color3(...hexToRgb(extract("lookTracersColor"))); //updaté line colo(u)r
-            object.lookDirLine[H.renderingGroupId] = extract("lookTracersRGI1") ? 1 : 0; //render in front shell?
+            object.lookDirLine[H.renderingGroupId] = extract("lookTracersRGI1")? 1 : 0; //render in front shell?
             //I dont really like the implementation without parenting, but IDK how the fuck bab's parenting system works and we need to update anyway. :/
         }
         object.tracerLines.setVerticesData(L.BABYLON.VertexBuffer.PositionKind, [crosshairsPosition.x, crosshairsPosition.y, crosshairsPosition.z, newPosition.x, newPosition.y, newPosition.z]);
-        object.tracerLines.color = new L.BABYLON.Color3(...color);
-        object.box.color = new L.BABYLON.Color3(...color);
+          object.tracerLines.color = new L.BABYLON.Color3(...color);
+          object.box.color = new L.BABYLON.Color3(...color);
     };
 
-    const obfuscateEmail = function (email) {
+    const obfuscateEmail = function(email) {
         const parts = email.split('@');
         const modifiedFirstPart = parts[0].substring(0, 1) +
-            parts[0].substring(1, parts[0].length - 1).replace(/./g, '*') +
-            parts[0].substring(parts[0].length - 1);
+                                    parts[0].substring(1, parts[0].length - 1).replace(/./g, '*') +
+                                    parts[0].substring(parts[0].length - 1);
         return modifiedFirstPart + '@' + parts[1];
     };
-    const updateAccountRecords = function (key, value) {
+    const updateAccountRecords = function(key, value) {
         let currentEmail = load("MostRecentEmail");
         let maskedEmail = unsafeWindow.extern.account.maskedEmail;
         if (currentEmail && obfuscateEmail(currentEmail) == maskedEmail) {
@@ -4215,7 +4089,7 @@ z-index: 999999;
         accountDetails.inventoryList = [];
         accountDetails.inventory.forEach(item => {
             let itemName = item.name;
-            if (tierCache[itemName] !== undefined) itemName = itemName + " [T" + tierCache[itemName] + "]";
+            if (tierCache[itemName] !== undefined) itemName = itemName+" [T"+tierCache[itemName]+"]";
             accountDetails.inventoryList.push(itemName);
         });
         if (key && value) {
@@ -4244,7 +4118,54 @@ z-index: 999999;
         let oldMonitorObjects = JSON.parse(JSON.stringify(monitorObjects));
 
         if (extract("debug")) {
-            unsafeWindow.globalSS = {};
+            unsafeWindow.globalSS = {
+                ss,
+                H,
+                F,
+                L,
+                C,
+                tp,
+                initMenu,
+                extractAsDropdownInt,
+                extract,
+                extractDropdownList,
+                save,
+                load,
+                GM_listValues,
+                GM_getValue,
+                GM_setValue,
+                crackedShell,
+                createPopup,
+                createPrompt,
+                remove,
+                change,
+                unban,
+                GM_info: (typeof GM_info !== 'undefined') ? GM_info : undefined,
+                GM: (typeof GM !== 'undefined') ? GM : undefined,
+                getScrambled,
+                soundsSFC,
+                accountStatus,
+                cachedRealData,
+                retrievedSFX,
+                findBadgesForUsername,
+                badgeList,
+                crosshairsPosition,
+                predictGrenade: newPredictGrenade,
+                miniCamera,
+                configMain,
+                configBots,
+                predictBloom,
+                verification,
+                createVarDataPopup,
+                // pathfindingInfo: {
+                //     activePath: activePath,
+                //     pathfindingTargetOverride: pathfindingTargetOverride,
+                //     activePath: activePath,
+                //     activeNodeTarget: activeNodeTarget,
+                //     mapNodes: GLOBAL_NODE_LIST,
+                // },
+                log,
+            };
             unsafeWindow.globalSS.ss = ss;
             unsafeWindow.globalSS.H = H;
             unsafeWindow.globalSS.F = F;
@@ -4290,9 +4211,11 @@ z-index: 999999;
             //     activeNodeTarget: activeNodeTarget,
             //     mapNodes: GLOBAL_NODE_LIST,
             // };
+        } else {
+            delete unsafeWindow.globalSS;
         };
         save("DisableLogs", extract("consoleLogs"));
-        if (extract('sfChatAutoStart') && !sfChatContainer) {
+        if (extract('sfChatAutoStart') && !sfChatContainer){
             startStateFarmChat(true);
         };
         startUpComplete = (!document.getElementById("progressBar"));
@@ -4612,8 +4535,8 @@ z-index: 999999;
 
             // addStreamsToInGameUI(); //broken rn anyways
 
-            const pausedGameUI = document.querySelector('.paused-game-ui');
-            const hasZIndex1 = pausedGameUI.classList.contains('z-index-1');
+            const pausedGameUI   = document.querySelector('.paused-game-ui');
+            const hasZIndex1     = pausedGameUI.classList.contains('z-index-1');
             const hasZIndex10000 = pausedGameUI.classList.contains('z-index-10000');
             if (extract("restoreScroll") && (hasZIndex1 || !hasZIndex10000)) {
                 pausedGameUI.classList.remove('z-index-1', 'z-index-10000');
@@ -4637,7 +4560,7 @@ z-index: 999999;
 
                 miniCamera.orthoLeft = -cameraScale;
                 miniCamera.orthoRight = cameraScale;
-                miniCamera.orthoBottom = - cameraScale;
+                miniCamera.orthoBottom =- cameraScale;
                 miniCamera.orthoTop = cameraScale;
 
                 let mapScale = extract("minimapSize");
@@ -4688,7 +4611,7 @@ z-index: 999999;
                 let models = [3000, 3100, 3400, 3600, 3800, 4000, 4200];
                 models.forEach(ID => {
                     let item = unsafeWindow.extern.catalog.findItemById(ID);
-                    item.item_data.meshName.replaceAll("_Legacy", "");
+                    item.item_data.meshName.replaceAll("_Legacy","");
                     if (extract("legacyModels")) item.item_data.meshName = `${item.item_data.meshName}_Legacy`;
                 });
             };
@@ -4801,7 +4724,7 @@ z-index: 999999;
             let object = monitorObjects[storeAs];
             if (monitorObjects[object] !== oldMonitorObjects[object]) {
                 log(object, monitorObjects[object]);
-                tp[storeAs + "Button"].refresh();
+                tp[storeAs+"Button"].refresh();
             };
         };
     };
@@ -5017,48 +4940,48 @@ z-index: 999999;
                     sendChatMessage("Invalid repeat message");
                 }
                 break;
-            /*
-        case "pathtarget": // pathfinding target
-            let option = args[1]; // eslint-disable-line
-            if (option) {
-                if (option === "set") {
-                    let x = args[2];
-                    let y = args[3];
-                    let z = args[4];
-                    if (x && y && z) {
-                        pathfindingTargetOverride = { x: x, y: y, z: z };
-                        isFirstFrameAttemptingToPathfind = true;
-                    } else {
-                        sendChatMessage("Invalid pathtarget coordinates")
+                /*
+            case "pathtarget": // pathfinding target
+                let option = args[1]; // eslint-disable-line
+                if (option) {
+                    if (option === "set") {
+                        let x = args[2];
+                        let y = args[3];
+                        let z = args[4];
+                        if (x && y && z) {
+                            pathfindingTargetOverride = { x: x, y: y, z: z };
+                            isFirstFrameAttemptingToPathfind = true;
+                        } else {
+                            sendChatMessage("Invalid pathtarget coordinates")
+                        };
                     };
                 };
-            };
-            break;
-        case "clearpath":
-            clearPath();
-            break;
-        case "clearpath_t":
-            clearPath_andTarget();
-            break;
-        case "setpathdespawn":
-            if (args[1]) {
-                if (args[1] === "true") {
-                    despawnIfNoPath = true;
-                } else if (args[1] === "false") {
-                    despawnIfNoPath = false;
-                } else if (args[1] === "toggle") {
-                    despawnIfNoPath = !despawnIfNoPath;
+                break;
+            case "clearpath":
+                clearPath();
+                break;
+            case "clearpath_t":
+                clearPath_andTarget();
+                break;
+            case "setpathdespawn":
+                if (args[1]) {
+                    if (args[1] === "true") {
+                        despawnIfNoPath = true;
+                    } else if (args[1] === "false") {
+                        despawnIfNoPath = false;
+                    } else if (args[1] === "toggle") {
+                        despawnIfNoPath = !despawnIfNoPath;
+                    } else {
+                        sendChatMessage("Invalid setpathdespawn argument");
+                    }
                 } else {
-                    sendChatMessage("Invalid setpathdespawn argument");
-                }
-            } else {
-                sendChatMessage("Invalid setpathdespawn message");
-            };
-            */
+                    sendChatMessage("Invalid setpathdespawn message");
+                };
+                */
         };
     };
 
-    const onOptionChanged = function (module, value) {
+    const onOptionChanged = function(module, value) {
         if ((!configMain) || (!configBots)) {
             updateConfig();
         };
@@ -5117,7 +5040,7 @@ z-index: 999999;
         unsafeWindow.firebase.auth().createUserWithEmailAndPassword(email, pass)
             .then(response => {
                 log("success?!?!?!? created account");
-                setTimeout(function () {
+                setTimeout(function(){
                     updateAccountRecords("emailPass", emailPass);
                     accountStatus = "created account";
                 }, 2000);
@@ -5126,7 +5049,7 @@ z-index: 999999;
         unsafeWindow.firebase.auth().signInWithEmailAndPassword(email, pass)
             .then(response => {
                 log("success?!?!?!? signed in");
-                setTimeout(function () {
+                setTimeout(function(){
                     updateAccountRecords("emailPass", emailPass);
                     accountStatus = "created account";
                 }, 2000);
@@ -5142,8 +5065,8 @@ z-index: 999999;
                         ["customSFX1", extractAsDropdownInt("customSFX1") || 0],
                         ["customSFX2", extractAsDropdownInt("customSFX2") || 0],
                         ["customSFX3", extractAsDropdownInt("customSFX3") || 0],
-                        ["skybox", extractAsDropdownInt("skybox") || 0],
-                        ["filter", extractAsDropdownInt("filter") || 0],
+                        ["skybox",     extractAsDropdownInt("skybox")     || 0],
+                        ["filter",     extractAsDropdownInt("filter")     || 0],
                     ]);
                 };
             };
@@ -5635,14 +5558,14 @@ z-index: 999999;
         const timeDiff = distancePlayers(player, 1) / bulletSpeed + 1;
         newPos = newPos || new L.BABYLON.Vector3(0, 0, 0)
         newPos.x = player[H.x], newPos.y = player[H.y], newPos.z = player[H.z],
-            newPos = newPos.add(velocityVector.scale(timeDiff));
+        newPos = newPos.add(velocityVector.scale(timeDiff));
         newPos.y = player[H.y];
         cappedVector = cappedVector || new L.BABYLON.Vector3(0, 0, 0);
         cappedVector.x = velocityVector.x, cappedVector.y = 0.29, cappedVector.z = velocityVector.z;
         Math.capVector3(cappedVector);
         const terminalVelocity = -cappedVector.y;
         const timeAccelerating = Math.min(timeDiff, (terminalVelocity - velocityVector.y) / -0.012);
-        if (player.onGround == 0) { //if player on ground we don't need to predict y because it's gonna stay same. the new pos y value has already been set to current y so no need to do anything when on ground.
+        if(player.onGround==0){ //if player on ground we don't need to predict y because it's gonna stay same. the new pos y value has already been set to current y so no need to do anything when on ground.
             const predictedY = velocityVector.y * timeAccelerating + timeAccelerating * (timeAccelerating) * -0.012 / 2 + newPos.y + terminalVelocity * Math.max(timeDiff - timeAccelerating, 0);
             rayVector = rayVector || new L.BABYLON.Vector3(0, 0, 0);
             rayVector.x = 0, rayVector.y = predictedY - newPos.y, rayVector.z = 0;
@@ -5714,15 +5637,15 @@ z-index: 999999;
         var x = pos.x;
         var y = pos.y;
         var z = pos.z;
-        var dx = -vec.x * 2;
-        var dy = vec.y * 2;
-        var dz = -vec.z * 2;
+        var dx = -vec.x*2;
+        var dy = vec.y*2;
+        var dz = -vec.z*2;
 
         ssGrenade.throw(player, { x, y, z }, { x: dx, y: dy, z: dz });
 
         const result = {
-            positions: [],
-            finalPos: null,
+             positions: [],
+             finalPos: null,
         };
 
         while (ssGrenade.ttl > 0) {
@@ -5851,7 +5774,7 @@ z-index: 999999;
         createAnonFunction('getGrenadeValue', function () {
             try {
                 if (extract('grenadeMax')) return extract('grenadePower');
-                return ss.grenadeThrowPower;
+		return ss.grenadeThrowPower;
             } catch {
                 return ss.grenadeThrowPower;
             }
@@ -5986,7 +5909,7 @@ z-index: 999999;
                     state[H.pitch] = setPrecision(aimbot.pitchReal);
                     ss.MYPLAYER[H.stateBuffer][Math.mod(ss.MYPLAYER.stateIdx - i, 256)] = state;
                 };
-                if (extract("aimbSemiSilent") && extract("silentAimbot")) {
+                if(extract("aimbSemiSilent") && extract("silentAimbot")){
                     ss.MYPLAYER[H.yaw] = getAimbot(currentlyTargeting).yawReal;
                     ss.MYPLAYER[H.pitch] = getAimbot(currentlyTargeting).pitchReal;
                 }
@@ -6025,29 +5948,29 @@ z-index: 999999;
                 change("leaveGame");
             };
             //GAME HISTORY gr
-            if (!GAMECODE || GAMECODE == undefined) return;
+            if(!GAMECODE || GAMECODE==undefined) return;
             const HISTORY_MAX_ENTRIES = 6;
             let history = GM_getValue("StateFarm_GameHistory");
-            if (history) history = JSON.parse(history); //should be an ARRAY kxdnfgoisdhngfiosdhjgoisdhgfjo
-            if (!history) history = [];
+            if(history) history = JSON.parse(history); //should be an ARRAY kxdnfgoisdhngfiosdhjgoisdhgfjo
+            if(!history) history = [];
             const recent = history[0]; // first indeX
-            if (history.length > 0 && recent.code && recent.code == GAMECODE) {
-                ++recent.amount;
-                recent.time = Date.now();
-                recent.message = terminationMessage;
-                recent.closeCode = ERRORCODE;
+            if(history.length>0 && recent.code && recent.code == GAMECODE){
+              ++recent.amount;
+              recent.time = Date.now();
+              recent.message = terminationMessage;
+              recent.closeCode = ERRORCODE;
             } else {
-                const arrElem = {
-                    amount: 1,
-                    code: GAMECODE,
-                    string: getRoomAsString(),
-                    time: Date.now(),
-                    message: terminationMessage,
-                    closeCode: ERRORCODE
-                };
-                history.unshift(arrElem);
+              const arrElem = {
+                amount: 1,
+                code: GAMECODE,
+                string: getRoomAsString(),
+                time: Date.now(),
+                message: terminationMessage,
+                closeCode: ERRORCODE
+              };
+            history.unshift(arrElem);
             }
-            while (history.length > HISTORY_MAX_ENTRIES) history.pop();
+            while(history.length > HISTORY_MAX_ENTRIES) history.pop();
             GM_setValue("StateFarm_GameHistory", JSON.stringify(history));
         });
         createAnonFunction('modifyChat', function (msg) {
@@ -6062,65 +5985,65 @@ z-index: 999999;
             } else {
                 if (msg !== lastSentMessage) { //not spammed or afked
                     //NOTE: never, NEVER, never under any otherworldly circumstances use Notepad++ for editing nested stuff like this. IT WILL FUCK UP THE FORMATTING
-                    //ITS STILL FUCKED UP IN THE GH EDITOR WTF PLEASE END ME
-                    //TODO: FIX THIS FUCKING FORMATTING fuckfuckFUCK
-                    if (extract("chatFilterBypass")) msg = msg.replaceAll("fuck", "ꬵսсk"); //special case bc they check f.ck; this basically just gets the f from the nonexacts.
+			//ITS STILL FUCKED UP IN THE GH EDITOR WTF PLEASE END ME
+			//TODO: FIX THIS FUCKING FORMATTING fuckfuckFUCK
+                    if(extract("chatFilterBypass")) msg=msg.replaceAll("fuck", "ꬵսсk"); //special case bc they check f.ck; this basically just gets the f from the nonexacts.
                     if (extract("chatFilterBypass") && ss.isBadWord(msg)) { //apply filter bypass
                         //#freedomOfSpeech #againstInternetCensorship
                         //Bl*e W*zard D*gital will not c*nsor me!!!!!
-                        const exactLookAlikes = {
-                            //(almost) exact lookalikes, will make it look better if it is enough
-                            'a': 'а', 'c': 'с', 'e': 'е',
-                            'h': 'հ', 'i': 'і', 'j': 'ј',
-                            'n': '𝗇', 'o': 'о', 'p': 'р',
-                            'q': 'q', 'u': 'ս', 'w': 'ԝ',
-                            'y': 'у',
-                            //uppercase
-                            'B': 'В', 'D': 'ꓓ', 'E': 'Е',
-                            'H': 'Η', 'I': 'І', 'J': 'Ј',
-                            'U': '𐓎',
-                            'V': 'ⴸ', 'W': 'Ԝ', 'X': 'Χ', 'Y': 'Υ',
-                            'Z': 'Ζ',
-                        };
+    			        const exactLookAlikes = {
+	    		            //(almost) exact lookalikes, will make it look better if it is enough
+		    	            'a': 'а', 'c': 'с', 'e': 'е',
+			                'h': 'հ', 'i': 'і', 'j': 'ј',
+			                'n': '𝗇', 'o': 'о', 'p': 'р',
+    			            'q': 'q', 'u': 'ս',  'w': 'ԝ',
+	    		            'y': 'у',
+    		    	        //uppercase
+	    		            'B': 'В', 'D': 'ꓓ', 'E': 'Е',
+    	    		        'H': 'Η', 'I': 'І', 'J': 'Ј',
+	    	    	        'U': '𐓎',
+		    	            'V': 'ⴸ', 'W': 'Ԝ', 'X': 'Χ', 'Y': 'Υ',
+			                'Z': 'Ζ',
+    			        };
                         const lookAlikes = {
                             //nvm, found this complete list on reddit: https://www.reddit.com/r/Unicode/comments/gpgmb7/unique_unicode_chars_that_look_the_exact_same_as/
-                            //should literally cover 100% of the thing now, still keeping fallback though
-                            '0': 'O',
-                            '1': '𝟷', '2': '𝟸', '3': 'Ꝫ', '4': '４',
-                            '5': '𝟻', '6': '𝟨', '7': '𝟽', '8': '𝟪',
-                            '9': '𝟫', '@': '＠',
-                            'b': 'ᖯ',
-                            'd': '𝚍', 'f': 'ꬵ', 'g': '𝗀',
-                            'k': '𝚔',
-                            'l': 'ⅼ', 'm': 'ｍ', 'r': '𝗋', 's': '𐑈',
-                            't': '𝚝', 'v': '∨',
-                            'x': 'ⅹ', 'z': '𝗓', 'A': '𐊠',
-                            'C': '𐊢',
-                            'F': '𐊇', 'G': 'Ԍ', 'K': 'Κ', 'L': 'Ⅼ', 'M': 'Μ',
-                            'N': 'Ν', 'O': 'Ο', 'P': 'Ρ', 'Q': '𝖰',
-                            'R': '𖼵', 'S': 'Ѕ', 'T': 'Τ',
+				//should literally cover 100% of the thing now, still keeping fallback though
+                            		'0': 'O',
+		        	        '1': '𝟷', '2': '𝟸', '3': 'Ꝫ', '4': '４',
+			                '5': '𝟻', '6': '𝟨', '7': '𝟽', '8': '𝟪',
+    			            '9': '𝟫', '@': '＠',
+		    	        'b': 'ᖯ',
+        			        'd': '𝚍', 'f': 'ꬵ', 'g': '𝗀',
+	        		        'k': '𝚔',
+		        	        'l': 'ⅼ', 'm': 'ｍ', 'r': '𝗋', 's': '𐑈',
+			                't': '𝚝', 'v': '∨',
+    	    		        'x': 'ⅹ',  'z': '𝗓', 'A': '𐊠',
+	        		        'C': '𐊢',
+    		          	    'F': '𐊇', 'G': 'Ԍ', 'K': 'Κ', 'L': 'Ⅼ', 'M': 'Μ',
+	    	    	        'N': 'Ν', 'O': 'Ο', 'P': 'Ρ', 'Q': '𝖰',
+    	    	    	    'R': '𖼵', 'S': 'Ѕ', 'T': 'Τ',
                         };
                         let onlyReplace = msg;
-                        //exact
-                        for (let char in exactLookAlikes) {
+	    	            //exact
+		                for (let char in exactLookAlikes) {
                             //replace all chars with lookalikes
-                            onlyReplace = onlyReplace.replaceAll(char, exactLookAlikes[char]);
+		    	            onlyReplace = onlyReplace.replaceAll(char, exactLookAlikes[char]);
                         };
-                        //did that work?
-                        if (ss.isBadWord(onlyReplace)) {
-                            log("chatFilterBypass: exacts were not enough, trying full...");
-                            for (let char in lookAlikes) {
-                                onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]);
-                            };
-                        };
-                        if (!ss.isBadWord(onlyReplace)) {
-                            //did the lookalike replace do the job? Set it as the new message
-                            log("chatFilterBypass: lookalike replace worked!");
+    		            //did that work?
+	    	            if(ss.isBadWord(onlyReplace)){
+		    	            log("chatFilterBypass: exacts were not enough, trying full...");
+    		    	        for (let char in lookAlikes) {
+	    		                onlyReplace = onlyReplace.replaceAll(char, lookAlikes[char]);
+		    	            };
+    		            };
+                        if(!ss.isBadWord(onlyReplace)){
+                        //did the lookalike replace do the job? Set it as the new message
+		        	    log("chatFilterBypass: lookalike replace worked!");
                             msg = onlyReplace;
                         };
-                        if (ss.isBadWord(onlyReplace)) {
+                        if(ss.isBadWord(onlyReplace)){
                             //if lookalike replace did NOT work, we use the old method.
-                            log("chatFilterBypass: lookalike did NOT work, falling back to reverse...");
+		    	            log("chatFilterBypass: lookalike did NOT work, falling back to reverse...");
                             const UNICODE_RTL_OVERRIDE = '\u202e'
                             msg = ([UNICODE_RTL_OVERRIDE,].concat(reverseString(msg).split(""))).join("");
                         };
@@ -6208,37 +6131,37 @@ z-index: 999999;
 
             return extract('gameBlacklist') == false || extract('gameBlacklist') == undefined ? false : result;
         });
-        createAnonFunction("getParticleSpeedMultiplier", function () {
-            return extract("particleSpeedMultiplier");
-        });
+      createAnonFunction("getParticleSpeedMultiplier", function(){
+        return extract("particleSpeedMultiplier");
+      });
 
-        /*
-        const originalFunction = Function;
-  
-        unsafeWindow.Function = function (...args) {
-            log(args.join(""));
-            if (args.join('').includes('(()=>{var ')) {
-              unsafeWindow.Function = originalFunction;
-              unsafeWindow.Date.now = _dateNow;
-  
-              // this is the right script
-              return originalFunction(applyStateFarm(...args));
-            }
-            return originalFunction(...args);
-        };
-        */
+      /*
+      const originalFunction = Function;
+
+      unsafeWindow.Function = function (...args) {
+          log(args.join(""));
+          if (args.join('').includes('(()=>{var ')) {
+            unsafeWindow.Function = originalFunction;
+            unsafeWindow.Date.now = _dateNow;
+
+            // this is the right script
+            return originalFunction(applyStateFarm(...args));
+          }
+          return originalFunction(...args);
+      };
+      */
 
         let _apc = HTMLElement.prototype.appendChild;
         let shellshock_og = null;
 
-        HTMLElement.prototype.appendChild = function (node) {
+        HTMLElement.prototype.appendChild = function(node) {
             if (node.tagName === 'SCRIPT' && node.innerHTML && node.innerHTML.startsWith('(()=>{')) {
                 shellshock_og = node.innerHTML;
                 node.innerHTML = applyStateFarm(node.innerHTML);
             };
             return _apc.call(this, node);
         };
-
+        
         const proto = unsafeWindow.HTMLScriptElement.prototype;
         const existing = Object.getOwnPropertyDescriptor(proto, "textContent");
 
@@ -6310,8 +6233,8 @@ z-index: 999999;
             let match;
             let clientKeys;
 
-            window.originalJS = fetchTextContent('/js/shellshock.js');
-            if (crackedShell) window.originalJS = fetchTextContent('/js/shellshock.og.js');
+            let originalJS = fetchTextContent('/js/shellshock.js');
+            if (crackedShell) originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
                 hash = "latest";
@@ -6362,40 +6285,34 @@ z-index: 999999;
                     clientKeys = JSON.parse(cachedRecent);
                 } else {
                     const vardataButtonsInfo = [
-                        {
-                            id: 'loadLatest', enabled: !!onlineClientKeys, text: 'Load Latest\n(online) (RECOMMENDED)', isHighlighted: true, action: () => {
-                                change("vardataFallback", 1);
-                                if (extract("vardataType") == "never") change("vardataType", 1);
-                                if (extract("vardataType") == "justOnce") change("vardataType", 3);
-                                closeVardataPopup();
-                            }
-                        },
-                        {
-                            id: 'loadCached', enabled: true, text: 'Input Custom', isHighlighted: false, action: () => {
-                                const error = () => createPopup("Inputted VarData isn't valid.", "error");
+                        { id: 'loadLatest', enabled: !!onlineClientKeys, text: 'Load Latest\n(online) (RECOMMENDED)', isHighlighted: true, action: () => {
+                            change("vardataFallback", 1);
+                            if (extract("vardataType") == "never") change("vardataType", 1);
+                            if (extract("vardataType") == "justOnce") change("vardataType", 3);
+                            closeVardataPopup();
+                        }},
+                        { id: 'loadCached', enabled: true, text: 'Input Custom', isHighlighted: false, action: () => {
+                            const error = () => createPopup("Inputted VarData isn't valid.", "error");
 
-                                try {
-                                    let converted = JSON.parse(prompt('Enter vardata:'));
-                                    if (converted.vars && converted.checksum) {
-                                        change("vardataCustom", inputValue);
-                                        change("vardataFallback", 4);
-                                        change("vardataType", 1); //custom isnt consistent enough
-                                        closeVardataPopup();
-                                    } else {
-                                        error();
-                                    };
-                                } catch (e) {
+                            try {
+                                let converted = JSON.parse(prompt('Enter vardata:'));
+                                if (converted.vars && converted.checksum) {
+                                    change("vardataCustom", inputValue);
+                                    change("vardataFallback", 4);
+                                    change("vardataType", 1); //custom isnt consistent enough
+                                    closeVardataPopup();
+                                } else {
                                     error();
-                                }
+                                };
+                            } catch (e) {
+                                error();
                             }
-                        },
-                        {
-                            id: 'loadRecent', enabled: !!vardataCache.latest, text: 'Load Cached\n(most recent)', isHighlighted: false, action: () => {
-                                change("vardataFallback", 3);
-                                if (extract("vardataType") == "never") change("vardataType", 1);
-                                closeVardataPopup();
-                            }
-                        }
+                        }},
+                        { id: 'loadRecent', enabled: !!vardataCache.latest, text: 'Load Cached\n(most recent)', isHighlighted: false, action: () => {
+                            change("vardataFallback", 3);
+                            if (extract("vardataType") == "never") change("vardataType", 1);
+                            closeVardataPopup();
+                        }}
                     ];
 
                     createVarDataPopup(vardataButtonsInfo);
@@ -6539,8 +6456,8 @@ z-index: 999999;
                 // modifyJS(H.respawnTime+'=Math.max',H.respawnTime+'=Math.min');
 
                 //instant spectate
-                modifyJS(`\{${H.enterSpectatorModeBlocked}\|\|`, `\{(window["${functionNames.getInstantSpectateEnterSpectatorModeBlocked}"](${H.enterSpectatorModeBlocked}))\|\|`);
-                modifyJS(`\),${H.respawnTime}<0&&`, `\),(window["${functionNames.getInstantSpectateRespawnTime}"](${H.respawnTime}))&&`);
+                modifyJS(`\{${H.enterSpectatorModeBlocked}\|\|`,`\{(window["${functionNames.getInstantSpectateEnterSpectatorModeBlocked}"](${H.enterSpectatorModeBlocked}))\|\|`);
+                modifyJS(`\),${H.respawnTime}<0&&`,`\),(window["${functionNames.getInstantSpectateRespawnTime}"](${H.respawnTime}))&&`);
 
                 //Modifies matchmaker JS to block gamecodes.
                 match = js.match(/region,([a-zA-Z$_]+)\(([a-zA-Z$_]+)/); //im so sorry i thought i was slick
@@ -6560,7 +6477,7 @@ z-index: 999999;
                 //intercept signedIn function
                 modifyJS(`if(this.isAnonymous`, `window.${functionNames.interceptSignedIn}(arguments);if(this.isAnonymous`);
 
-                modifyJS(`="SPACE",`, `="SPACE",window.${functionNames.shouldInputSpace}()&&`)
+                modifyJS(`="SPACE",`,`="SPACE",window.${functionNames.shouldInputSpace}()&&`)
 
                 modifyJS(/tp-/g, '');
                 modifyJS(`window.location.href="https://free`, `let ballsack="https://free`);
@@ -6579,8 +6496,8 @@ z-index: 999999;
                 const splitted = match[0].split("{"); //split right bevor function opens to inject delta manipulator. Might not be the best way but it works fine.
                 const delta = splitted[0].charAt(splitted[0].length - 2); //name of the delta argument.
                 modifyJS(match[0], splitted[0] + "{" //add curly bracket because the split removed it. ehhhhhh
-                    + `${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
-                    + splitted[1]
+                  +`${delta}=${delta}*window.${functionNames.getParticleSpeedMultiplier}();` //get mutiplier value for delta.
+                  +splitted[1]
                 )
 
 
@@ -6681,7 +6598,7 @@ z-index: 999999;
             let leftOffset = ((i % 15) * 100);
             // let topOffset=((i%3)*100);
             let topOffset = 0;
-            let proxyURL = extract("proxyBots") == "static" ? window.location.host : proxyList[proxyListIndex];
+            let proxyURL = extract("proxyBots") == "static" ? window.location.host : proxyList[proxyListIndex] ;
             proxyListIndex = (proxyListIndex + 1) % proxyList.length;
             let params = "?AUTOMATED=true&StateFarm=";
             let name = botNames[i];
@@ -6701,7 +6618,7 @@ z-index: 999999;
             } else {
                 try {
                     if (canMassBot === undefined) {
-                        let data = await fetch(`https://${getScrambled().replace([0 - 9], '')}.${location.host}/$/ping`);
+                        let data = await fetch(`https://${getScrambled().replace([0-9], '')}.${location.host}/$/ping`);
                         data = await data.text();
                         if (data !== 'OK') {
                             alert('You are not on a version of CrackedShell that supports botting.');
@@ -6716,7 +6633,7 @@ z-index: 999999;
                 };
 
                 if (canMassBot === true)
-                    unsafeWindow.open(`https://${getScrambled().replace([0 - 9], '')}.${location.host}/${params}&cs=${new URLSearchParams(new URL(location.href).searchParams).get('cs')}`, '_blank', `width=${extract("botWindowWidth")}},height=${extract("botWindowHeight")},left=` + leftOffset + ',top=' + topOffset);
+                    unsafeWindow.open(`https://${getScrambled().replace([0-9], '')}.${location.host}/${params}&cs=${new URLSearchParams(new URL(location.href).searchParams).get('cs')}`, '_blank', `width=${extract("botWindowWidth")}},height=${extract("botWindowHeight")},left=` + leftOffset + ',top=' + topOffset);
             };
         };
     };
@@ -6776,7 +6693,7 @@ z-index: 999999;
         addParam("autoGamemode", extractAsDropdownInt("autoGamemodeBots"));
         addParam("useCustomName", extract("useCustomNameBots"));
         addParam("autoMacro", extract("useBotMacro"));
-        addParam("customMacro", extract("botMacro").replaceAll(">", "{greater}").replaceAll("<", "{less}"));
+        addParam("customMacro", extract("botMacro").replaceAll(">","{greater}").replaceAll("<","{less}"));
         addParam("leaveEmpty", extract("leaveEmptyBots"));
         addParam("autoLeave", extract("autoLeaveBots"));
         addParam("autoLeaveDelay", extract("autoLeaveDelayBots"));
@@ -6815,7 +6732,7 @@ z-index: 999999;
         if (reset) { initMenu(true); log("StateFarm: clearing before applying settings") };
         settings.forEach(element => {
             element = element.split(">");
-            if (element[0] == "customMacro") { element[1] = element[1].replaceAll("{less}", "<").replaceAll("{greater}", ">") };
+            if (element[0] == "customMacro") {element[1] = element[1].replaceAll("{less}","<").replaceAll("{greater}",">")};
             try {
                 change(element[0], JSON.parse(element[1]));
             } catch (error) {
@@ -7483,11 +7400,11 @@ z-index: 999999;
                     crosshairsPosition = new L.BABYLON.Vector3();
 
                     Object.defineProperty(ss.MYPLAYER.scene, 'forceWireframe', {
-                        configurable: false,
-                        get: () => {
-                            return extract("wireframe");
-                        },
-                        set: () => { }
+                         configurable: false,
+                         get: () => {
+                             return extract("wireframe");
+                         },
+                         set: () => {}
                     });
 
                     if (AUTOMATED) {
@@ -7634,19 +7551,19 @@ z-index: 999999;
                     const passedLists = whitelisted && (!blacklisted);
                     const tracersType = extract("tracersType");
 
-                    if (player.lookLineData && player.lookLineData.length === 6) {
+                   if (player.lookLineData && player.lookLineData.length === 6) {
                         // player.lookLineData
                         const x1 = player.lookLineData[0],
-                            y1 = player.lookLineData[1],
-                            z1 = player.lookLineData[2],
-                            x2 = player.lookLineData[3],
-                            y2 = player.lookLineData[4],
-                            z2 = player.lookLineData[5];
+                              y1 = player.lookLineData[1],
+                              z1 = player.lookLineData[2],
+                              x2 = player.lookLineData[3],
+                              y2 = player.lookLineData[4],
+                              z2 = player.lookLineData[5];
 
                         //  ss.MYPLAYER pos
                         const rx = ss.MYPLAYER[H.actor][H.mesh].position.x,
-                            ry = ss.MYPLAYER[H.actor][H.mesh].position.y,
-                            rz = ss.MYPLAYER[H.actor][H.mesh].position.z;
+                              ry = ss.MYPLAYER[H.actor][H.mesh].position.y,
+                              rz = ss.MYPLAYER[H.actor][H.mesh].position.z;
                         // not speed
                         const dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
                         // , also not spped
@@ -7663,18 +7580,18 @@ z-index: 999999;
 
                     //predEsp
                     if (extract("predictionESP")) { //important note here is that we only create/update the predESP if the module is toggled on. saves resources from predictPosition raycast
-                        if (!player.pred) { //do we need a new TN as parent?
-                            const pPTransformNode = new L.BABYLON.TransformNode("pPredTNode", player[H.actor].scene); //TN's are literally perfect for this wtf
-                            pPTransformNode.parent = player[H.actor][H.mesh]; //parent to the player's mesh. Not really needed, but good practise.
-                            player.pred = pPTransformNode; //why use object actually? All the info is stored right in the TN :)
-                        };
-                        if (player.pred && player.pred.getScene()) { //does pred exist and is on a valid scene? not really needed, as we literally
-                            //create the thing above if this is not the case, but eh. Better safe than sorry
-                            player.pred.setAbsolutePosition(predictPosition(player)); //transformNode is attached to mesh, so we need absolute pos here.
-                            updateOrCreateLinesESP(player.pred, "pPredESP", hexToRgb(getColor("predictionESPColor", "predictionESPColorRainbow"))); //I love names. pPredESP, pPTransformNode. Truly nice
-                            player.pred.exists = objExists; //make sure the lines don't get picked up by the ESPLines Garbage collector afterwards
-                            player.pred.tracerLines.visibility = false; //they just don't work for this.
-                        };
+                      if (!player.pred) { //do we need a new TN as parent?
+                        const pPTransformNode = new L.BABYLON.TransformNode("pPredTNode", player[H.actor].scene); //TN's are literally perfect for this wtf
+                        pPTransformNode.parent = player[H.actor][H.mesh]; //parent to the player's mesh. Not really needed, but good practise.
+                        player.pred = pPTransformNode; //why use object actually? All the info is stored right in the TN :)
+                      };
+                      if (player.pred && player.pred.getScene()) { //does pred exist and is on a valid scene? not really needed, as we literally
+                        //create the thing above if this is not the case, but eh. Better safe than sorry
+                        player.pred.setAbsolutePosition(predictPosition(player)); //transformNode is attached to mesh, so we need absolute pos here.
+                        updateOrCreateLinesESP(player.pred, "pPredESP", hexToRgb(getColor("predictionESPColor", "predictionESPColorRainbow"))); //I love names. pPredESP, pPTransformNode. Truly nice
+                        player.pred.exists = objExists; //make sure the lines don't get picked up by the ESPLines Garbage collector afterwards
+                        player.pred.tracerLines.visibility = false; //they just don't work for this.
+                      };
                     };
 
                     let color, progress;
@@ -7696,7 +7613,7 @@ z-index: 999999;
                     } else if (tracersType == "static") {
                         color = hexToRgb(getColor("tracersColor1", "tracersColor1Rainbow"));
                     } else if (tracersType == "visibility") {
-                        color = getLineOfSight(player) ? hexToRgb(getColor("tracersColor2", "tracersColor2Rainbow")) : hexToRgb(getColor("tracersColor1", "tracersColor1Rainbow"))
+                        color = getLineOfSight(player) ? hexToRgb(getColor("tracersColor2", "tracersColor2Rainbow")) : hexToRgb(getColor("tracersColor1", "tracersColor1Rainbow") )
                     };
                     updateOrCreateLinesESP(player, "playerESP", color);
 
@@ -7720,8 +7637,7 @@ z-index: 999999;
                 if (player) {
                     if (!ss.SETTINGS.safeNames) {
                     };
-                    if (extract("unfilterNames")) {
-                        player.name = (cachedRealData[player.uniqueId]?.name || player.name);
+                    if (extract("unfilterNames")) { player.name = (cachedRealData[player.uniqueId]?.name || player.name);
                     } else player.name = (player?.normalName || player.name);
                     if (extract("nametags") && player[H.actor] && player[H.actor].nameSprite) { //taken from shellshock.js, so var names are weird
                         player[H.actor].nameSprite._manager[H.renderingGroupId] = 1;
@@ -7747,7 +7663,7 @@ z-index: 999999;
                         };
                         onlinePlayersArray.push([player, player.name, player.team]);
 
-                        player[H.actor].setupNameSprite = (() => {
+                        player[H.actor].setupNameSprite = (()=>{
                             setupNameSpriteNew(player[H.actor])
                         });
                         player[H.actor].setupNameSprite();
@@ -7859,42 +7775,42 @@ z-index: 999999;
             };
             //trajectories
             if (trajectory) {
-                trajectory.dispose();
-                trajectory = null;
-            };
-            if (extract("trajectories") && ss.MYPLAYER[H.grenadeCount] >= 1 && ss.MYPLAYER[H.playing]) {
-                if (!trajectoryNade) {
-                    const clone = ss.cloneMesh('grenadeItem', ss.SCENE, null);
-                    if (clone) {
-                        clone.setEnabled(true);
-                        trajectoryNade = clone;
-                        trajectoryNade.renderOverlay = true;
-                        trajectoryNade[H.renderingGroupId] = 1;
-                        trajectoryNade.scaling.x = 2.5;
-                        trajectoryNade.scaling.y = 2.5;
-                        trajectoryNade.scaling.z = 2.5;
-                        trajectoryNade.color = new L.BABYLON.Color3(0.627, 0.125, 0.941); // https://3dwebgs.github.io/color4bbyln/
-                    };
-                };
+               trajectory.dispose();
+               trajectory = null;
+             };
+             if (extract("trajectories") && ss.MYPLAYER[H.grenadeCount] >= 1 && ss.MYPLAYER[H.playing]) {
+                 if (!trajectoryNade) {
+                     const clone = ss.cloneMesh('grenadeItem', ss.SCENE, null);
+                     if (clone) {
+                         clone.setEnabled(true);
+                         trajectoryNade = clone;
+                         trajectoryNade.renderOverlay = true;
+                         trajectoryNade[H.renderingGroupId] = 1;
+                         trajectoryNade.scaling.x = 2.5;
+                         trajectoryNade.scaling.y = 2.5;
+                         trajectoryNade.scaling.z = 2.5;
+                         trajectoryNade.color = new L.BABYLON.Color3(0.627, 0.125, 0.941); // https://3dwebgs.github.io/color4bbyln/
+                     };
+                 };
 
-                let power = 0;
+                 let power = 0;
 
-                if (extract("grenadeMax")) {
-                    power = extract("grenadePower");
-                } else if (document.getElementById("grenadeThrowContainer").style.visibility === "visible") {
-                    power = ss.grenadeThrowPower;
-                }
+                 if (extract("grenadeMax")) {
+                     power = extract("grenadePower");
+                 } else if (document.getElementById("grenadeThrowContainer").style.visibility === "visible") {
+                     power = ss.grenadeThrowPower;
+                 }
 
-                const result = newPredictGrenade(ss.MYPLAYER, power);
-                const lines = [result.positions.map(e => new L.BABYLON.Vector3(e.x, e.y, e.z))];
-                trajectory = L.BABYLON.MeshBuilder.CreateLineSystem("traject", { lines: lines }, ss.SCENE);
-                trajectory.color = new L.BABYLON.Color3(0.627, 0.125, 0.941); // https://3dwebgs.github.io/color4bbyln/
-                trajectory[H.renderingGroupId] = 1;
+                 const result = newPredictGrenade(ss.MYPLAYER, power);
+                 const lines = [result.positions.map(e => new L.BABYLON.Vector3(e.x, e.y, e.z))];
+                 trajectory = L.BABYLON.MeshBuilder.CreateLineSystem("traject", { lines: lines }, ss.SCENE);
+                 trajectory.color = new L.BABYLON.Color3(0.627, 0.125, 0.941); // https://3dwebgs.github.io/color4bbyln/
+                 trajectory[H.renderingGroupId] = 1;
 
-                trajectoryNade.position = new L.BABYLON.Vector3(result.finalPos.x, result.finalPos.y, result.finalPos.z);
-            } else if (trajectoryNade) {
-                trajectoryNade.dispose();
-                trajectoryNade = null;
+                 trajectoryNade.position = new L.BABYLON.Vector3(result.finalPos.x, result.finalPos.y, result.finalPos.z);
+             } else if (trajectoryNade) {
+                 trajectoryNade.dispose();
+                 trajectoryNade = null;
             };
             // log("done updating lines")
             //garbage collection
@@ -8002,7 +7918,7 @@ z-index: 999999;
                 account = await (await fetch(factoryURL + extract('factoryKey'), {
                     method: 'POST'
                 })).json();
-            } catch { };
+            } catch {};
 
             if (!account) {
                 factory.write('Factory is currently offline.');
@@ -8146,7 +8062,7 @@ z-index: 999999;
                     */
                 };
 
-                let filter = typeof (extract("filter")) == 'number' ? extract("filter") : 2;
+                let filter = typeof(extract("filter")) == 'number' ? extract("filter") : 2;
                 if (ss.SCENE && ss.SCENE.appliedFilter !== filter) {
                     ss.SCENE.materials.forEach(material => {
                         material.alphaMode = filter;
@@ -8344,7 +8260,7 @@ z-index: 999999;
                                 };
                                 if (selectNewTarget) {
                                     candidates.push(player);
-                                    if (player.isVisible) { amountVisible += 1 };
+                                    if ( player.isVisible ) { amountVisible += 1 };
                                 };
                             };
                         };
@@ -8369,7 +8285,7 @@ z-index: 999999;
                             player.aimdistance
                         ))
                     );
-                    let visibleValue = ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team));
+                    let visibleValue =  ((!ss.MYPLAYER.team) || (player.team !== ss.MYPLAYER.team));
                     if (visibilityMode == "disabled") { //we dont care about that shit
                         //go ahead
                     } else if (amountVisible < 1) { //none of candidates are visible
@@ -8385,8 +8301,8 @@ z-index: 999999;
                             currentlyTargeting = player;
                         };
                     };
-                    if (extract("aimbotTargetMode") === "aimingAt") {
-                        currentlyTargeting = enemyAimNearest;
+                    if(extract("aimbotTargetMode") === "aimingAt"){
+                      currentlyTargeting = enemyAimNearest;
                     };
                 });
 
@@ -8548,11 +8464,11 @@ z-index: 999999;
         let count = GM_getValue("StateFarm_TampermonkeyWarnings") || 0;
         count++;
         if (count <= 3) {
-            let userConfirmed = confirm("StateFarm Client: Tampermonkey detected! StateFarm Client does not support this manager, use Violentmonkey instead. Press OK to be redirected to the Violentmonkey website. You can continue to use Tampermonkey, but expect unreliable results. For more information, visit our Discord server: " + discordURL);
+            let userConfirmed = confirm("StateFarm Client: Tampermonkey detected! StateFarm Client does not support this manager, use Violentmonkey instead. Press OK to be redirected to the Violentmonkey website. You can continue to use Tampermonkey, but expect unreliable results. For more information, visit our Discord server: "+discordURL);
             if (userConfirmed) {
                 GM_openInTab(violentmonkeyURL, { active: true });
             };
-            alert(`This alert will show three times in total. Please install Violentmonkey before reporting issues. ${3 - count} more warnings.`);
+            alert(`This alert will show three times in total. Please install Violentmonkey before reporting issues. ${3-count} more warnings.`);
         };
         GM_setValue("StateFarm_TampermonkeyWarnings", count); //continue counting for the lulz
     };
@@ -8560,7 +8476,7 @@ z-index: 999999;
     setTimeout(() => {
         if (unsafeWindow.location.pathname == "/" && !attemptedInjection) {
             log("Injection didn't work for whatever reason, let's try again.");
-            // reloadPage();
+            reloadPage();
         };
     }, 30000);
 })();
