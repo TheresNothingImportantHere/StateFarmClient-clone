@@ -1,7 +1,7 @@
 <!-- these are links, they'll autoupdate thru the readme -->
 
-<!-- __GSF_LINKS_START__ -->
-[discord]: https://discord.gg/xgJcFVGsqB
+<!-- __SFC_LINKS_START__ -->
+[discord]: https://discord.gg/EeEqrGtvjc
 [greasyfork]: https://greasyfork.org/scripts/482982
 [terms]: https://docs.google.com/document/d/18A226mG4kVyd-BoNSxXxoXOuhwtm9M3CFwTaFf0-sZU/edit?usp=sharing
 
@@ -9,8 +9,11 @@
 [raw]: https://github.com/Hydroflame522/StateFarmClient/raw/main/StateFarmClient.js
 [license]:  https://github.com/Hydroflame522/StateFarmClient/blob/main/LICENSE.md
 
+[site]: https://sfc.best
+[install]: https://sfc.best/install
+
 [liberty]: https://github.com/onlypuppy7/LibertyMutualShellShockers
-<!-- __GSF_LINKS_END__ -->
+<!-- __SFC_LINKS_END__ -->
 
 <div align='center'>﻿<img src='https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/sfc%20banner/shell%20logo%20(transparent%20for%20white%20backgrounds).png?raw=true' width='80%'></div>
 <h1 align='center'>StateFarm Client</h1>
@@ -18,10 +21,11 @@
 <br><br>
 
 <div align='center'>
-
+<!-- Greasyfork is ganked
 [![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)][greasyfork]
-[![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)][raw]
-[![Discord Members](https://shields.io/discord/1361474831639379988?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)][discord]
+[![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)][raw] -->
+ 
+[![Discord Members](https://shields.io/discord/1354077512719663164?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)][discord]
 
 </div>
 
@@ -40,7 +44,7 @@ StateFarm is the **BEST** utility mod for Shell Shockers (shellshock.io), includ
 </div>
 <br>
 
-The information below is accurate as of StateFarm version **3.4.1-pre147**. 
+The information below is accurate as of StateFarm version **3.4.3-pre43**. 
 <br><br>
 
 # [](#table-of-contents)Table of Contents:
@@ -81,23 +85,24 @@ The information below is accurate as of StateFarm version **3.4.1-pre147**.
    
 # [](#download-sources)Download Sources:
 - [GitHub][repo]<br>
-![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)
+<!-- Greasyfork is still cooked ![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)
 
 - [GreasyFork][greasyfork]<br>
-![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)
+![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)  -->
+
+- [Website][install]<br>
 
 <br>
 
 # [](#installation-tutorial)Installation Tutorial:
-> If Violent Monkey's Chrome Webstore version is outdated, you can access the latest version from <a href="https://github.com/violentmonkey/violentmonkey/releases">their GitHub repository</a>
+> If Violentmonkey's Chrome Webstore version is outdated, you can access the latest version from <a href="https://github.com/violentmonkey/violentmonkey/releases">their GitHub repository</a>
 
 Before you can install the client, there are a few things you must set up to be able to run userscripts.
 1. Install Violentmonkey from [https://violentmonkey.github.io/get-it/](https://violentmonkey.github.io/get-it/) or any other userscript manager. (**DO NOT** use Tampermonkey unless no other option available!)
-
-3. Open the Violentmonkey dashboard. 
-4. Visit the [GreasyFork][greasyfork] page & click `Install this script`.
+2. Open the Violentmonkey dashboard. 
+3. Visit the [Install][install] page & click `Install this script`.
     - Alternatively, use the raw version from [GitHub][raw].
-5. Visit [https://shellshock.io](https://shellshock.io/) (or another Shell Shockers link), & use StateFarm!
+4. Visit [https://shellshock.io](https://shellshock.io/) (or another Shell Shockers link), & use StateFarm!
 
 <br>
 
@@ -107,6 +112,7 @@ Before you can install the client, there are a few things you must set up to be 
 > Below is a few basic ways to start using StateFarm.
 
 - Press **H** to show/hide the panel. You can also drag it by clicking & dragging `StateFarm` at the top.
+- The ✅ or ❌ at the top next to the version indicates if you are on the latest version of the client or not. If you aren't, things will probably break.
 - Click on various categories/tabs (combat, render, chat, etc) to expand different areas of the client.
 - Press **K** to chat with other StateFarm users
 - Press **J** to show/hide the botting panel. This allows you to use bots. See more at [Botting](#botting).
@@ -123,7 +129,7 @@ Aimbot is one of the key features of StateFarm, it is the most powerful combat m
 	- If using a mouse, click the **V** key to enable & disable aimbot.
   
 ### ESP
-**ESP** or also known as `wall mods`, are mods that allow you to see players positions through walls.<br>
+**ESP** or also known as `wall mods`, are mods that allow you to see other players' positions through walls.<br>
 To configure ESP, open the `Render` tab.
 
 - To see eggs through walls with **boxes**, enable `PlayerESP`.
@@ -480,7 +486,7 @@ Various account management tools
 
  - **Hydroflame521** - for founding the project.
  - **onlypuppy7** - for leading development.
- - **porcupane**, **not_food** , **de_Neuublue**, **OakSwingZZZ**, **1ust** , **Seq** for code contributions & development.
+ - **hijinks**, **not_food** , **de_Neuublue**, **OakSwingZZZ**, **1ust**, **Seq** for code contributions & development.
  - **susdung**, **portending** - for updating and maintaining the readme.
  - **gus/yk0_0** - for some skyboxes used in StateFarm Client.
 <!-- **Zertalious** - old code in old versions. -->
