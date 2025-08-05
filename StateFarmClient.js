@@ -2,8 +2,8 @@
 // @name         Shell Shockers Aimbot & ESP: StateFarm Client V3 - Bloom, Chat, Botting, Unban & More, shellshock.io
 // @description  Shell Shockers Aimbot & ESP of the highest level. Best shellshock.io menu in 2025 with NO ADS! Many cheats such as Aimbot, PlayerESP, AmmoESP, Chams, Nametags, Join/Leave alerts, Chat Filter Bypass, AntiAFK, FOV Slider, Zooming, Player Stats, Auto Reload, Auto Unban and many more whilst having unsurpassed customisation options such as binding to any key, easily editable color scheme and themes - all on the fly!
 // @author       Hydroflame521, enbyte, notfood, 1ust, OakSwingZZZ, Seq and de_Neuublue
-// @namespace    https://github.com/Hydroflame522/StateFarmClient/
-// @supportURL   https://github.com/Hydroflame522/StateFarmClient/issues/
+// @namespace    https://gitlab.com/Hydroflame522/StateFarmClient/
+// @supportURL   https://gitlab.com/Hydroflame522/StateFarmClient/-/issues/
 // @license      GPL-3.0
 // @run-at       document-start
 
@@ -23,7 +23,7 @@
 // @grant        GM.setClipboard
 // @grant        GM.openInTab
 
-// @icon         https://raw.githubusercontent.com/Hydroflame522/StateFarmClient/main/icons/StateFarmClientLogo384px.png?v=1
+// @icon         https://sfc.best/raw/icons/StateFarmClientLogo384px.png
 
 // @require      https://cdn.jsdelivr.net/npm/tweakpane@3.1.10/dist/tweakpane.min.js
 
@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre41
+// @version      3.4.3-pre44
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -90,7 +90,7 @@
 // @match        *://*.shellshockers.club/*
 // @match        *://*.shellshockers.life/*
 // @match        *://*.shellshockers.site/*
-// @match	 *://*.shellshockers.today/*
+// @match	     *://*.shellshockers.today/*
 // @match        *://*.shellshockers.us/*
 // @match        *://*.shellshockers.website/*
 // @match        *://*.shellshockers.wiki/*
@@ -110,11 +110,9 @@
 // @match        *://*.yolk.quest/*
 // @match        *://*.yolk.today/*
 // @match        *://*.zygote.cafe/*
-// @match        *://*.getstate.farm/*
-// @match        *://localhost:5173/*
 // @antifeature  membership
-// @downloadURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.user.js
-// @updateURL https://update.greasyfork.org/scripts/482982/Shell%20Shockers%20Aimbot%20%20ESP%3A%20StateFarm%20Client%20V3%20-%20Bloom%2C%20Chat%2C%20Botting%2C%20Unban%20%20More%2C%20shellshockio.meta.js
+// @downloadURL  https://sfc.best/js/sf.user.js
+// @updateURL    https://sfc.best/js/sf.meta.js
 // ==/UserScript==
 
 //various debug fun things
@@ -142,74 +140,11 @@ if (__DEBUG__.preventConsoleBlock) {
   });
 };
 
-let _dateNow = unsafeWindow.Date.now;
-/*unsafeWindow.Date.now = () => {
-    try {
-        throw new Error("skibidi");
-    } catch (e) {
-        //console.log(e.stack);
-        if (e.stack.includes('imports.wbg.__wbg_now')) {
-            //return 1743774560481;
-        }
-        else return _dateNow();
-    }
-};*/
 
 let attemptedInjection = false;
 // log("StateFarm: running (before function)");
 
 (function () {
-    //onlypuppy7 leaving alert
-    /*
-    if (!GM_getValue("onlypuppy7Alert")) {
-        alert("Notice: onlypuppy7 is no longer maintaining this script. Please report any bugs to Hydroflame521 or 1ust. Thank you for your understanding.");
-        GM_setValue("onlypuppy7Alert", true);
-    };
-    */
-
-    if ((location.hostname.includes('getstate.farm') || location.hostname == 'localhost') && typeof unsafeWindow !== 'undefined') {
-        unsafeWindow.userscript = typeof GM_info !== 'undefined' ? GM_info : false;
-
-        const bannedKeys = ['LoginDB', 'AccountRecords', 'MostRecentEmail'];
-
-        if (typeof GM_listValues !== 'undefined' && typeof GM_getValue !== 'undefined') {
-            let keyArr = GM_listValues();
-            const allValues = {};
-            keyArr = keyArr.filter((key) => !bannedKeys.includes(key));
-            keyArr.forEach((key) => allValues[key] = GM_getValue(key));
-            unsafeWindow.gm = allValues;
-        };
-
-        if (typeof GM_setValue !== 'undefined') unsafeWindow.onmessage = (m) => {
-            if (m.data.source !== 'getstate.farm') return;
-
-            if (m.data.type == 'GM.setValue') GM_setValue(m.data.key, m.data.value);
-        };
-        return;
-    };
-
-    if (typeof isCrackedShell !== 'undefined') alert('CrackedShell v1 is no longer supported. Upgrade to v2.');
-
-    let crackedShell = typeof $WEBSOCKET !== 'undefined';
-
-    if (crackedShell) {
-        GM_getValue = (name) => {
-            try {
-                return JSON.parse(localStorage.getItem(name));
-            } catch {
-                return localStorage.getItem(name);
-            };
-        };
-        GM_setValue = (name, value) => {
-            if (typeof value === 'object') localStorage.setItem(name, JSON.stringify(value));
-            else localStorage.setItem(name, value);
-        };
-        GM_listValues = () => Object.keys(localStorage);
-        GM_deleteValue = (...a) => localStorage.removeItem(...a);
-        GM_openInTab = (link) => window.open(link, '_blank');
-        GM_setClipboard = (text, _, callback) => navigator.clipboard.writeText(text).then(() => callback());
-        unsafeWindow = window;
-    };
 
     const storageKey = "StateFarm_" + (unsafeWindow.document.location.host.replaceAll(".", "")) + "_";
     const log = function(...args) {
@@ -265,7 +200,7 @@ let attemptedInjection = false;
 
         let index = 0;
         // loop through all replacements
-        for (const { pattern, replacement } of replacements) {
+        /* for (const { pattern, replacement } of replacements) {
             // search and patch
             for (let i = 0; i < bytes.length - pattern.length; i++) {
                 if (pattern.every((b, j) => bytes[i + j] === b)) {
@@ -291,85 +226,145 @@ let attemptedInjection = false;
                 };
             };
             index++;
-        };
+        }; */
 
         const end = performance.now();
 
         log(`[sfc] Loop patching for ${replacements.length} patches took ${end - start}ms`);
-        
+
         const wbg = importObj.wbg;
 
-        function randomChars(len) {
-            let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            let result = "";
-            for (let i = 0; i < len; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
         let blockedCalls = ["sethref", "setInterval"];
-        let exceptions = ["SELF", "WINDOW", "GLOBAL_THIS", "GLOBAL", "is_undefined", "init_", "document", "createElement", "settextContent", "body", "appendChild", "get"];
+        let exceptions = ["SELF", "WINDOW", "GLOBAL_THIS", "GLOBAL", "is_undefined", "init_", "document", "createElement", "settextContent", "body", "instanceof_Window", "instanceof_HtmlCanvasElement", "nodeType", "_item_", "_textContent_", "_now_", "_closure_", "_string_", "_number_", "movementX", "movementY", "_new_", "addEventListener", "instanceof_HtmlElement", "_get_", "_set_"];
 
-        let _textContent_old = wbg[Object.keys(wbg).find(x => x.includes('_textContent'))]
+        // https://stackoverflow.com/questions/2712136/how-do-i-make-this-loop-all-children-recursively
+
+        function wipeNode(node, classNameToRemove) {
+            const clonedNode = node.cloneNode(true);
+
+            function removeElements(currentNode) {
+                if (!currentNode || !currentNode.children) {
+                    return;
+                };
+                const children = Array.from(currentNode.children);
+
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    const classList = Array.from(child.classList);
+                    if (classList.includes('tp-statefarm')
+                        || classList.includes('tp-dvfw')
+                        || classList.includes("MiniMap")
+                        || classList.includes("playerDot")
+                        || classList.some(c => c.startsWith("tp-"))) {
+                        currentNode.removeChild(child);
+                    } else {
+                        removeElements(child);
+                    };
+                };
+            };
+            removeElements(clonedNode);
+
+            return clonedNode;
+        };
+
+
+        function checkForStateFarmChildren(node) {
+            if (node.querySelectorAll) {
+                return node.querySelectorAll("[class^=\"tp-\"], .MiniMap, .playerDot").length > 0;
+            };
+            return true;
+        };
+
+        class FakeNodeList extends Array {
+            item(index) {
+                return this[index];
+            };
+        };
 
         let rewrites = { // nice try but you only publicly get to see the prod rewrites
-            /* '_textContent': function (arg0, arg1) { // _ is important to avoid hooking settextContent
-                let content = arg1.textContent;
-                if (!content.startsWith("(()=>{")) {
-                    let dummy = createStatefarmElement("p");
-                    dummy.textContent = "Shell Shockers " + randomChars(10); // nice try bwd, you got me for a little while here
-                    // console.log("replacing", arg1.textContent, "with", dummy.textContent);
-                    return _textContent_old(arg0, dummy);
-                } else {
-                    return _textContent_old(arg0, arg1); // let shellshock.js integrity check be redirected to document patch
-                }
-            } */
            'querySelector': function (item, wasm_str_offset, len) {
                 if (len == 1) { // '*'
-                    console.log("Hooked querySelector", item, wasm_str_offset, len);
+                    log("Hooked querySelector", item, wasm_str_offset, len);
                     let items = document.querySelectorAll("*:not(.tp-statefarm):not(.tp-statefarm *):not(.tp-statefarm > *):not(.tp-statefarm > * *)");
-                    console.log("Hooked length:", items.length);
-                    return items
-                }
-           }
-
-        }
+                    log("Hooked length:", items.length);
+                    return items;
+                };
+           },
+           'childNodes': function (item) {
+                // log("Hooked childNodes, arg:", item);
+                let nodes = item.childNodes;
+                let spoofedNodes = new FakeNodeList();
+                for (let child of nodes) {
+                    if (checkForStateFarmChildren(child)) { // holy speedup
+                        let fakeNode = wipeNode(child.cloneNode(true));
+                        spoofedNodes.push(fakeNode);
+                    } else {
+                        spoofedNodes.push(child.cloneNode(true));
+                    };
+                };
+                return spoofedNodes;
+            },
+            '_length_': function (item) {
+                if (item instanceof FakeNodeList) {
+                    return item.length;
+                } else {
+                    log("Hooked length, arg:", item);
+                    return item.length;
+                };
+            },
+            // 'addEventListener': function(item, stringStart, stringLen, listener) {
+            //     log("Hooked addEventListener", item, stringStart, stringLen, listener);
+            //     item.addEventListener('pointermove', (...args) => {
+            //         // log("Called pointermove listener with args:", args);
+            //         listener(...args);
+            //     });
+            // },
+            'appendChild': function (item, child) {
+                console.log(child.innerText);
+                item.appendChild(child);
+            },
+            'innerText': () => {},
+            '_has_': () => true,
+            'isTrusted': () => true,
+        };
 
         for (const key in wbg) {
-            if (blockedCalls.some(call => key.toLowerCase().includes(call.toLowerCase()))) {
+            if (blockedCalls.some(call => key.includes(call))) {
                 log(`${key}: Patching blank`);
                 wbg[key] = function (...args) {
                     console.warn(`Blocked call to ${key}`, args);
                 };
             };
-            // console.log(`wbg.${key}:`, wbg[key].toString()); 
+            // log(`wbg.${key}:`, wbg[key].toString());
             if (exceptions.some(exception => key.includes(exception))) {
-                console.log(`${key}: Skipping patch (raw: ${wbg[key].toString()})`);
+                log(`${key}: Skipping patch (raw: ${wbg[key].toString()})`);
                 continue;
             } else if (Object.keys(rewrites).some(rew => key.includes(rew))) {
-                console.log(`${key}: Custom patch`);
+                log(`${key}: Custom patch`);
                 wbg[key] = rewrites[Object.keys(rewrites).find(rew => key.includes(rew))];
             } else {
-                // console.log(`${key}: Default patch (print args)`)
-                /* wbg[key] = function () {
-                    console.log("Called", key);
-                    console.log("Args", arguments);
-                } */
-            }
+                log(`${key}: Default patch (print args)`)
+                wbg[key] = function () {
+                    log("Called", key);
+                    log("Args", arguments);
+                    console.warn(`Called unpatched ${key}! Something probably broke. Args:`, arguments, "\nNot allowing passthrough!");
+                    // return wbg[key].apply(this, arguments);
+                };
+            };
         };
 
         ss.WASMOBJECT = { response, importObj };
         window.WASMOBJECT = { response, importObj };
 
         // debugger;
-        console.log(`importObj wbg hooks:`, importObj.wbg);
+        log(`importObj wbg hooks:`, importObj.wbg);
 
         // instantiate patched WASM
         return WebAssembly.instantiate(bytes, importObj);
     };
 
     log("[sfc] WASM hook installed.");
+
 
     log("StateFarm: running (after function)");
     //script info
@@ -381,32 +376,62 @@ let attemptedInjection = false;
     const discordURL = "https://dsc.gg/sfnetwork";
     const discordName = "Farmer's Workers' Union";
     const greasyforkID = "482982";
-    const githubID = "Hydroflame522/StateFarmClient";
     const youtubeURL = "https://www.youtube.com/@StateFarmClientV3";
 
     const greasyforkURL = `https://greasyfork.org/en/scripts/${greasyforkID}`;
-    const downloadURL = `https://update.greasyfork.org/scripts/${greasyforkID}/user.js`;
-    const updateURL = `https://update.greasyfork.org/scripts/${greasyforkID}/meta.js`;
+    const downloadURL = GM_info ? GM_info.script.updateURL : greasyforkURL;
+    const updateURL = GM_info ? GM_info.script.updateURL : greasyforkURL;
     const scriptInfoURL = `https://greasyfork.org/scripts/${greasyforkID}.json`;
 
-    //all of this github stuff assumes youve cloned the repo
-    const githubURL = `https://github.com/${githubID}`;
-    const featuresGuideURL = `https://github.com/${githubID}/tree/main?tab=readme-ov-file#-features`;
-    const bottingGuideURL = `https://github.com/${githubID}/tree/main?tab=readme-ov-file#-botting`;
+    //all of this git stuff assumes youve cloned the repo
+    const gitID = "Hydroflame521/StateFarmClient";
+    const gitType = "gitlab"; // or "github"
 
-    const replacementLogoURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement.png`;
-    const replacementLogoHalloweenURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement-halloween.png`;
-    const replacementLogoChristmasURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement-christmas.png`;
-    const replacementLogoNewYearsURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/shell-logo-replacement-new-years.png`;
+    const baseURL = `https://${gitType}.com/${gitID}`;
+    const treeMain = gitType === "github"
+      ? "tree/main?tab=readme-ov-file"
+      : "-/tree/main";
 
-    const replacementFeedURL = `https://raw.githubusercontent.com/${githubID}/main/ingamefeeds/`;
-    const commitFeedURL = `https://api.github.com/repos/${githubID}/commits?path=StateFarmClient.js`;
-    const badgeListURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/ingamebadges/`;
-    const iconURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/icons/StateFarmClientLogo384px.png`;
-    const itsOverURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/its%20over/ItsOver4Smaller_.png`;
-    const eggShowURL = `https://cdn.jsdelivr.net/gh/${githubID}@main/assets/show/EggShowSmaller_.png`;
-    const sfxURL = `https://api.github.com/repos/${githubID}/contents/soundpacks/sfx`;
-    const skyboxListURL = `https://api.github.com/repos/${githubID}/contents/skyboxes/`;
+    // const rawBase = gitType === "github"
+    //   ? `https://raw.githubusercontent.com/${gitID}/main`
+    //   : `https://gitlab.com/${gitID}/-/raw/main`;
+    const rawBase = "https://sfc.best/raw/";
+
+    const cdnBase = gitType === "github"
+      ? `https://cdn.jsdelivr.net/gh/${gitID}@main`
+      : rawBase;
+
+    const apiTreeBase = gitType === "github"
+      ? `https://api.github.com/repos/${gitID}/contents`
+      : `https://gitlab.com/api/v4/projects/${encodeURIComponent(gitID)}/repository/tree`;
+
+    const commitFeedURL = gitType === "github"
+      ? `https://api.github.com/repos/${gitID}/commits?path=StateFarmClient.js`
+      : `https://gitlab.com/api/v4/projects/${encodeURIComponent(gitID)}/repository/commits?path=StateFarmClient.js&ref=main`;
+
+    //   log(commitFeedURL, "commit feed URL");
+
+    const featuresGuideURL = `${baseURL}/${treeMain}#-features`;
+    const bottingGuideURL = `${baseURL}/${treeMain}#-botting`;
+
+    const replacementLogoURL = `${cdnBase}/icons/shell-logo-replacement.png`;
+    const replacementLogoHalloweenURL = `${cdnBase}/icons/shell-logo-replacement-halloween.png`;
+    const replacementLogoChristmasURL = `${cdnBase}/icons/shell-logo-replacement-christmas.png`;
+    const replacementLogoNewYearsURL = `${cdnBase}/icons/shell-logo-replacement-new-years.png`;
+
+    const replacementFeedURL = `${rawBase}/ingamefeeds/`;
+    const badgeListURL = `${cdnBase}/ingamebadges/`;
+    const iconURL = `${cdnBase}/icons/StateFarmClientLogo384px.png`;
+    const itsOverURL = `${cdnBase}/assets/its%20over/ItsOver4Smaller_.png`;
+    const eggShowURL = `${cdnBase}/assets/show/EggShowSmaller_.png`;
+
+    const sfxURL = gitType === "github"
+      ? `${apiTreeBase}/soundpacks/sfx`
+      : `${apiTreeBase}?path=soundpacks/sfx&ref=main`;
+
+    const skyboxListURL = gitType === "github"
+      ? `${apiTreeBase}/skyboxes`
+      : `${apiTreeBase}?path=skyboxes&ref=main`;
 
     //misc: statefarm external services
     const factoryURL = 'https://factory.getstate.farm/api/account?key=';
@@ -503,13 +528,13 @@ let attemptedInjection = false;
 
                     fetch(commitFeedURL).then(response => {
                         if (response.ok) return response.json();
-                        else throw new Error('Failed to fetch commit history contents');
+                        else log('Failed to fetch commit history contents', response);
                     }).then(commitHistory => {
                         log("retrieved: commit history", commitHistory);
 
                         if (oldVersion !== version) {
                             commitHistoryContent += `
-                                <a href="${githubURL}" target="_blank" style="text-decoration: none;">
+                                <a href="${baseURL}" target="_blank" style="text-decoration: none;">
                                     <div class="updated-notice" style="background-color: #28a745; color: #fff; padding: 0.75em; text-align: center; font-weight: bold; margin-bottom: 0.15em; margin-top: 0.25em; border-radius: 10px; border: 2px solid #155724;">
                                         <p style="margin: 0; font-size: 0.95em;">🎉 StateFarm has been updated (v${version})! Check out the latest updates below.</p>
                                     </div>
@@ -528,9 +553,11 @@ let attemptedInjection = false;
                         };
 
                         commitHistory.forEach(commit => {
-                            const commitDate = new Date(commit.commit.author.date).toLocaleString();
-                            const authorProfileURL = `https://github.com/${commit.author.login}`; //replace with actual url if available
-                            const messageParts = commit.commit.message.split('\n\n', 2); //split by the first occurrence of '\n\n'
+                            const commitDate = new Date(commit?.commit?.author?.date || commit?.committed_date || 0).toLocaleString();
+                            const authorName = commit.author?.login || commit.author?.username || commit.author_name ;
+                            const authorProfileURL = `https://${gitType}/${authorName}`; //replace with actual url if available
+                            const authorAvatarURL = commit.author?.avatar_url || commit.author?.avatar || `${cdnBase}/icons/default-avatar.png`; //replace with actual avatar url if available
+                            const messageParts = (commit.commit?.message || commit?.message || "").split('\n\n', 2); //split by the first occurrence of '\n\n'
                             const title = messageParts[0]; //title part of the message
                             const description = messageParts[1] || ''; //description part of the message, defaults to empty string if not present
 
@@ -538,15 +565,15 @@ let attemptedInjection = false;
                             <div class="commit-item" style="padding: 0.2em 0.3em; background-color: #95e2fe; border-bottom: 2px solid #0B93BD;">
                                 <div style="display: flex; align-items: flex-start;">
                                     <a href="${authorProfileURL}" target="_blank" style="margin-right: 0.3em; display: flex; align-items: flex-start;">
-                                        <img src="${commit.author.avatar_url}" alt="${commit.author.login}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                        <img src="${authorAvatarURL}" alt="${authorName}" style="width: 24px; height: 24px; border-radius: 50%;">
                                     </a>
                                     <div style="display: flex; flex-direction: column; justify-content: flex-start;">
-                                        <a href="${commit.html_url}" target="_blank" style="color: #0E7697; text-decoration: none; font-size: 0.75em; font-weight: bold; line-height: 1.2;">
+                                        <a href="${commit?.html_url || commit?.web_url}" target="_blank" style="color: #0E7697; text-decoration: none; font-size: 0.75em; font-weight: bold; line-height: 1.2;">
                                             ${title}
                                         </a>
                                         ${description ? `<p style="color: #0B93BD; font-size: 0.65em; margin: 0; line-height: 1.2;">${description}</p>` : ''}
                                         <span style="color: white; font-size: 0.75em; font-weight: bold;">
-                                            by <a href="${authorProfileURL}" target="_blank" style="color: #0E7697; text-decoration: none; font-size: 0.75em;">${commit.author.login}</a> on ${commitDate}
+                                            by <a href="${authorProfileURL}" target="_blank" style="color: #0E7697; text-decoration: none; font-size: 0.75em;">${authorName}</a> on ${commitDate}
                                         </span>
                                     </div>
                                 </div>
@@ -578,7 +605,7 @@ let attemptedInjection = false;
 
                     var data = await response.json();
                     data.forEach((file) => {
-                        retrievedSFX.push({ text: file.name.replace(".zip", ""), value: btoa(file.download_url) });
+                        retrievedSFX.push({ text: file.name.replace(".zip", ""), value: btoa(file.download_url ? file.download_url : `${rawBase}/${file.path}`) });
                     });
                     //1ust i hated your implementation and this is me showing that i reached my breaking point.
                     var response = await fetch(skyboxListURL); //when the nice guy loses his temper
@@ -586,8 +613,8 @@ let attemptedInjection = false;
 
                     var data = await response.json();
                     data.forEach((folder) => {
-                        if (folder.type === "dir") {
-                            let url = folder.url;
+                        if (folder.type === "dir" || folder.mode === "040000" || folder.type === "tree") {
+                            let url = folder.url || `${rawBase}/${folder.path}`; //fallback to api tree base if url is not provided
                             //make it into a download url
                             url = url.replace("//api.github.com/repos/", "//raw.githubusercontent.com/");
                             url = url.replace("/contents/", "/master/");
@@ -2003,12 +2030,6 @@ debug mode).`},
                     alert(`Results:\nAccounts Total: ${accountCount}; With Items: ${accountWithItemsCount}\nItem Count: ${itemCountTotal}\nOther info has been pasted into console.`);
                 } });
             tp.accountsTab.pages[0].addSeparator();
-            initFolder({ location: tp.accountsTab.pages[0], title: "Account Generator (Factory)", storeAs: "factoryFolder", });
-                initModule({ location: tp.factoryFolder, title: 'Factory Key', storeAs: 'factoryKey', tooltip: "Factory access token (for the lucky few)", defaultValue: "" });
-                initModule({ location: tp.factoryFolder, title: 'Factory Gen', storeAs: 'factoryGen', tooltip: "Get an account from the Factory database", button: 'Generate!', clickFunction: () => F.runFactory(), bindLocation: tp.accountsTab.pages[1] });
-            tp.accountsTab.pages[0].addSeparator();
-            initModule({ location: tp.accountsTab.pages[0], title: 'Email Verified Gen', storeAs: 'kilnGen', tooltip: 'Instantly generates an email-verified account to chat with using the Kiln project', button: 'Generate!', clickFunction: () => F.runKiln(), bindLocation: tp.accountsTab.pages[1] })
-            tp.accountsTab.pages[0].addSeparator();
         //MISC MODULES
         initFolder({ location: tp.mainPanel, title: "Misc", storeAs: "miscFolder", });
         initTabs({ location: tp.miscFolder, storeAs: "miscTab" }, [
@@ -2286,7 +2307,7 @@ debug mode).`},
             tp.clientTab.pages[0].addSeparator();
             initFolder({ location: tp.clientTab.pages[0], title: "Creator's Links", storeAs: "linksFolder",});
                 initModule({ location: tp.linksFolder, title: "Discord", storeAs: "discord", tooltip: "The official StateFarm Client Discord server", button: "Link", clickFunction: () => GM_openInTab(discordURL, { active: true }) });
-                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "The official StateFarm Client GitHub Repository! Check out the devs suffering here", button: "Link", clickFunction: () => GM_openInTab(githubURL, { active: true }) });
+                initModule({ location: tp.linksFolder, title: "GitHub", storeAs: "github", tooltip: "The official StateFarm Client GitHub Repository! Check out the devs suffering here", button: "Link", clickFunction: () => GM_openInTab(baseURL, { active: true }) });
             tp.clientTab.pages[0].addSeparator();
             initModule({ location: tp.clientTab.pages[0], title: "Reset", storeAs: "clear", tooltip: "Powerwashes StateFarm completely", button: "DELETE", clickFunction: function(){
                 const userConfirmed=confirm("Are you sure you want to continue? This will clear all stored module states and keybinds.");
@@ -3907,22 +3928,6 @@ z-index: 999999;
     const randomInt = function (min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
-    const radianAngleDiff = function (angle1, angle2) {
-        const fullCircle = 2 * Math.PI;
-        // Normalize angles to be within [0, 2π)
-        angle1 = (angle1 % fullCircle + fullCircle) % fullCircle;
-        angle2 = (angle2 % fullCircle + fullCircle) % fullCircle;
-        // Find the absolute angular difference
-        let diff = Math.abs(angle1 - angle2);
-        // Ensure the difference is within [0, π)
-        diff = Math.min(diff, fullCircle - diff);
-        // Determine the sign of the difference correctly
-        if ((angle1 - angle2 + fullCircle) % fullCircle > Math.PI) {
-            return -diff;
-        } else {
-            return diff;
-        };
-    };
     clientID = (getScrambled() + "noID");
     const createAnonFunction = function (name, func) {
         const funcName = getScrambled();
@@ -4915,7 +4920,7 @@ z-index: 999999;
                     <br>
                     <br>
                     <a href="${discordURL}">Discord&emsp;</a>
-                    <a href="${githubURL}">Github&emsp;</a>
+                    <a href="${baseURL}">Gitlab&emsp;</a>
                     <a href="${greasyforkURL}">Greasyfork&emsp;</a>
                     <a href="${youtubeURL}">YouTube</a>
                     <br>
@@ -5541,6 +5546,123 @@ z-index: 999999;
     };
     */
 
+    const yawpitch = {
+        magicValue: 0.0025, // multiplier for mouse movement
+        listener: null,
+        movementsToApply: {
+            x: 0,
+            y: 0,
+            reset: () => {
+                yawpitch.movementsToApply.x = 0;
+                yawpitch.movementsToApply.y = 0;
+            },
+        },
+        listenerHook: (event, originalListener) => {
+            originalListener.call(this, event);
+        },
+        // fakeMovePointer: (force = false) => {
+        //     if (!force && !(yawpitch.movementsToApply.x || yawpitch.movementsToApply.y)) {
+        //         return;
+        //     };
+        //     const event = new PointerEvent('pointermove');
+        //     yawpitch.listenerHook(event, yawpitch.listener);
+        // },
+        movePointer: (movementX = 0, movementY = 0) => {
+            yawpitch.setMouseParams();
+
+            yawpitch.listener({ //direct call will bypass the hook
+                movementX: Math.round(movementX),
+                movementY: Math.round(movementY),
+                x: 1,
+                isTrusted: true,
+            });
+
+            // yawpitch.getAndSetYawPitch();
+        },
+        getAndSetYawPitch: (viaWasm = true) => {
+            if (viaWasm) {
+                const result = unsafeWindow.get_yaw_pitch();
+                ss.MYPLAYER[H.yaw] = result.yaw;
+                ss.MYPLAYER[H.pitch] = result.pitch;
+                ss.MYPLAYER[H.coords] = result.coords;
+                return result;
+            } else {
+                return {
+                    yaw: ss.MYPLAYER[H.yaw],
+                    pitch: ss.MYPLAYER[H.pitch],
+                    coords: ss.MYPLAYER[H.coords]
+                };
+            };
+        },
+        setMouseParams: (mouseSpeed = 50, mouseInvert = 0, scopeFov = 0.9, scope = false, uniqueId = ss.MYPLAYER[H.uniqueId]) => {
+            unsafeWindow.set_mouse_params(
+                mouseSpeed,
+                mouseInvert,
+                scopeFov, //ss.MYPLAYER[H.weapon][H.actor].scopeFov
+                scope, //ss.MYPLAYER.scope
+                uniqueId
+            );
+        },
+        changeByMovement: (x = 0, y = 0) => {
+            // yawpitch.setMouseParams();
+
+            log("Changing yaw and pitch by movement:", x, y);
+
+            let mouseSpeed = ss.SETTINGS.mouseSpeed ? Number(ss.SETTINGS.mouseSpeed) : 50;
+            let mouseInvert = ss.SETTINGS.mouseInvert ? Number(ss.SETTINGS.mouseInvert) : 0;
+
+            let effectiveMouseSpeed = (mouseSpeed * mouseInvert) / 50;
+
+            yawpitch.movePointer(
+                x * effectiveMouseSpeed,
+                y * effectiveMouseSpeed,
+            );
+
+        },
+        changeByYawPitchDiff: (yaw = 0, pitch = 0) => {
+            yawpitch.changeByMovement(
+                yaw   / yawpitch.magicValue,
+                pitch / yawpitch.magicValue
+            );
+        },
+        radianAngleDiff: (angle1 = 0, angle2 = 0) => {
+            const fullCircle = 2 * Math.PI;
+            // Normalize angles to be within [0, 2π]
+            angle1 = (angle1 % fullCircle + fullCircle) % fullCircle;
+            angle2 = (angle2 % fullCircle + fullCircle) % fullCircle;
+            // Find the absolute angular difference
+            let diff = Math.abs(angle1 - angle2);
+            // Ensure the difference is within [0, π)
+            diff = Math.min(diff, fullCircle - diff);
+            // Determine the sign of the difference correctly
+            if ((angle1 - angle2 + fullCircle) % fullCircle > Math.PI) {
+                return -diff;
+            } else {
+                return diff;
+            };
+        },
+        setToYawPitch: (yaw = 0, pitch = 0) => {
+            const yawDiff = yawpitch.radianAngleDiff(ss.MYPLAYER[H.yaw], yaw);
+            const pitchDiff = yawpitch.radianAngleDiff(ss.MYPLAYER[H.pitch], pitch);
+
+            // log("Setting yaw and pitch:", yaw, pitch, "Diffs:", yawDiff, pitchDiff);
+
+            yawpitch.changeByYawPitchDiff(yawDiff, pitchDiff);
+        },
+        getCoordsForYawPitch: (yaw = 0, pitch = 0) => { //useful for silent
+            const starting = yawpitch.getAndSetYawPitch(false);
+            yawpitch.setToYawPitch(yaw, pitch);
+            const atDesired = yawpitch.getAndSetYawPitch(false);
+            yawpitch.setToYawPitch(starting.yaw, starting.pitch);
+
+            //for testing
+            // const ending = yawpitch.getAndSetYawPitch(false);
+            // console.log("Starting:", starting, "At desired:", atDesired, "Ending:", ending);
+
+            return atDesired;
+        },
+    };
+
     // [sfc] PREDICTION CODE
 
     const predictBloom = function (yaw, pitch, amountToGenerate = ss.MYPLAYER[H.weapon].constructor.standardMeshName !== "dozenGauge" ? 1 : 20) { //outputs the difference in yaw/pitch from the bloom
@@ -5564,8 +5686,8 @@ z-index: 999999;
             const finalBulletTranslation = finalBulletMatrix.getTranslation();
             const bulletYaw = calculateYaw(finalBulletTranslation);
             const bulletPitch = calculatePitch(finalBulletTranslation);
-            const bulletYawDiff = radianAngleDiff(yaw, bulletYaw)
-            const bulletPitchDiff = radianAngleDiff(pitch, bulletPitch);
+            const bulletYawDiff = yawpitch.radianAngleDiff(yaw, bulletYaw)
+            const bulletPitchDiff = yawpitch.radianAngleDiff(pitch, bulletPitch);
 
             //log("current accuracy: ",accuracy)
             //log("input yaw: ",yaw)
@@ -5655,7 +5777,7 @@ z-index: 999999;
         let distanceToTarget = L.BABYLON.Vector3.DistanceSquared(position, targetPosition)
         return distanceToTarget < distanceToMap
     };
-    const getAimbot = function (target) {
+    const getAimbot = function (target, viaWasm) { //returns the yaw and pitch to aim at the target, viaWasm to include coords
         let targetPosition = extract("prediction") ? predictPosition(target) : target[H.actor][H.mesh].position;
         let directionVector = getDirectionVectorFacingTarget(targetPosition, true, -0.05);
 
@@ -5668,7 +5790,13 @@ z-index: 999999;
             direction = applyBloom(direction, 1);
         };
 
-        return direction;
+        const wasmResult = viaWasm && yawpitch.getCoordsForYawPitch(direction.yawReal, direction.pitchReal);
+
+        return {
+            yaw: viaWasm ? wasmResult.yaw : direction.yawReal,
+            pitch: viaWasm ? wasmResult.pitch : direction.pitchReal,
+            coords: viaWasm ? wasmResult.coords : null,
+        };
     };
 
     const newPredictGrenade = (player = ss.MYPLAYER, grenadeThrowPower = 0) => {
@@ -5908,9 +6036,9 @@ z-index: 999999;
         });
         createAnonFunction('beforeFiring', function (MYPLAYER) {
             if (extract("aimbot") && (extract("aimbotRightClick") ? isRightButtonDown : true) && (targetingComplete || extract("silentAimbot")) && ss.MYPLAYER[H.playing] && currentlyTargeting && currentlyTargeting[H.playing]) {
-                const aimbot = getAimbot(currentlyTargeting);
+                const aimbot = getAimbot(currentlyTargeting, true);
                 // credit for code: de_neuublue
-                let diffYaw = Math.radDifference(ss.MYPLAYER[H.yaw], aimbot.yawReal) * 180 / Math.PI;
+                let diffYaw = Math.radDifference(ss.MYPLAYER[H.yaw], aimbot.yaw) * 180 / Math.PI;
                 let diffPositive = diffYaw > 0 // a turn to the left if positive
                 diffYaw *= diffPositive ? 1 : -1;
                 for (let i = 0; i < 3; i++) {
@@ -5960,14 +6088,17 @@ z-index: 999999;
                     };
                     // log(ss.CONTROLKEYS, newControlKeys);
                     state.controlKeys |= newControlKeys;
-                    state[H.yaw] = setPrecision(aimbot.yawReal);
-                    state[H.pitch] = setPrecision(aimbot.pitchReal);
+                    state[H.yaw] = setPrecision(aimbot.yaw);
+                    state[H.pitch] = setPrecision(aimbot.pitch);
+                    state[H.coords] = aimbot.coords;
                     ss.MYPLAYER[H.stateBuffer][Math.mod(ss.MYPLAYER.stateIdx - i, 256)] = state;
                 };
-                if(extract("aimbSemiSilent") && extract("silentAimbot")){
-                    ss.MYPLAYER[H.yaw] = getAimbot(currentlyTargeting).yawReal;
-                    ss.MYPLAYER[H.pitch] = getAimbot(currentlyTargeting).pitchReal;
-                }
+                if (extract("aimbSemiSilent") && extract("silentAimbot")) {
+                    const aimbot = getAimbot(currentlyTargeting, true);
+                    ss.MYPLAYER[H.yaw] = aimbot.yaw;
+                    ss.MYPLAYER[H.pitch] = aimbot.pitch;
+                    ss.MYPLAYER[H.coords] = aimbot.coords;
+                };
                 log("force update?");
                 ss.SERVERSYNC();
             };
@@ -6186,25 +6317,56 @@ z-index: 999999;
 
             return extract('gameBlacklist') == false || extract('gameBlacklist') == undefined ? false : result;
         });
-      createAnonFunction("getParticleSpeedMultiplier", function(){
-        return extract("particleSpeedMultiplier");
-      });
+        createAnonFunction("getParticleSpeedMultiplier", function(){
+            return extract("particleSpeedMultiplier");
+        });
 
-      /*
-      const originalFunction = Function;
+        const originalAddEventListener = EventTarget.prototype.addEventListener;
+        // const eventCache = [];
+        // unsafeWindow.__eventListenerCache = eventCache;
 
-      unsafeWindow.Function = function (...args) {
-          log(args.join(""));
-          if (args.join('').includes('(()=>{var ')) {
-            unsafeWindow.Function = originalFunction;
-            unsafeWindow.Date.now = _dateNow;
+        log("what the bball???");
 
-            // this is the right script
-            return originalFunction(applyStateFarm(...args));
-          }
-          return originalFunction(...args);
-      };
-      */
+        EventTarget.prototype.addEventListener = function (type, listener, options) {
+            try {
+                const target = this;
+                const tag = target.tagName || target.constructor.name;
+
+                // eventCache.push({ target: tag, type, listener, options });
+
+                // log(`Listener added: [${tag}] type=${type}, listener=${listener.name || 'anonymous'}, options=${JSON.stringify(options)}`);
+
+                if (type == "pointermove" && listener.name == "real") {
+                    yawpitch.listener = listener;
+                    log("Gotcha. REAL pointermove listener detected.");
+
+                    const originalListener = listener;
+                    listener = function(event) {
+                        yawpitch.listenerHook(event, originalListener);
+                    };
+                };
+            } catch (e) {
+                console.warn('Event hook error:', e);
+            };
+
+            return originalAddEventListener.call(this, type, listener, options);
+        };
+
+        /*
+        const originalFunction = Function;
+
+        unsafeWindow.Function = function (...args) {
+            log(args.join(""));
+            if (args.join('').includes('(()=>{var ')) {
+                unsafeWindow.Function = originalFunction;
+                unsafeWindow.Date.now = _dateNow;
+
+                // this is the right script
+                return originalFunction(applyStateFarm(...args));
+            }
+            return originalFunction(...args);
+        };
+        */
 
         let _apc = HTMLElement.prototype.appendChild;
         let shellshock_og = null;
@@ -6216,7 +6378,7 @@ z-index: 999999;
             };
             return _apc.call(this, node);
         };
-        
+
         const proto = unsafeWindow.HTMLScriptElement.prototype;
         const existing = Object.getOwnPropertyDescriptor(proto, "textContent");
 
@@ -6289,7 +6451,6 @@ z-index: 999999;
             let clientKeys;
 
             let originalJS = fetchTextContent('/js/shellshock.js');
-            if (crackedShell) originalJS = fetchTextContent('/js/shellshock.og.js');
 
             const getVardata = function (hash) {
                 hash = "latest";
@@ -7907,120 +8068,6 @@ z-index: 999999;
             };
         });
 
-        const getOverlay = (name) => {
-            document.body.insertAdjacentHTML('beforeend', `
-                <style>
-                    .factoryOverlay {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgba(0, 0, 0);
-                        z-index: 9999999;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                    }
-
-                    .factoryText {
-                        color: white;
-                        font-weight: bold;
-                        font-family: 'Nunito';
-                        font-size: 20px;
-                    }
-
-                    .factoryStatus {
-                        color: white;
-                        font-weight: bold;
-                        font-family: 'Nunito';
-                        font-size: 36px;
-                    }
-                </style>
-
-                <div class="factoryOverlay">
-                    <span class="factoryText">${name}</span>
-                    <span class="factoryStatus"></span>
-                </div>
-            `);
-
-            const factory = {
-                write: (p) => document.querySelector('.factoryStatus').innerHTML = p, // eslint-disable-line
-
-                remove: () => {
-                    let style = (s, t) => document.querySelector('.factoryOverlay').style[s] = t; // eslint-disable-line
-                    style('visibility', 'hidden');
-                    style('opacity', 0);
-                    style('transition', 'visibility 0s 1s, opacity 1s linear');
-                    setTimeout(() => document.querySelector('.factoryOverlay').remove(), 1001);
-                }
-            };
-
-            return factory;
-        }
-
-        createAnonFunction("runFactory", async () => {
-            const factory = getOverlay("Factory");
-
-            factory.write('Fetching Account...');
-
-            await firebase.auth().signOut();
-
-            let account;
-
-            try {
-                account = await (await fetch(factoryURL + extract('factoryKey'), {
-                    method: 'POST'
-                })).json();
-            } catch {};
-
-            if (!account) {
-                factory.write('Factory is currently offline.');
-                setTimeout(() => factory.remove(), 2000);
-                return;
-            } else if (!account.success) {
-                factory.write(account.error || 'Unknown error.');
-                setTimeout(() => factory.remove(), 2000);
-                return;
-            };
-
-            factory.write('Fetched Account! 🎉 Signing in....');
-
-            let signIn = async () => {
-                try {
-                    await unsafeWindow.firebase.auth().signInWithEmailAndPassword(account.email, account.password);
-                } catch {
-                    await signIn();
-                };
-            };
-
-            await signIn();
-
-            factory.write('Fully signed in! 🎉');
-            setTimeout(() => factory.remove(), 1000);
-        });
-
-        createAnonFunction("runKiln", async () => {
-            const factory = getOverlay("Kiln");
-
-            factory.write('Creating Account...');
-
-            await firebase.auth().signOut();
-            await firebase.auth().createUserWithEmailAndPassword(getScrambled() + '@getstate.farm', getScrambled());
-            await firebase.auth().currentUser.sendEmailVerification();
-
-            factory.write('Created Account! 🎉 Verifying....');
-
-            let i = setInterval(() => {
-                if (ss.USERDATA.playerAccount.isEmailVerified) clearInterval(i);
-                else globalSS.ss.apiAuth();
-            }, 1000);
-
-            factory.write('Signed in + email verified! 🎉');
-            setTimeout(() => factory.remove(), 1000);
-        });
-
         const applySkybox = () => {
             //check if we should switch
             const delta2 = Date.now() - lastRandomSkyBoxChangeTime;
@@ -8383,8 +8430,8 @@ z-index: 999999;
 
                             //new method: neuublue / https://github.com/AimTuxOfficial/AimTux/blob/master/src/Hacks/aimbot.cpp
 
-                            const yawDiff = Math.radDifference(aimbot.yawReal, ss.MYPLAYER[H.yaw]);
-                            const pitchDiff = Math.radDifference(aimbot.pitchReal, ss.MYPLAYER[H.pitch]);
+                            const yawDiff = Math.radDifference(aimbot.yaw, ss.MYPLAYER[H.yaw]);
+                            const pitchDiff = Math.radDifference(aimbot.pitch, ss.MYPLAYER[H.pitch]);
 
                             if (extract("aimbotAntiSnapRegime") != "slowEnd") { // not slow end
                                 antiSnap /= ((yawDiff ** 2 + pitchDiff ** 2) ** 0.5) * 4; // constant
@@ -8393,8 +8440,13 @@ z-index: 999999;
                                 antiSnap = Math.min(1, antiSnap);
                             };
 
-                            ss.MYPLAYER[H.yaw] = setPrecision(ss.MYPLAYER[H.yaw] + yawDiff * antiSnap);
-                            ss.MYPLAYER[H.pitch] = setPrecision(ss.MYPLAYER[H.pitch] + pitchDiff * antiSnap);
+                            yawpitch.setToYawPitch(
+                                ss.MYPLAYER[H.yaw] + yawDiff * antiSnap,
+                                ss.MYPLAYER[H.pitch] + pitchDiff * antiSnap
+                            );
+
+                            // ss.MYPLAYER[H.yaw] = setPrecision(ss.MYPLAYER[H.yaw] + yawDiff * antiSnap);
+                            // ss.MYPLAYER[H.pitch] = setPrecision(ss.MYPLAYER[H.pitch] + pitchDiff * antiSnap);
 
                             if (previousTarget !== currentlyTargeting) { targetingComplete = false };
 
@@ -8409,8 +8461,8 @@ z-index: 999999;
                                 return value;
                             };
 
-                            ss.MYPLAYER[H.yaw] = setPrecision(lerp(ss.MYPLAYER[H.yaw], aimbot.yawReal, antiSnap));
-                            ss.MYPLAYER[H.pitch] = setPrecision(lerp(ss.MYPLAYER[H.pitch], aimbot.pitchReal, antiSnap));
+                            ss.MYPLAYER[H.yaw] = setPrecision(lerp(ss.MYPLAYER[H.yaw], aimbot.yaw, antiSnap));
+                            ss.MYPLAYER[H.pitch] = setPrecision(lerp(ss.MYPLAYER[H.pitch], aimbot.pitch, antiSnap));
                             */
                         };
                         if (enemyMinimumDistance < extract("antiSneak")) {
