@@ -2,8 +2,8 @@
 // @name         Shell Shockers Aimbot & ESP: StateFarm Client V3 - Bloom, Chat, Botting, Unban & More, shellshock.io
 // @description  Shell Shockers Aimbot & ESP of the highest level. Best shellshock.io menu in 2025 with NO ADS! Many cheats such as Aimbot, PlayerESP, AmmoESP, Chams, Nametags, Join/Leave alerts, Chat Filter Bypass, AntiAFK, FOV Slider, Zooming, Player Stats, Auto Reload, Auto Unban and many more whilst having unsurpassed customisation options such as binding to any key, easily editable color scheme and themes - all on the fly!
 // @author       Hydroflame521, enbyte, notfood, 1ust, OakSwingZZZ, Seq and de_Neuublue
-// @namespace    https://gitlab.com/Hydroflame522/StateFarmClient/
-// @supportURL   https://gitlab.com/Hydroflame522/StateFarmClient/-/issues/
+// @namespace    https://github.com/Hydroflame522/StateFarmClient/
+// @supportURL   https://github.com/Hydroflame522/StateFarmClient/-/issues/
 // @license      GPL-3.0
 // @run-at       document-start
 
@@ -32,7 +32,7 @@
     //3.#.#-release for release (in the unlikely event that happens)
 // this ensures that each version of the script is counted as different
 
-// @version      3.4.3-pre44
+// @version      3.5.0
 
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
@@ -385,7 +385,7 @@ let attemptedInjection = false;
 
     //all of this git stuff assumes youve cloned the repo
     const gitID = "Hydroflame521/StateFarmClient";
-    const gitType = "gitlab"; // or "github"
+    const gitType = "github"; // or "github"
 
     const baseURL = `https://${gitType}.com/${gitID}`;
     const treeMain = gitType === "github"
@@ -4920,7 +4920,7 @@ z-index: 999999;
                     <br>
                     <br>
                     <a href="${discordURL}">Discord&emsp;</a>
-                    <a href="${baseURL}">Gitlab&emsp;</a>
+                    <a href="${baseURL}">Github&emsp;</a>
                     <a href="${greasyforkURL}">Greasyfork&emsp;</a>
                     <a href="${youtubeURL}">YouTube</a>
                     <br>
