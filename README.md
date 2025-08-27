@@ -1,7 +1,7 @@
 <!-- these are links, they'll autoupdate thru the readme -->
 
 <!-- __SFC_LINKS_START__ -->
-[discord]: https://discord.gg/EeEqrGtvjc
+[discord]: https://dsc.gg/sfnetwork
 [greasyfork]: https://greasyfork.org/scripts/482982
 [terms]: https://docs.google.com/document/d/18A226mG4kVyd-BoNSxXxoXOuhwtm9M3CFwTaFf0-sZU/edit?usp=sharing
 
@@ -15,6 +15,15 @@
 [liberty]: https://github.com/onlypuppy7/LibertyMutualShellShockers
 <!-- __SFC_LINKS_END__ -->
 
+### Important information regarding the current availability of StateFarm Client and it's Discord
+
+> [!TIP]
+> Make sure to bookmark our website, as it's our uncensored home for news and installs: [sfc.best][site]
+
+BWD is too pathetic to fix their own game so they send [false DMCAs to our projects](https://www.youtube.com/watch?v=QMmB72aEvlg). Resultantly, StateFarm Client is not currently available on GreasyFork. Please [install] on the website, which works exactly the way GreasyFork did, and will still autoupdate.
+
+Our [discord] also keeps being struck by false reports, so if you ever notice the server disappearing, just rejoin using this link, as we've probably made a new one already: https://sfc.best/discord or https://dsc.gg/sfnetwork (these are autoupdating links.
+
 <div align='center'>﻿<img src='https://github.com/Hydroflame522/StateFarmClient/blob/main/assets/sfc%20banner/shell%20logo%20(transparent%20for%20white%20backgrounds).png?raw=true' width='80%'></div>
 <h1 align='center'>StateFarm Client</h1>
 <h3 align='center'>for Shell Shockers</h3>
@@ -25,7 +34,7 @@
 [![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)][greasyfork]
 [![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)][raw] -->
  
-[![Discord Members](https://shields.io/discord/1354077512719663164?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)][discord]
+[![Discord Members](https://shields.io/discord/1395137772100129019?style=for-the-badge&label=discord&logo=discord&labelColor=black&color=5865F2)][discord]
 
 </div>
 
@@ -84,13 +93,13 @@ The information below is accurate as of StateFarm version **3.4.3-pre43**.
 <br>
    
 # [](#download-sources)Download Sources:
-- [GitHub][repo]<br>
 <!-- Greasyfork is still cooked ![Current Version](https://shields.io/greasyfork/v/482982?style=for-the-badge&label=version&labelColor=black&color=8507f2)
 
 - [GreasyFork][greasyfork]<br>
 ![Greasyfork Installs](https://shields.io/greasyfork/dt/482982?style=for-the-badge&labelColor=black&logo=greasyfork&color=e61005)  -->
 
 - [Website][install]<br>
+- [GitHub][repo]<br>
 
 <br>
 
