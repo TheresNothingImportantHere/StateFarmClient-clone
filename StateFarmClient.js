@@ -34,6 +34,8 @@
 
 // @version      3.5.0
 
+// @match        *://shell.onlypuppy7.online/*
+// @match        *://expert-happiness-69vg4q4jwj4qhxxj9-6900.app.github.dev/*
 // @match        *://*.shellshock.io/*
 // @match        *://*.algebra.best/*
 // @match        *://*.algebra.monster/*
